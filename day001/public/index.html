@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Palette Generator | Extract • Harmonize • Gradient</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #0a0a0a;
+      --bg-elevated: #141414;
+      --bg-card: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #f5f5f5;
+      --text-muted: #888;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    header h1 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    
+    .logo {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+      transition: opacity 0.2s ease;
+    }
+    
+    .logo:hover {
+      opacity: 1;
+    }
+    
+    .logo svg {
+      height: 28px;
+      width: auto;
+    }
+    
+    header p {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+    
+    /* Upload Area */
+    .upload-section {
+      margin-bottom: 2rem;
+    }
+    
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: var(--bg-elevated);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .upload-area:hover, .upload-area.dragover {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.05);
+    }
+    
+    .upload-area.has-image {
+      padding: 1rem;
+    }
+    
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.6;
+    }
+    
+    .upload-area h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .upload-area p {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    .upload-area input[type="file"] {
+      display: none;
+    }
+    
+    #preview-container {
+      display: none;
+      position: relative;
+      max-width: 100%;
+    }
+    
+    #preview-container.visible {
+      display: block;
+    }
+    
+    #preview-image {
+      max-width: 100%;
+      max-height: 400px;
+      border-radius: var(--radius-sm);
+      display: block;
+      margin: 0 auto;
+    }
+    
+    #color-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    #color-overlay.visible {
+      opacity: 1;
+    }
+    
+    .upload-placeholder {
+      transition: opacity 0.3s;
+    }
+    
+    .upload-area.has-image .upload-placeholder {
+      display: none;
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+    
+    .tab-btn {
+      padding: 0.75rem 1.25rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    
+    .tab-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    
+    .tab-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Palette Grid */
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .color-swatch {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid var(--border);
+    }
+    
+    .color-swatch:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    .color-swatch.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+    
+    .swatch-color {
+      height: 100px;
+      position: relative;
+    }
+    
+    .swatch-info {
+      padding: 0.75rem;
+    }
+    
+    .swatch-hex {
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .swatch-name {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .copy-indicator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    
+    .color-swatch.copied .copy-indicator {
+      opacity: 1;
+    }
+    
+    /* Export Section */
+    .export-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+    }
+    
+    .export-section h3 {
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .export-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .export-btn {
+      padding: 0.5rem 1rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .export-btn:hover {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.1);
+    }
+    
+    .export-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    
+    .export-preview {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      white-space: pre;
+      color: var(--text-muted);
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .copy-all-btn {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: white;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-weight: 500;
+    }
+    
+    .copy-all-btn:hover {
+      background: var(--accent-hover);
+    }
+    
+    /* Harmonies Section */
+    .harmonies-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .harmony-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+    }
+    
+    .harmony-card h4 {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .harmony-colors {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .harmony-color {
+      flex: 1;
+      height: 60px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: transform 0.2s;
+      position: relative;
+    }
+    
+    .harmony-color:hover {
+      transform: scale(1.05);
+    }
+    
+    .harmony-color::after {
+      content: attr(data-hex);
+      position: absolute;
+      bottom: -1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.65rem;
+      font-family: monospace;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    
+    /* Contrast Checker */
+    .contrast-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    
+    @media (max-width: 768px) {
+      .contrast-section {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .contrast-picker {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+    }
+    
+    .contrast-picker h4 {
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+      color: var(--text-muted);
+    }
+    
+    .contrast-color-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+    
+    .contrast-color-btn {
+      aspect-ratio: 1;
+      border-radius: var(--radius-sm);
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .contrast-color-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .contrast-color-btn.selected {
+      border-color: white;
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+    
+    .contrast-result {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+    }
+    
+    .contrast-preview {
+      padding: 2rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    
+    .contrast-preview h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .contrast-preview p {
+      font-size: 0.875rem;
+    }
+    
+    .contrast-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .contrast-stat {
+      text-align: center;
+      padding: 1rem;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+    }
+    
+    .contrast-ratio {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    
+    .contrast-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    
+    .wcag-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin: 0.125rem;
+    }
+    
+    .wcag-pass { background: var(--success); color: white; }
+    .wcag-fail { background: var(--danger); color: white; }
+    
+    /* Gradient Generator */
+    .gradient-section {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 1.5rem;
+    }
+    
+    @media (max-width: 900px) {
+      .gradient-section {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .gradient-preview-container {
+      position: relative;
+    }
+    
+    .gradient-preview {
+      aspect-ratio: 16/9;
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+      min-height: 300px;
+    }
+    
+    .gradient-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .gradient-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      mix-blend-mode: normal;
+      animation: float 20s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(10%, -10%) scale(1.1); }
+      50% { transform: translate(-5%, 15%) scale(0.95); }
+      75% { transform: translate(-15%, -5%) scale(1.05); }
+    }
+    
+    .gradient-controls {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+    }
+    
+    .gradient-controls h4 {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    
+    .control-group {
+      margin-bottom: 1.25rem;
+    }
+    
+    .control-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    
+    .control-group input[type="range"] {
+      width: 100%;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    
+    .control-group input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    
+    .bg-toggle {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .bg-toggle button {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    
+    .bg-toggle button.dark {
+      background: #0a0a0a;
+      color: white;
+    }
+    
+    .bg-toggle button.light {
+      background: #f5f5f5;
+      color: #0a0a0a;
+    }
+    
+    .bg-toggle button.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+    }
+    
+    .gradient-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .gradient-btn {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .gradient-btn:hover {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.1);
+    }
+    
+    .gradient-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    
+    .gradient-btn.primary:hover {
+      background: var(--accent-hover);
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+    }
+    
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 1rem;
+      opacity: 0.4;
+    }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .toast.visible {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
+    /* Loading */
+    .loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 10, 10, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    
+    .loading-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 600px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .tabs {
+        gap: 0.25rem;
+      }
+      
+      .tab-btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+      }
+      
+      .palette-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .harmonies-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="https://aikemist.com" class="logo" title="Alkemist">
+        <svg xmlns="http://www.w3.org/2000/svg" width="368" height="63" viewBox="0 0 368 63" fill="none"><path d="M31.1163 3.52958L56.896 58.0328V61.0699H0V58.0328L27.7501 3.52958H31.1163ZM17.1591 49.5783H40.1474L29.1458 26.1025L17.1591 49.5783ZM71.267 61.0699V0H81.7759V61.0699H71.267ZM135.884 61.0699H122.419L110.597 46.7053L108.216 49.1678V61.0699H96.7216V0H108.216V37.1016L118.725 25.692H132.764L118.396 40.467L135.884 61.0699ZM170.78 50.317L178.498 55.4882C175.131 59.5103 169.959 62.0549 164.294 62.0549C153.949 62.0549 145.493 53.6003 145.493 43.2578C145.493 32.8333 153.949 24.4608 164.294 24.4608C174.639 24.4608 183.095 32.8333 183.095 43.2578C183.095 44.407 183.013 45.4741 182.767 46.6233H156.33C156.823 47.9366 157.48 49.0858 158.383 50.0708C160.107 51.9587 162.324 52.9437 164.705 52.9437C166.921 52.9437 169.138 51.9587 170.78 50.317ZM156.166 40.3849H173.161C172.75 38.9074 172.012 37.512 170.944 36.3629C169.302 34.557 167.003 33.572 164.705 33.572C162.324 33.572 160.107 34.557 158.383 36.3629C157.398 37.512 156.659 38.9074 156.166 40.3849ZM207.072 25.692L208.632 28.4829C211.177 26.2666 214.461 24.707 217.581 24.707C222.671 24.707 227.105 27.4158 230.06 31.6841C232.934 27.4158 237.531 24.707 242.54 24.707C251.324 24.707 258.467 33.0795 258.467 43.5041V61.0699H249.272V43.5041C249.272 38.4149 246.07 33.9004 241.39 33.9004C236.793 33.9004 233.755 38.497 233.591 42.9295V61.0699H224.395V43.5041C224.395 38.4149 221.111 33.9004 216.514 33.9004C212.491 33.9004 209.946 37.0195 208.96 40.7133V61.0699H199.108V25.692H207.072ZM274.891 15.0212V3.52958H285.482V15.0212H274.891ZM274.891 61.0699V25.692H285.482V61.0699H274.891ZM298.868 55.6524L305.436 49.0037C310.608 54.9137 318.49 55.1599 318.49 50.7274C318.49 48.1008 315.945 47.2799 313.317 46.4591C306.421 44.3249 301.659 42.1908 301.659 35.3779C301.659 28.8933 307.488 24.625 314.221 24.625C320.296 24.625 323.58 25.9383 328.342 28.8112L323.58 36.2808C316.684 31.3558 312.004 31.7662 311.511 35.542C311.101 38.1687 314.959 38.6612 319.064 40.0566C324.073 41.5341 328.752 44.8995 328.752 50.9737C328.752 56.6374 322.923 62.0549 315.698 62.0549C309.294 62.0549 303.219 60.0028 298.868 55.6524ZM359.79 25.692H368V35.2958H359.79V61.0699H349.363V35.2958H341.974V25.692H349.363V12.5587H359.79V25.692Z" fill="white"/></svg>
+      </a>
+      <h1>Color Palette Generator</h1>
+      <p>Extract • Harmonize • Generate beautiful gradients</p>
+    </header>
+    
+    <section class="upload-section">
+      <div class="upload-area" id="upload-area">
+        <div class="upload-placeholder">
+          <div class="upload-icon">🎨</div>
+          <h3>Drop an image or click to upload</h3>
+          <p>PNG, JPG, WebP • Extract dominant colors instantly</p>
+        </div>
+        <div id="preview-container">
+          <img id="preview-image" alt="Uploaded preview">
+          <canvas id="color-overlay"></canvas>
+        </div>
+        <input type="file" id="file-input" accept="image/*">
+        <div class="loading-overlay" id="loading-overlay">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </section>
+    
+    <div id="main-content" style="display: none;">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="palette">🎨 Palette</button>
+        <button class="tab-btn" data-tab="harmonies">🔮 Harmonies</button>
+        <button class="tab-btn" data-tab="contrast">👁️ Contrast</button>
+        <button class="tab-btn" data-tab="gradient">✨ Gradient</button>
+        <button class="tab-btn" data-tab="export">📋 Export</button>
+      </div>
+      
+      <!-- Palette Tab -->
+      <div class="tab-content active" id="tab-palette">
+        <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.875rem;">
+          Click a swatch to copy hex • Click again to highlight in image
+        </p>
+        <div class="palette-grid" id="palette-grid"></div>
+      </div>
+      
+      <!-- Harmonies Tab -->
+      <div class="tab-content" id="tab-harmonies">
+        <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.875rem;">
+          Generated from your dominant color • Click any color to copy
+        </p>
+        <div class="harmonies-grid" id="harmonies-grid"></div>
+      </div>
+      
+      <!-- Contrast Tab -->
+      <div class="tab-content" id="tab-contrast">
+        <div class="contrast-section">
+          <div class="contrast-picker">
+            <h4>Foreground Color</h4>
+            <div class="contrast-color-grid" id="fg-colors"></div>
+          </div>
+          <div class="contrast-result" id="contrast-result">
+            <div class="contrast-preview" id="contrast-preview">
+              <h3>Sample Text</h3>
+              <p>The quick brown fox jumps over the lazy dog</p>
+            </div>
+            <div class="contrast-stats">
+              <div class="contrast-stat">
+                <div class="contrast-ratio" id="contrast-ratio">—</div>
+                <div class="contrast-label">Contrast Ratio</div>
+                <div id="wcag-normal"></div>
+              </div>
+              <div class="contrast-stat">
+                <div class="contrast-label" style="margin-bottom: 0.75rem;">WCAG Compliance</div>
+                <div id="wcag-large"></div>
+              </div>
+            </div>
+          </div>
+          <div class="contrast-picker">
+            <h4>Background Color</h4>
+            <div class="contrast-color-grid" id="bg-colors"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Gradient Tab -->
+      <div class="tab-content" id="tab-gradient">
+        <div class="gradient-section">
+          <div class="gradient-preview-container">
+            <div class="gradient-preview" id="gradient-preview">
+              <div class="gradient-canvas" id="gradient-canvas"></div>
+            </div>
+          </div>
+          <div class="gradient-controls">
+            <h4>Gradient Settings</h4>
+            <div class="bg-toggle">
+              <button class="dark active" id="bg-dark">Dark</button>
+              <button class="light" id="bg-light">Light</button>
+            </div>
+            <div class="control-group">
+              <label>Blur Intensity: <span id="blur-value">80</span>px</label>
+              <input type="range" id="blur-slider" min="40" max="150" value="80">
+            </div>
+            <div class="control-group">
+              <label>Blob Size: <span id="size-value">100</span>%</label>
+              <input type="range" id="size-slider" min="50" max="150" value="100">
+            </div>
+            <div class="control-group">
+              <label>Animation Speed: <span id="speed-value">1</span>x</label>
+              <input type="range" id="speed-slider" min="0.5" max="3" value="1" step="0.1">
+            </div>
+            <div class="control-group">
+              <label>Opacity: <span id="opacity-value">70</span>%</label>
+              <input type="range" id="opacity-slider" min="30" max="100" value="70">
+            </div>
+            <div class="gradient-actions">
+              <button class="gradient-btn" id="randomize-btn">🎲 Randomize Positions</button>
+              <button class="gradient-btn" id="toggle-animation-btn">⏸️ Pause Animation</button>
+              <button class="gradient-btn primary" id="copy-gradient-btn">📋 Copy CSS</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Export Tab -->
+      <div class="tab-content" id="tab-export">
+        <div class="export-section">
+          <h3>📦 Export Palette</h3>
+          <div class="export-buttons">
+            <button class="export-btn active" data-format="hex">Raw Hex</button>
+            <button class="export-btn" data-format="css">CSS Variables</button>
+            <button class="export-btn" data-format="tailwind">Tailwind Config</button>
+            <button class="export-btn" data-format="scss">SCSS Variables</button>
+          </div>
+          <pre class="export-preview" id="export-preview"></pre>
+          <button class="copy-all-btn" id="copy-export-btn">Copy to Clipboard</button>
+        </div>
+      </div>
+    </div>
+    
+    <div id="empty-state" class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+      </svg>
+      <h3>Upload an image to get started</h3>
+      <p>We'll extract the dominant colors and generate beautiful palettes</p>
+    </div>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+
+<script>
+// Color Name Database (subset of ntc.js for common colors)
+const colorNames = [
+  ["000000", "Black"],["000080", "Navy Blue"],["0000C8", "Dark Blue"],["0000FF", "Blue"],
+  ["000741", "Stratos"],["001B1C", "Swamp"],["002387", "Resolution Blue"],["002900", "Deep Fir"],
+  ["002E20", "Burnham"],["002FA7", "International Klein Blue"],["003153", "Prussian Blue"],
+  ["003366", "Midnight Blue"],["003399", "Smalt"],["003532", "Deep Teal"],["003E40", "Cyprus"],
+  ["004620", "Kaitoke Green"],["0047AB", "Cobalt"],["004816", "Crusoe"],["004950", "Sherpa Blue"],
+  ["0056A7", "Endeavour"],["00581A", "Camarone"],["0066CC", "Science Blue"],["0066FF", "Blue Ribbon"],
+  ["00755E", "Tropical Rain Forest"],["0076A3", "Allports"],["007BA7", "Deep Cerulean"],
+  ["007EC7", "Lochmara"],["007FFF", "Azure Radiance"],["008080", "Teal"],["0095B6", "Bondi Blue"],
+  ["009DC4", "Pacific Blue"],["00A693", "Persian Green"],["00A86B", "Jade"],["00CC99", "Caribbean Green"],
+  ["00CCCC", "Robin's Egg Blue"],["00FF00", "Green"],["00FF7F", "Spring Green"],["00FFFF", "Cyan"],
+  ["010D1A", "Blue Charcoal"],["011635", "Midnight"],["011D13", "Holly"],["012731", "Daintree"],
+  ["01361C", "Cardin Green"],["01371A", "County Green"],["013E62", "Astronaut Blue"],
+  ["013F6A", "Regal Blue"],["014B43", "Aqua Deep"],["015E85", "Orient"],["016162", "Blue Stone"],
+  ["016D39", "Fun Green"],["01796F", "Pine Green"],["017987", "Blue Lagoon"],
+  ["1C1208", "Karaka"],["1C1E13", "El Paso"],["1C39BB", "Persian Blue"],["1C8A2D", "Japanese Laurel"],
+  ["1D6142", "Green Pea"],["1E0F04", "Crowshead"],["1E1609", "Rangoon Green"],["1E1708", "Creole"],
+  ["1E385B", "Cello"],["1E433C", "Midnight Moss"],["1E90FF", "Dodger Blue"],["1E9AB0", "Eastern Blue"],
+  ["1F120F", "Night Rider"],["1FC2C2", "Java"],["20208D", "Jacksons Purple"],["202E54", "Cloud Burst"],
+  ["204852", "Blue Dianne"],["211A0E", "Eternity"],["220878", "Deep Blue"],["228B22", "Forest Green"],
+  ["233418", "Mallard"],["240A40", "Violet"],["242A1D", "Kilamanjaro"],["242E16", "Log Cabin"],
+  ["24500F", "Black Olive"],["251607", "Green House"],["251706", "Graphite"],["251F4F", "Tolopea"],
+  ["25272C", "Shark"],["25311C", "Green Kelp"],["2596D1", "Curious Blue"],["260368", "Paua"],
+  ["26056A", "Paris M"],["261105", "Wood Bark"],["261414", "Gondola"],["262335", "Steel Gray"],
+  ["26283B", "Ebony Clay"],["273A81", "Bay of Many"],["27504B", "Plantation"],["278A5B", "Eucalyptus"],
+  ["281E15", "Oil"],["283A77", "Astronaut"],["286ACD", "Mariner"],["290C5E", "Violent Violet"],
+  ["292130", "Bastille"],["292319", "Zeus"],["292937", "Charade"],["297B9A", "Jelly Bean"],
+  ["29AB87", "Jungle Green"],["2A0359", "Cherry Pie"],["2A140E", "Coffee Bean"],["2A2630", "Baltic Sea"],
+  ["2A380B", "Turtle Green"],["2A52BE", "Cerulean Blue"],["2B0202", "Sepia Black"],
+  ["2B194F", "Valhalla"],["2B3228", "Heavy Metal"],["2C0E8C", "Blue Gem"],["2C1632", "Revolver"],
+  ["2C2133", "Bleached Cedar"],["2C8C84", "Lochinvar"],["2D2510", "Mikado"],["2D383A", "Outer Space"],
+  ["2D569B", "St Tropaz"],["2E0329", "Jacaranda"],["2E1905", "Jacko Bean"],["2E3222", "Rangitoto"],
+  ["2E3F62", "Rhino"],["2E8B57", "Sea Green"],["2EBFD4", "Scooter"],["2F270E", "Onion"],
+  ["2F3CB3", "Governor Bay"],["2F519E", "Sapphire"],["2F5A57", "Spectra"],["2F6168", "Casal"],
+  ["300529", "Melanzane"],["301F1E", "Cocoa Brown"],["302A0F", "Woodrush"],["304B6A", "San Juan"],
+  ["30D5C8", "Turquoise"],["311C17", "Eclipse"],["314459", "Pickled Bluewood"],["315BA1", "Azure"],
+  ["FF0000", "Red"],["FF007F", "Rose"],["FF00FF", "Magenta"],["FF2400", "Scarlet"],
+  ["FF3399", "Wild Strawberry"],["FF33CC", "Razzle Dazzle Rose"],["FF355E", "Radical Red"],
+  ["FF3F34", "Red Orange"],["FF4040", "Coral Red"],["FF4500", "Orange Red"],["FF4D00", "Vermillion"],
+  ["FF6037", "Outrageous Orange"],["FF6347", "Tomato"],["FF6600", "Safety Orange"],["FF6666", "Bittersweet"],
+  ["FF6B53", "Persimmon"],["FF69B4", "Hot Pink"],["FF6FFF", "Ultra Pink"],["FF7518", "Pumpkin"],
+  ["FF7F00", "Orange"],["FF7F50", "Coral"],["FF8C00", "Dark Orange"],["FF91A4", "Salmon Pink"],
+  ["FF9933", "Deep Saffron"],["FF9966", "Atomic Tangerine"],["FF9999", "Light Salmon"],["FFA500", "Orange"],
+  ["FFA07A", "Light Salmon"],["FFA62F", "Golden Poppy"],["FFAB81", "Rajah"],["FFB5C5", "Light Pink"],
+  ["FFBA00", "Selective Yellow"],["FFBD88", "Macaroni And Cheese"],["FFC0CB", "Pink"],
+  ["FFD700", "Gold"],["FFD800", "School Bus Yellow"],["FFDAB9", "Peach"],["FFDB58", "Mustard"],
+  ["FFDDAF", "Caramel"],["FFDDCD", "Peach Schnapps"],["FFDDDD", "Pippin"],["FFDF00", "Golden Yellow"],
+  ["FFE135", "Banana Yellow"],["FFE4B5", "Moccasin"],["FFE4C4", "Bisque"],["FFE4E1", "Misty Rose"],
+  ["FFEBCD", "Blanched Almond"],["FFEFD5", "Papaya Whip"],["FFF0DB", "Antique White"],
+  ["FFF0F5", "Lavender Blush"],["FFF5EE", "Seashell"],["FFF8DC", "Cornsilk"],["FFFACD", "Lemon Chiffon"],
+  ["FFFAF0", "Floral White"],["FFFAFA", "Snow"],["FFFDD0", "Cream"],["FFFF00", "Yellow"],
+  ["FFFFF0", "Ivory"],["FFFFFF", "White"],["F5F5F5", "White Smoke"],["F5F5DC", "Beige"],
+  ["F5DEB3", "Wheat"],["F5FFFA", "Mint Cream"],["F0FFF0", "Honeydew"],["F0FFFF", "Azure"],
+  ["F0F8FF", "Alice Blue"],["F0E68C", "Khaki"],["F08080", "Light Coral"],["FAFAD2", "Light Goldenrod"],
+  ["FAF0E6", "Linen"],["FAEBD7", "Antique White"],["FA8072", "Salmon"],["EEE8AA", "Pale Goldenrod"],
+  ["EE82EE", "Violet"],["E9967A", "Dark Salmon"],["E6E6FA", "Lavender"],["E0FFFF", "Light Cyan"],
+  ["DCDCDC", "Gainsboro"],["DDA0DD", "Plum"],["DB7093", "Pale Violet Red"],["DAA520", "Goldenrod"],
+  ["DA70D6", "Orchid"],["D8BFD8", "Thistle"],["D3D3D3", "Light Gray"],["D2B48C", "Tan"],
+  ["D2691E", "Chocolate"],["CD853F", "Peru"],["CD5C5C", "Indian Red"],["C71585", "Medium Violet Red"],
+  ["C0C0C0", "Silver"],["BDB76B", "Dark Khaki"],["BC8F8F", "Rosy Brown"],["BA55D3", "Medium Orchid"],
+  ["B8860B", "Dark Goldenrod"],["B22222", "Firebrick"],["B0E0E6", "Powder Blue"],["B0C4DE", "Light Steel Blue"],
+  ["ADFF2F", "Green Yellow"],["ADD8E6", "Light Blue"],["A9A9A9", "Dark Gray"],["A52A2A", "Brown"],
+  ["A0522D", "Sienna"],["9932CC", "Dark Orchid"],["98FB98", "Pale Green"],["9400D3", "Dark Violet"],
+  ["9370DB", "Medium Purple"],["90EE90", "Light Green"],["8FBC8F", "Dark Sea Green"],
+  ["8B4513", "Saddle Brown"],["8B008B", "Dark Magenta"],["8B0000", "Dark Red"],["8A2BE2", "Blue Violet"],
+  ["87CEFA", "Light Sky Blue"],["87CEEB", "Sky Blue"],["808080", "Gray"],["808000", "Olive"],
+  ["800080", "Purple"],["800000", "Maroon"],["7FFFD4", "Aquamarine"],["7FFF00", "Chartreuse"],
+  ["7CFC00", "Lawn Green"],["7B68EE", "Medium Slate Blue"],["778899", "Light Slate Gray"],
+  ["708090", "Slate Gray"],["6B8E23", "Olive Drab"],["6A5ACD", "Slate Blue"],["696969", "Dim Gray"],
+  ["66CDAA", "Medium Aquamarine"],["6495ED", "Cornflower Blue"],["5F9EA0", "Cadet Blue"],
+  ["556B2F", "Dark Olive Green"],["4B0082", "Indigo"],["48D1CC", "Medium Turquoise"],
+  ["483D8B", "Dark Slate Blue"],["483C32", "Taupe"],["4682B4", "Steel Blue"],["4169E1", "Royal Blue"],
+  ["40E0D0", "Turquoise"],["3CB371", "Medium Sea Green"],["32CD32", "Lime Green"],["2F4F4F", "Dark Slate Gray"],
+  ["2E8B57", "Sea Green"],["228B22", "Forest Green"],["20B2AA", "Light Sea Green"],
+  ["191970", "Midnight Blue"],["1E90FF", "Dodger Blue"],["00CED1", "Dark Turquoise"],
+  ["00BFFF", "Deep Sky Blue"],["008B8B", "Dark Cyan"],["008000", "Green"],["006400", "Dark Green"],
+  ["0000CD", "Medium Blue"],["00008B", "Dark Blue"],["9ACD32", "Yellow Green"],
+  ["8E4585", "Plum"],["C9A0DC", "Wisteria"],["E0B0FF", "Mauve"],["DCD0FF", "Periwinkle"],
+  ["915C83", "Antique Fuchsia"],["6C3461", "Byzantium"],["AEC6CF", "Pastel Blue"],
+  ["77DD77", "Pastel Green"],["FFB347", "Pastel Orange"],["FF6961", "Pastel Red"],
+  ["CB99C9", "Pastel Violet"],["FDFD96", "Pastel Yellow"],["836953", "Pastel Brown"],
+  ["779ECB", "Dark Pastel Blue"],["03C03C", "Dark Pastel Green"],["966FD6", "Dark Pastel Purple"],
+  ["C23B22", "Dark Pastel Red"],["E68FAC", "Charm Pink"],["F19CBB", "Amaranth Pink"],
+  ["DE5D83", "Blush"],["FC8EAC", "Flamingo Pink"],["FF77FF", "Fuchsia Pink"],
+  ["FFB7C5", "Cherry Blossom Pink"],["FADADD", "Pale Pink"],["F4C2C2", "Baby Pink"],
+  ["DE3163", "Cerise"],["EC3B83", "Cerise Pink"],["DA3287", "Deep Cerise"],
+  ["915F6D", "Mauve Taupe"],["E0B0FF", "Mauve"],["E6E6FA", "Lavender"],["B57EDC", "Lavender"],
+  ["CCCCFF", "Periwinkle"],["C8A2C8", "Lilac"],["E0218A", "Barbie Pink"],["FF1493", "Deep Pink"],
+  ["FF69B4", "Hot Pink"],["FFB6C1", "Light Pink"],["FFC0CB", "Pink"],["FF91AF", "Baker Miller Pink"],
+  ["F77FBE", "Persian Pink"],["FC0FC0", "Shocking Pink"],["FF6FFF", "Ultra Pink"],
+  ["CC8899", "Puce"],["AA98A9", "Rose Quartz"],["E32636", "Alizarin Crimson"],
+  ["960018", "Carmine"],["DC143C", "Crimson"],["FF0038", "Carmine Red"],
+  ["E34234", "Vermilion"],["FF2400", "Scarlet"],["CC5500", "Burnt Orange"],
+  ["E25822", "Flame"],["FC6600", "Safety Orange"],["FF8C00", "Dark Orange"],
+  ["FFA000", "Orange"],["FFAE42", "Yellow Orange"],["FBEC5D", "Maize"],
+  ["FCF75E", "Icterine"],["FFEF00", "Canary Yellow"],["FADA5E", "Royal Yellow"],
+  ["F0DC82", "Buff"],["C2B280", "Sand"],["F4A460", "Sandy Brown"],["D2691E", "Chocolate"],
+  ["CD853F", "Peru"],["DEB887", "Burlywood"],["D2B48C", "Tan"],["C19A6B", "Camel"],
+  ["FFDEAD", "Navajo White"],["FFE4C4", "Bisque"],["987654", "Pale Brown"],
+  ["4A2C2A", "Liver"],["704214", "Sepia"],["483C32", "Taupe"],["5C4033", "Van Dyke Brown"],
+  ["321414", "Seal Brown"],["3D0C02", "Black Bean"],["3C1414", "Dark Sienna"],
+  ["80461B", "Russet"],["A52A2A", "Brown"],["993300", "Burnt Umber"],["6B4423", "Kobicha"],
+  ["CC7722", "Ochre"],["B5651D", "Light Brown"],["C04000", "Mahogany"],
+  ["7B3F00", "Chocolate"],["6F4E37", "Coffee"],["654321", "Dark Brown"],
+  ["5D3954", "Dark Byzantium"],["301934", "Dark Purple"],["4B0082", "Indigo"],
+  ["310062", "Persian Indigo"],["663399", "Rebecca Purple"],["7851A9", "Royal Purple"],
+  ["9966CC", "Amethyst"],["9678B6", "Purple Mountain Majesty"],["BF94E4", "Bright Lavender"],
+  ["7B68EE", "Medium Slate Blue"],["6A5ACD", "Slate Blue"],["483D8B", "Dark Slate Blue"],
+  ["E6E6FA", "Lavender"],["D8BFD8", "Thistle"],["DDA0DD", "Plum"],["EE82EE", "Violet"],
+  ["DA70D6", "Orchid"],["FF00FF", "Fuchsia"],["BA55D3", "Medium Orchid"],
+  ["9370DB", "Medium Purple"],["8A2BE2", "Blue Violet"],["9400D3", "Dark Violet"],
+  ["9932CC", "Dark Orchid"],["8B008B", "Dark Magenta"],["800080", "Purple"],
+  ["4B0082", "Indigo"],["6B3FA0", "Royal Purple"],["8E4585", "Plum"],
+  ["DF73FF", "Heliotrope"],["C71585", "Medium Violet Red"],["E0115F", "Ruby"],
+  ["E30022", "Cadmium Red"],["ED2939", "Imperial Red"],["CB410B", "Sinopia"],
+  ["B31B1B", "Carnelian"],["A40000", "Dark Candy Apple Red"],["8B0000", "Dark Red"],
+  ["722F37", "Wine"],["701C1C", "Persian Plum"],["5C0120", "Rosewood"],
+  ["560319", "Dark Scarlet"],["4C0121", "Bordeaux"],["3D0C02", "Black Bean"],
+  ["082567", "Sapphire"],["0F4D92", "Yale Blue"],["1560BD", "Denim"],
+  ["1E90FF", "Dodger Blue"],["2A52BE", "Cerulean Blue"],["318CE7", "Bleu De France"],
+  ["4169E1", "Royal Blue"],["4682B4", "Steel Blue"],["007BA7", "Cerulean"],
+  ["00BFFF", "Deep Sky Blue"],["007FFF", "Azure"],["6CB4EE", "Aero"],
+  ["73C2FB", "Maya Blue"],["87CEEB", "Sky Blue"],["87CEFA", "Light Sky Blue"],
+  ["89CFF0", "Baby Blue"],["ACE5EE", "Blizzard Blue"],["ADD8E6", "Light Blue"],
+  ["B0E0E6", "Powder Blue"],["AFDBF5", "Uranian Blue"],["A1CAF1", "Baby Blue Eyes"],
+  ["AEC6CF", "Pastel Blue"],["5D8AA8", "Air Force Blue"],["003366", "Dark Midnight Blue"],
+  ["002244", "Yankees Blue"],["00008B", "Dark Blue"],["0000CD", "Medium Blue"],
+  ["0000FF", "Blue"],["0047AB", "Cobalt Blue"],["00356B", "Oxford Blue"],
+  ["002147", "Oxford Blue"],["ACE1AF", "Celadon"],["ADDFAD", "Light Moss Green"],
+  ["BFFF00", "Lime"],["7FFF00", "Chartreuse"],["39FF14", "Neon Green"],
+  ["00FF00", "Electric Green"],["32CD32", "Lime Green"],["228B22", "Forest Green"],
+  ["008000", "Green"],["006400", "Dark Green"],["355E3B", "Hunter Green"],
+  ["004225", "British Racing Green"],["2E8B57", "Sea Green"],["3CB371", "Medium Sea Green"],
+  ["20B2AA", "Light Sea Green"],["00A86B", "Jade"],["50C878", "Emerald"],
+  ["4F7942", "Fern Green"],["8A9A5B", "Moss Green"],["6B8E23", "Olive Drab"],
+  ["556B2F", "Dark Olive Green"],["9DC183", "Olivine"],["808000", "Olive"],
+  ["00FF7F", "Spring Green"],["00FA9A", "Medium Spring Green"],["98FB98", "Pale Green"],
+  ["90EE90", "Light Green"],["8FBC8F", "Dark Sea Green"],["66CDAA", "Medium Aquamarine"],
+  ["7FFFD4", "Aquamarine"],["40E0D0", "Turquoise"],["48D1CC", "Medium Turquoise"],
+  ["00CED1", "Dark Turquoise"],["AFEEEE", "Pale Turquoise"],["E0FFFF", "Light Cyan"],
+  ["00FFFF", "Cyan"],["008B8B", "Dark Cyan"],["008080", "Teal"],["2F4F4F", "Dark Slate Gray"],
+  ["708090", "Slate Gray"],["778899", "Light Slate Gray"],["A9A9A9", "Dark Gray"],
+  ["808080", "Gray"],["696969", "Dim Gray"],["D3D3D3", "Light Gray"],["C0C0C0", "Silver"],
+  ["DCDCDC", "Gainsboro"],["F5F5F5", "White Smoke"],["FFFAFA", "Snow"],["FFFFF0", "Ivory"],
+  ["F5FFFA", "Mint Cream"],["F0FFFF", "Azure"],["F0F8FF", "Alice Blue"],["F8F8FF", "Ghost White"],
+  ["FFF8DC", "Cornsilk"],["FFFACD", "Lemon Chiffon"],["FAFAD2", "Light Goldenrod Yellow"],
+  ["FFFFE0", "Light Yellow"],["FFFF00", "Yellow"],["FFD700", "Gold"],["FFA500", "Orange"],
+  ["FF8C00", "Dark Orange"],["FF7F50", "Coral"],["FF6347", "Tomato"],["FF4500", "Orange Red"],
+];
+
+// Get color name from hex
+function getColorName(hex) {
+  hex = hex.replace('#', '').toUpperCase();
+  
+  // Exact match first
+  const exact = colorNames.find(c => c[0] === hex);
+  if (exact) return exact[1];
+  
+  // Find closest color
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  
+  let minDist = Infinity;
+  let closestName = 'Unknown';
+  
+  for (const [colorHex, name] of colorNames) {
+    const cr = parseInt(colorHex.substr(0, 2), 16);
+    const cg = parseInt(colorHex.substr(2, 2), 16);
+    const cb = parseInt(colorHex.substr(4, 2), 16);
+    
+    // Weighted distance (human perception)
+    const dist = Math.sqrt(
+      2 * Math.pow(r - cr, 2) +
+      4 * Math.pow(g - cg, 2) +
+      3 * Math.pow(b - cb, 2)
+    );
+    
+    if (dist < minDist) {
+      minDist = dist;
+      closestName = name;
+    }
+  }
+  
+  return closestName;
+}
+
+// App State
+const state = {
+  image: null,
+  imageData: null,
+  colors: [],
+  selectedColor: null,
+  contrastFg: null,
+  contrastBg: null,
+  exportFormat: 'hex',
+  gradientBg: 'dark',
+  gradientAnimating: true,
+  gradientBlur: 80,
+  gradientSize: 100,
+  gradientSpeed: 1,
+  gradientOpacity: 70,
+  blobPositions: []
+};
+
+// DOM Elements
+const uploadArea = document.getElementById('upload-area');
+const fileInput = document.getElementById('file-input');
+const previewContainer = document.getElementById('preview-container');
+const previewImage = document.getElementById('preview-image');
+const colorOverlay = document.getElementById('color-overlay');
+const loadingOverlay = document.getElementById('loading-overlay');
+const mainContent = document.getElementById('main-content');
+const emptyState = document.getElementById('empty-state');
+const paletteGrid = document.getElementById('palette-grid');
+const harmoniesGrid = document.getElementById('harmonies-grid');
+const toast = document.getElementById('toast');
+
+// Initialize
+document.addEventListener('DOMContentLoaded', init);
+
+function init() {
+  // Upload handlers
+  uploadArea.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', handleFileSelect);
+  uploadArea.addEventListener('dragover', handleDragOver);
+  uploadArea.addEventListener('dragleave', handleDragLeave);
+  uploadArea.addEventListener('drop', handleDrop);
+  
+  // Tab handlers
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+  
+  // Export format handlers
+  document.querySelectorAll('.export-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.export-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.exportFormat = btn.dataset.format;
+      updateExportPreview();
+    });
+  });
+  
+  // Export copy button
+  document.getElementById('copy-export-btn').addEventListener('click', copyExport);
+  
+  // Gradient controls
+  document.getElementById('bg-dark').addEventListener('click', () => setGradientBg('dark'));
+  document.getElementById('bg-light').addEventListener('click', () => setGradientBg('light'));
+  document.getElementById('blur-slider').addEventListener('input', updateGradientBlur);
+  document.getElementById('size-slider').addEventListener('input', updateGradientSize);
+  document.getElementById('speed-slider').addEventListener('input', updateGradientSpeed);
+  document.getElementById('opacity-slider').addEventListener('input', updateGradientOpacity);
+  document.getElementById('randomize-btn').addEventListener('click', randomizeGradient);
+  document.getElementById('toggle-animation-btn').addEventListener('click', toggleAnimation);
+  document.getElementById('copy-gradient-btn').addEventListener('click', copyGradientCSS);
+}
+
+// File Handling
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) processFile(file);
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  uploadArea.classList.add('dragover');
+}
+
+function handleDragLeave(e) {
+  e.preventDefault();
+  uploadArea.classList.remove('dragover');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  uploadArea.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    processFile(file);
+  }
+}
+
+function processFile(file) {
+  loadingOverlay.classList.add('visible');
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      state.image = img;
+      previewImage.src = e.target.result;
+      uploadArea.classList.add('has-image');
+      previewContainer.classList.add('visible');
+      
+      // Setup overlay canvas
+      colorOverlay.width = img.width;
+      colorOverlay.height = img.height;
+      
+      extractColors(img);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// Color Extraction using k-means clustering
+function extractColors(img) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  // Scale down for performance
+  const maxDim = 150;
+  const scale = Math.min(maxDim / img.width, maxDim / img.height, 1);
+  canvas.width = img.width * scale;
+  canvas.height = img.height * scale;
+  
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  state.imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  
+  const pixels = [];
+  const data = state.imageData.data;
+  
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    const a = data[i + 3];
+    
+    if (a > 128) { // Skip transparent pixels
+      pixels.push([r, g, b]);
+    }
+  }
+  
+  // K-means clustering
+  const k = 8;
+  const colors = kMeansColors(pixels, k);
+  
+  // Sort by luminance
+  colors.sort((a, b) => {
+    const lumA = 0.299 * a[0] + 0.587 * a[1] + 0.114 * a[2];
+    const lumB = 0.299 * b[0] + 0.587 * b[1] + 0.114 * b[2];
+    return lumB - lumA;
+  });
+  
+  state.colors = colors.map(c => rgbToHex(c[0], c[1], c[2]));
+  
+  loadingOverlay.classList.remove('visible');
+  mainContent.style.display = 'block';
+  emptyState.style.display = 'none';
+  
+  renderPalette();
+  renderHarmonies();
+  renderContrastPicker();
+  renderGradient();
+  updateExportPreview();
+}
+
+function kMeansColors(pixels, k) {
+  if (pixels.length === 0) return [];
+  
+  // Initialize centroids randomly from pixels
+  let centroids = [];
+  const used = new Set();
+  
+  while (centroids.length < k && centroids.length < pixels.length) {
+    const idx = Math.floor(Math.random() * pixels.length);
+    const key = pixels[idx].join(',');
+    if (!used.has(key)) {
+      used.add(key);
+      centroids.push([...pixels[idx]]);
+    }
+  }
+  
+  // Iterate
+  for (let iter = 0; iter < 10; iter++) {
+    // Assign pixels to nearest centroid
+    const clusters = Array(k).fill().map(() => []);
+    
+    for (const pixel of pixels) {
+      let minDist = Infinity;
+      let closest = 0;
+      
+      for (let i = 0; i < centroids.length; i++) {
+        const dist = colorDistance(pixel, centroids[i]);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = i;
+        }
+      }
+      
+      clusters[closest].push(pixel);
+    }
+    
+    // Update centroids
+    for (let i = 0; i < k; i++) {
+      if (clusters[i].length > 0) {
+        centroids[i] = [
+          Math.round(clusters[i].reduce((s, p) => s + p[0], 0) / clusters[i].length),
+          Math.round(clusters[i].reduce((s, p) => s + p[1], 0) / clusters[i].length),
+          Math.round(clusters[i].reduce((s, p) => s + p[2], 0) / clusters[i].length)
+        ];
+      }
+    }
+  }
+  
+  // Filter out very similar colors
+  const filtered = [];
+  for (const c of centroids) {
+    let unique = true;
+    for (const f of filtered) {
+      if (colorDistance(c, f) < 30) {
+        unique = false;
+        break;
+      }
+    }
+    if (unique) filtered.push(c);
+  }
+  
+  return filtered.slice(0, 8);
+}
+
+function colorDistance(c1, c2) {
+  return Math.sqrt(
+    Math.pow(c1[0] - c2[0], 2) +
+    Math.pow(c1[1] - c2[1], 2) +
+    Math.pow(c1[2] - c2[2], 2)
+  );
+}
+
+function rgbToHex(r, g, b) {
+  return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+// Render Functions
+function renderPalette() {
+  paletteGrid.innerHTML = state.colors.map((color, i) => `
+    <div class="color-swatch" data-color="${color}" data-index="${i}">
+      <div class="swatch-color" style="background: ${color}">
+        <div class="copy-indicator">Copied!</div>
+      </div>
+      <div class="swatch-info">
+        <div class="swatch-hex">${color.toUpperCase()}</div>
+        <div class="swatch-name">${getColorName(color)}</div>
+      </div>
+    </div>
+  `).join('');
+  
+  // Click handlers
+  paletteGrid.querySelectorAll('.color-swatch').forEach(swatch => {
+    swatch.addEventListener('click', () => handleSwatchClick(swatch));
+  });
+}
+
+function handleSwatchClick(swatch) {
+  const color = swatch.dataset.color;
+  
+  if (state.selectedColor === color) {
+    // Deselect
+    state.selectedColor = null;
+    swatch.classList.remove('selected');
+    hideColorOverlay();
+  } else {
+    // Select and copy
+    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+    swatch.classList.add('selected');
+    state.selectedColor = color;
+    
+    copyToClipboard(color);
+    swatch.classList.add('copied');
+    setTimeout(() => swatch.classList.remove('copied'), 1000);
+    
+    showColorOverlay(color);
+  }
+}
+
+function showColorOverlay(targetColor) {
+  if (!state.image) return;
+  
+  const ctx = colorOverlay.getContext('2d');
+  const img = state.image;
+  
+  // Draw image
+  colorOverlay.width = img.naturalWidth;
+  colorOverlay.height = img.naturalHeight;
+  ctx.drawImage(img, 0, 0);
+  
+  // Get image data
+  const imageData = ctx.getImageData(0, 0, colorOverlay.width, colorOverlay.height);
+  const data = imageData.data;
+  
+  const target = hexToRgb(targetColor);
+  const tolerance = 50;
+  
+  // Dim non-matching pixels
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    
+    const dist = Math.sqrt(
+      Math.pow(r - target.r, 2) +
+      Math.pow(g - target.g, 2) +
+      Math.pow(b - target.b, 2)
+    );
+    
+    if (dist > tolerance) {
+      // Dim the pixel
+      data[i] = r * 0.3;
+      data[i + 1] = g * 0.3;
+      data[i + 2] = b * 0.3;
+    }
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+  colorOverlay.classList.add('visible');
+}
+
+function hideColorOverlay() {
+  colorOverlay.classList.remove('visible');
+}
+
+// Color Harmonies
+function renderHarmonies() {
+  if (state.colors.length === 0) return;
+  
+  const dominant = state.colors[0];
+  const hsl = hexToHsl(dominant);
+  
+  const harmonies = {
+    'Complementary': [
+      dominant,
+      hslToHex((hsl.h + 180) % 360, hsl.s, hsl.l)
+    ],
+    'Analogous': [
+      hslToHex((hsl.h - 30 + 360) % 360, hsl.s, hsl.l),
+      dominant,
+      hslToHex((hsl.h + 30) % 360, hsl.s, hsl.l)
+    ],
+    'Triadic': [
+      dominant,
+      hslToHex((hsl.h + 120) % 360, hsl.s, hsl.l),
+      hslToHex((hsl.h + 240) % 360, hsl.s, hsl.l)
+    ],
+    'Split-Complementary': [
+      dominant,
+      hslToHex((hsl.h + 150) % 360, hsl.s, hsl.l),
+      hslToHex((hsl.h + 210) % 360, hsl.s, hsl.l)
+    ]
+  };
+  
+  harmoniesGrid.innerHTML = Object.entries(harmonies).map(([name, colors]) => `
+    <div class="harmony-card">
+      <h4>${name}</h4>
+      <div class="harmony-colors">
+        ${colors.map(c => `
+          <div class="harmony-color" style="background: ${c}" data-hex="${c.toUpperCase()}" 
+               onclick="copyToClipboard('${c}'); showToast('Copied ${c}')"></div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function hexToHsl(hex) {
+  const rgb = hexToRgb(hex);
+  const r = rgb.r / 255;
+  const g = rgb.g / 255;
+  const b = rgb.b / 255;
+  
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+  
+  if (max === min) {
+    h = s = 0;
+  } else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+  
+  return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+}
+
+function hslToHex(h, s, l) {
+  s /= 100;
+  l /= 100;
+  
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = l - c / 2;
+  
+  let r, g, b;
+  
+  if (h < 60) { r = c; g = x; b = 0; }
+  else if (h < 120) { r = x; g = c; b = 0; }
+  else if (h < 180) { r = 0; g = c; b = x; }
+  else if (h < 240) { r = 0; g = x; b = c; }
+  else if (h < 300) { r = x; g = 0; b = c; }
+  else { r = c; g = 0; b = x; }
+  
+  r = Math.round((r + m) * 255);
+  g = Math.round((g + m) * 255);
+  b = Math.round((b + m) * 255);
+  
+  return rgbToHex(r, g, b);
+}
+
+// Contrast Checker
+function renderContrastPicker() {
+  const fgGrid = document.getElementById('fg-colors');
+  const bgGrid = document.getElementById('bg-colors');
+  
+  // Add black and white to the colors
+  const allColors = ['#ffffff', '#000000', ...state.colors];
+  
+  fgGrid.innerHTML = allColors.map(c => `
+    <button class="contrast-color-btn" style="background: ${c}" data-color="${c}"></button>
+  `).join('');
+  
+  bgGrid.innerHTML = allColors.map(c => `
+    <button class="contrast-color-btn" style="background: ${c}" data-color="${c}"></button>
+  `).join('');
+  
+  // Set defaults
+  state.contrastFg = '#000000';
+  state.contrastBg = '#ffffff';
+  
+  fgGrid.querySelector('[data-color="#000000"]').classList.add('selected');
+  bgGrid.querySelector('[data-color="#ffffff"]').classList.add('selected');
+  
+  // Click handlers
+  fgGrid.querySelectorAll('.contrast-color-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      fgGrid.querySelectorAll('.contrast-color-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.contrastFg = btn.dataset.color;
+      updateContrastResult();
+    });
+  });
+  
+  bgGrid.querySelectorAll('.contrast-color-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      bgGrid.querySelectorAll('.contrast-color-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.contrastBg = btn.dataset.color;
+      updateContrastResult();
+    });
+  });
+  
+  updateContrastResult();
+}
+
+function updateContrastResult() {
+  const preview = document.getElementById('contrast-preview');
+  const ratioEl = document.getElementById('contrast-ratio');
+  const wcagNormal = document.getElementById('wcag-normal');
+  const wcagLarge = document.getElementById('wcag-large');
+  
+  preview.style.background = state.contrastBg;
+  preview.style.color = state.contrastFg;
+  
+  const ratio = getContrastRatio(state.contrastFg, state.contrastBg);
+  ratioEl.textContent = ratio.toFixed(2) + ':1';
+  
+  // WCAG thresholds
+  const aaLargePass = ratio >= 3;
+  const aaNormalPass = ratio >= 4.5;
+  const aaaLargePass = ratio >= 4.5;
+  const aaaNormalPass = ratio >= 7;
+  
+  wcagNormal.innerHTML = `
+    <span class="wcag-badge ${aaNormalPass ? 'wcag-pass' : 'wcag-fail'}">AA Normal ${aaNormalPass ? '✓' : '✗'}</span>
+    <span class="wcag-badge ${aaaNormalPass ? 'wcag-pass' : 'wcag-fail'}">AAA Normal ${aaaNormalPass ? '✓' : '✗'}</span>
+  `;
+  
+  wcagLarge.innerHTML = `
+    <span class="wcag-badge ${aaLargePass ? 'wcag-pass' : 'wcag-fail'}">AA Large ${aaLargePass ? '✓' : '✗'}</span>
+    <span class="wcag-badge ${aaaLargePass ? 'wcag-pass' : 'wcag-fail'}">AAA Large ${aaaLargePass ? '✓' : '✗'}</span>
+  `;
+}
+
+function getContrastRatio(fg, bg) {
+  const fgRgb = hexToRgb(fg);
+  const bgRgb = hexToRgb(bg);
+  
+  const fgLum = getLuminance(fgRgb.r, fgRgb.g, fgRgb.b);
+  const bgLum = getLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
+  
+  const lighter = Math.max(fgLum, bgLum);
+  const darker = Math.min(fgLum, bgLum);
+  
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function getLuminance(r, g, b) {
+  const [rs, gs, bs] = [r, g, b].map(c => {
+    c /= 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+// Gradient Generator
+function renderGradient() {
+  const canvas = document.getElementById('gradient-canvas');
+  canvas.innerHTML = '';
+  
+  // Generate random positions for blobs
+  state.blobPositions = state.colors.slice(0, 5).map(() => ({
+    x: 10 + Math.random() * 80,
+    y: 10 + Math.random() * 80,
+    size: 30 + Math.random() * 40,
+    delay: Math.random() * -20
+  }));
+  
+  // Create blobs
+  state.colors.slice(0, 5).forEach((color, i) => {
+    const blob = document.createElement('div');
+    blob.className = 'gradient-blob';
+    blob.style.background = color;
+    blob.style.width = `${state.blobPositions[i].size * (state.gradientSize / 100)}%`;
+    blob.style.height = `${state.blobPositions[i].size * (state.gradientSize / 100)}%`;
+    blob.style.left = `${state.blobPositions[i].x}%`;
+    blob.style.top = `${state.blobPositions[i].y}%`;
+    blob.style.filter = `blur(${state.gradientBlur}px)`;
+    blob.style.opacity = state.gradientOpacity / 100;
+    blob.style.animationDelay = `${state.blobPositions[i].delay}s`;
+    blob.style.animationDuration = `${20 / state.gradientSpeed}s`;
+    blob.dataset.index = i;
+    canvas.appendChild(blob);
+  });
+  
+  updateGradientBg();
+}
+
+function setGradientBg(type) {
+  state.gradientBg = type;
+  document.getElementById('bg-dark').classList.toggle('active', type === 'dark');
+  document.getElementById('bg-light').classList.toggle('active', type === 'light');
+  updateGradientBg();
+}
+
+function updateGradientBg() {
+  const preview = document.getElementById('gradient-preview');
+  preview.style.background = state.gradientBg === 'dark' ? '#0a0a0a' : '#f5f5f5';
+}
+
+function updateGradientBlur(e) {
+  state.gradientBlur = parseInt(e.target.value);
+  document.getElementById('blur-value').textContent = state.gradientBlur;
+  document.querySelectorAll('.gradient-blob').forEach(blob => {
+    blob.style.filter = `blur(${state.gradientBlur}px)`;
+  });
+}
+
+function updateGradientSize(e) {
+  state.gradientSize = parseInt(e.target.value);
+  document.getElementById('size-value').textContent = state.gradientSize;
+  document.querySelectorAll('.gradient-blob').forEach((blob, i) => {
+    const baseSize = state.blobPositions[i].size;
+    blob.style.width = `${baseSize * (state.gradientSize / 100)}%`;
+    blob.style.height = `${baseSize * (state.gradientSize / 100)}%`;
+  });
+}
+
+function updateGradientSpeed(e) {
+  state.gradientSpeed = parseFloat(e.target.value);
+  document.getElementById('speed-value').textContent = state.gradientSpeed;
+  document.querySelectorAll('.gradient-blob').forEach(blob => {
+    blob.style.animationDuration = `${20 / state.gradientSpeed}s`;
+  });
+}
+
+function updateGradientOpacity(e) {
+  state.gradientOpacity = parseInt(e.target.value);
+  document.getElementById('opacity-value').textContent = state.gradientOpacity;
+  document.querySelectorAll('.gradient-blob').forEach(blob => {
+    blob.style.opacity = state.gradientOpacity / 100;
+  });
+}
+
+function randomizeGradient() {
+  state.blobPositions = state.blobPositions.map(pos => ({
+    ...pos,
+    x: 10 + Math.random() * 80,
+    y: 10 + Math.random() * 80,
+    delay: Math.random() * -20
+  }));
+  
+  document.querySelectorAll('.gradient-blob').forEach((blob, i) => {
+    blob.style.left = `${state.blobPositions[i].x}%`;
+    blob.style.top = `${state.blobPositions[i].y}%`;
+    blob.style.animationDelay = `${state.blobPositions[i].delay}s`;
+  });
+}
+
+function toggleAnimation() {
+  state.gradientAnimating = !state.gradientAnimating;
+  const btn = document.getElementById('toggle-animation-btn');
+  btn.textContent = state.gradientAnimating ? '⏸️ Pause Animation' : '▶️ Resume Animation';
+  
+  document.querySelectorAll('.gradient-blob').forEach(blob => {
+    blob.style.animationPlayState = state.gradientAnimating ? 'running' : 'paused';
+  });
+}
+
+function copyGradientCSS() {
+  const bgColor = state.gradientBg === 'dark' ? '#0a0a0a' : '#f5f5f5';
+  const blobs = state.colors.slice(0, 5);
+  
+  let css = `.mesh-gradient {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: ${bgColor};
+  overflow: hidden;
+}
+
+.mesh-gradient::before,
+.mesh-gradient::after,
+.mesh-gradient .blob {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(${state.gradientBlur}px);
+  opacity: ${state.gradientOpacity / 100};
+  animation: float ${20 / state.gradientSpeed}s ease-in-out infinite;
+}
+
+`;
+
+  blobs.forEach((color, i) => {
+    const pos = state.blobPositions[i];
+    const size = pos.size * (state.gradientSize / 100);
+    const selector = i === 0 ? '::before' : i === 1 ? '::after' : `.blob-${i}`;
+    
+    css += `.mesh-gradient${i < 2 ? selector : ' ' + selector} {
+  background: ${color};
+  width: ${size}%;
+  height: ${size}%;
+  left: ${pos.x}%;
+  top: ${pos.y}%;
+  animation-delay: ${pos.delay}s;
+}
+
+`;
+  });
+
+  css += `@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(10%, -10%) scale(1.1); }
+  50% { transform: translate(-5%, 15%) scale(0.95); }
+  75% { transform: translate(-15%, -5%) scale(1.05); }
+}`;
+
+  copyToClipboard(css);
+  showToast('Gradient CSS copied!');
+}
+
+// Export Functions
+function updateExportPreview() {
+  const preview = document.getElementById('export-preview');
+  
+  switch (state.exportFormat) {
+    case 'hex':
+      preview.textContent = state.colors.map(c => c.toUpperCase()).join('\n');
+      break;
+    case 'css':
+      preview.textContent = `:root {\n${state.colors.map((c, i) => `  --color-${i + 1}: ${c};`).join('\n')}\n}`;
+      break;
+    case 'tailwind':
+      preview.textContent = `module.exports = {
+  theme: {
+    extend: {
+      colors: {
+${state.colors.map((c, i) => `        'palette-${i + 1}': '${c}',`).join('\n')}
+      }
+    }
+  }
+}`;
+      break;
+    case 'scss':
+      preview.textContent = state.colors.map((c, i) => `$color-${i + 1}: ${c};`).join('\n');
+      break;
+  }
+}
+
+function copyExport() {
+  const preview = document.getElementById('export-preview');
+  copyToClipboard(preview.textContent);
+  showToast('Copied to clipboard!');
+}
+
+// Tab Switching
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabId);
+  });
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.toggle('active', content.id === `tab-${tabId}`);
+  });
+}
+
+// Utility Functions
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).catch(() => {
+    // Fallback
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+  });
+}
+
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add('visible');
+  setTimeout(() => toast.classList.remove('visible'), 2000);
+}
+</script>
+</body>
+</html>

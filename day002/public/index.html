@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rune Writer — Mystical Text Converter</title>
+  <meta name="description" content="Transform your words into ancient runes. Elder Futhark, Younger Futhark, Anglo-Saxon Futhorc. Perfect for fantasy enthusiasts and tattoo planning.">
+  <meta property="og:title" content="Rune Writer — Mystical Text Converter">
+  <meta property="og:description" content="Transform your words into ancient runes">
+  <meta property="og:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>ᚱ</text></svg>">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #141414;
+      --bg-tertiary: #1a1a1a;
+      --text-primary: #e8e8e8;
+      --text-secondary: #888;
+      --accent: #c9a227;
+      --accent-glow: #ffd700;
+    }
+
+    @font-face {
+      font-family: 'RuneFont';
+      src: local('Segoe UI Historic'), local('Noto Sans Runic'), local('Arial');
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Particle Canvas */
+    #particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Main Container */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-top: 2rem;
+    }
+
+    .logo {
+      font-size: 4rem;
+      margin-bottom: 0.5rem;
+      animation: runeGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes runeGlow {
+      0%, 100% { text-shadow: 0 0 20px rgba(201, 162, 39, 0.5); }
+      50% { text-shadow: 0 0 40px rgba(201, 162, 39, 0.8), 0 0 60px rgba(255, 215, 0, 0.4); }
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 300;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #c9a227, #ffd700, #c9a227);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    /* Controls Section */
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .control-group {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid rgba(201, 162, 39, 0.1);
+    }
+
+    .control-group h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .control-group h3::before {
+      content: '◆';
+      font-size: 0.6rem;
+    }
+
+    /* Input Area */
+    .input-wrapper {
+      position: relative;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      background: var(--bg-tertiary);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 1rem;
+      color: var(--text-primary);
+      font-size: 1.1rem;
+      resize: vertical;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(201, 162, 39, 0.2);
+    }
+
+    textarea::placeholder {
+      color: var(--text-secondary);
+    }
+
+    /* Script Selection */
+    .script-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .script-btn {
+      flex: 1;
+      min-width: 120px;
+      padding: 0.75rem 1rem;
+      background: var(--bg-tertiary);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.9rem;
+    }
+
+    .script-btn:hover {
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+
+    .script-btn.active {
+      background: linear-gradient(135deg, rgba(201, 162, 39, 0.2), rgba(201, 162, 39, 0.1));
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .script-btn .rune-preview {
+      display: block;
+      font-size: 1.2rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Style Selection */
+    .style-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+
+    .style-btn {
+      padding: 1rem;
+      background: var(--bg-tertiary);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+
+    .style-btn:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .style-btn.active {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(201, 162, 39, 0.15), transparent);
+    }
+
+    .style-btn .icon {
+      font-size: 1.5rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .style-btn .name {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* Stone style button */
+    .style-btn[data-style="stone"] .icon { color: #8a8a8a; }
+    .style-btn[data-style="stone"].active { background: linear-gradient(135deg, rgba(138, 138, 138, 0.2), transparent); border-color: #8a8a8a; }
+
+    /* Magic style button */
+    .style-btn[data-style="magic"] .icon { color: #a855f7; }
+    .style-btn[data-style="magic"].active { background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), transparent); border-color: #a855f7; }
+
+    /* Wood style button */
+    .style-btn[data-style="wood"] .icon { color: #d97706; }
+    .style-btn[data-style="wood"].active { background: linear-gradient(135deg, rgba(217, 119, 6, 0.2), transparent); border-color: #d97706; }
+
+    /* Frost style button */
+    .style-btn[data-style="frost"] .icon { color: #38bdf8; }
+    .style-btn[data-style="frost"].active { background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), transparent); border-color: #38bdf8; }
+
+    /* Output Display */
+    .output-section {
+      margin-bottom: 2rem;
+    }
+
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .output-header h2 {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+    }
+
+    .output-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      padding: 0.5rem 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .action-btn:hover {
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, var(--accent), #b8941f);
+      border: none;
+      color: #0a0a0a;
+      font-weight: 600;
+    }
+
+    .action-btn.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(201, 162, 39, 0.4);
+    }
+
+    /* Rune Display Container */
+    .rune-display {
+      position: relative;
+      min-height: 200px;
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      overflow: hidden;
+      transition: all 0.5s ease;
+    }
+
+    .rune-display::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.5;
+      z-index: 0;
+      transition: all 0.5s ease;
+    }
+
+    /* Stone Style */
+    .rune-display.style-stone {
+      background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), inset 0 -2px 10px rgba(255,255,255,0.05);
+    }
+
+    .rune-display.style-stone::before {
+      background: 
+        radial-gradient(ellipse at 20% 30%, rgba(80,80,80,0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(60,60,60,0.3) 0%, transparent 50%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E");
+    }
+
+    .rune-display.style-stone .rune {
+      color: #d4d4d4;
+      text-shadow: 
+        2px 2px 0 #1a1a1a,
+        -1px -1px 0 rgba(255,255,255,0.1),
+        0 0 10px rgba(0,0,0,0.5);
+      filter: drop-shadow(1px 1px 0 #0a0a0a);
+    }
+
+    /* Magic Style */
+    .rune-display.style-magic {
+      background: radial-gradient(ellipse at center, #1a0a2e 0%, #0a0a15 100%);
+    }
+
+    .rune-display.style-magic::before {
+      background: 
+        radial-gradient(ellipse at 30% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+    }
+
+    .rune-display.style-magic .rune {
+      color: #e0b0ff;
+      text-shadow: 
+        0 0 10px #a855f7,
+        0 0 20px #a855f7,
+        0 0 40px #7c3aed,
+        0 0 60px #6d28d9;
+      animation: magicPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes magicPulse {
+      0%, 100% { 
+        text-shadow: 
+          0 0 10px #a855f7,
+          0 0 20px #a855f7,
+          0 0 40px #7c3aed,
+          0 0 60px #6d28d9;
+      }
+      50% { 
+        text-shadow: 
+          0 0 15px #c084fc,
+          0 0 30px #a855f7,
+          0 0 50px #7c3aed,
+          0 0 80px #6d28d9;
+      }
+    }
+
+    /* Wood Style */
+    .rune-display.style-wood {
+      background: linear-gradient(145deg, #2d1810, #1a0f0a);
+    }
+
+    .rune-display.style-wood::before {
+      background: 
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 2px,
+          rgba(139, 90, 43, 0.1) 2px,
+          rgba(139, 90, 43, 0.1) 4px
+        ),
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 20px,
+          rgba(101, 67, 33, 0.15) 20px,
+          rgba(101, 67, 33, 0.15) 22px
+        );
+    }
+
+    .rune-display.style-wood .rune {
+      color: #1a0a00;
+      text-shadow: 
+        0 0 3px rgba(255, 140, 0, 0.8),
+        0 0 6px rgba(255, 100, 0, 0.6),
+        1px 1px 0 rgba(0,0,0,0.8);
+      filter: drop-shadow(0 0 2px rgba(255, 140, 0, 0.5));
+    }
+
+    /* Frost Style */
+    .rune-display.style-frost {
+      background: linear-gradient(145deg, #0a1628, #051020);
+    }
+
+    .rune-display.style-frost::before {
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(56, 189, 248, 0.1) 0%, transparent 40%),
+        radial-gradient(ellipse at 80% 80%, rgba(14, 165, 233, 0.08) 0%, transparent 40%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='frost'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23frost)' opacity='0.1'/%3E%3C/svg%3E");
+    }
+
+    .rune-display.style-frost .rune {
+      color: #e0f7ff;
+      text-shadow: 
+        0 0 5px rgba(56, 189, 248, 0.8),
+        0 0 15px rgba(56, 189, 248, 0.5),
+        0 0 30px rgba(14, 165, 233, 0.3);
+      filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
+    }
+
+    /* Rune Text */
+    .rune-text {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 100px;
+    }
+
+    .rune {
+      font-size: 3.5rem;
+      cursor: pointer;
+      transition: transform 0.3s, filter 0.3s;
+      position: relative;
+      opacity: 0;
+      animation: runeReveal 0.5s ease forwards;
+    }
+
+    .rune:hover {
+      transform: scale(1.2);
+      z-index: 10;
+    }
+
+    .rune.space {
+      width: 1.5rem;
+      cursor: default;
+    }
+
+    .rune.space:hover {
+      transform: none;
+    }
+
+    @keyframes runeReveal {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+        filter: blur(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    /* Stone carve animation */
+    .style-stone .rune {
+      animation: stoneCarve 0.6s ease forwards;
+    }
+
+    @keyframes stoneCarve {
+      0% {
+        opacity: 0;
+        transform: scale(1.5);
+        filter: blur(5px);
+        text-shadow: none;
+      }
+      50% {
+        filter: blur(0);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        text-shadow: 
+          2px 2px 0 #1a1a1a,
+          -1px -1px 0 rgba(255,255,255,0.1),
+          0 0 10px rgba(0,0,0,0.5);
+      }
+    }
+
+    /* Magic fade animation */
+    .style-magic .rune {
+      animation: magicFade 0.8s ease forwards;
+    }
+
+    @keyframes magicFade {
+      0% {
+        opacity: 0;
+        transform: scale(0.5) rotate(-10deg);
+        filter: blur(10px) brightness(2);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0);
+        filter: blur(0) brightness(1);
+      }
+    }
+
+    /* Wood burn animation */
+    .style-wood .rune {
+      animation: woodBurn 0.7s ease forwards;
+    }
+
+    @keyframes woodBurn {
+      0% {
+        opacity: 0;
+        filter: brightness(3) blur(2px);
+        color: #ff6600;
+      }
+      50% {
+        color: #ff4400;
+        filter: brightness(1.5) blur(0);
+      }
+      100% {
+        opacity: 1;
+        color: #1a0a00;
+        filter: brightness(1) blur(0);
+      }
+    }
+
+    /* Frost etch animation */
+    .style-frost .rune {
+      animation: frostEtch 0.6s ease forwards;
+    }
+
+    @keyframes frostEtch {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+        filter: blur(5px);
+        text-shadow: 0 0 30px rgba(255, 255, 255, 0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+      }
+    }
+
+    /* Tooltip */
+    .tooltip {
+      position: fixed;
+      background: var(--bg-secondary);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(201, 162, 39, 0.2);
+      max-width: 280px;
+    }
+
+    .tooltip.visible {
+      opacity: 1;
+    }
+
+    .tooltip-rune {
+      font-size: 2.5rem;
+      text-align: center;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+
+    .tooltip-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .tooltip-phonetic {
+      font-size: 0.9rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .tooltip-meaning {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* Placeholder text */
+    .placeholder {
+      color: var(--text-secondary);
+      font-style: italic;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    /* Export Format Selection */
+    .export-options {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .export-select {
+      background: var(--bg-tertiary);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    .export-select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* Audio Toggle */
+    .audio-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .audio-toggle:hover {
+      background: rgba(201, 162, 39, 0.1);
+    }
+
+    .audio-toggle input {
+      display: none;
+    }
+
+    .audio-toggle .toggle-track {
+      width: 40px;
+      height: 22px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 11px;
+      position: relative;
+      transition: all 0.3s;
+    }
+
+    .audio-toggle .toggle-thumb {
+      width: 18px;
+      height: 18px;
+      background: var(--text-secondary);
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: all 0.3s;
+    }
+
+    .audio-toggle input:checked + .toggle-track {
+      background: var(--accent);
+    }
+
+    .audio-toggle input:checked + .toggle-track .toggle-thumb {
+      left: 20px;
+      background: var(--bg-primary);
+    }
+
+    .audio-toggle .label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      margin-top: 2rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Reference Table */
+    .reference-section {
+      margin-top: 3rem;
+    }
+
+    .reference-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      cursor: pointer;
+    }
+
+    .reference-header h3 {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-secondary);
+    }
+
+    .reference-toggle {
+      color: var(--accent);
+      font-size: 1.5rem;
+      transition: transform 0.3s;
+    }
+
+    .reference-toggle.open {
+      transform: rotate(45deg);
+    }
+
+    .reference-table {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 0.5rem;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .reference-table.visible {
+      display: grid;
+    }
+
+    .ref-rune {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.75rem;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .ref-rune:hover {
+      background: rgba(201, 162, 39, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .ref-rune .char {
+      font-size: 1.8rem;
+      color: var(--accent);
+    }
+
+    .ref-rune .latin {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        letter-spacing: 0.15em;
+      }
+
+      .logo {
+        font-size: 3rem;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .rune {
+        font-size: 2.5rem;
+      }
+
+      .rune-display {
+        padding: 2rem 1rem;
+      }
+
+      .output-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+
+      .output-actions {
+        width: 100%;
+      }
+
+      .action-btn {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .style-buttons {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Loading state */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .loading-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: loadingPulse 1.4s ease-in-out infinite;
+    }
+
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes loadingPulse {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Canvas for export (hidden) */
+    #exportCanvas {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+  
+  <div class="container">
+    <header>
+      <div class="logo">ᚱᚢᚾᛖ</div>
+      <h1>Rune Writer</h1>
+      <p class="tagline">Transform your words into ancient mystical scripts</p>
+    </header>
+
+    <div class="controls">
+      <div class="control-group">
+        <h3>Your Text</h3>
+        <div class="input-wrapper">
+          <textarea id="inputText" placeholder="Enter your text here... (e.g., your name, a quote, or a message)"></textarea>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <h3>Rune Script</h3>
+        <div class="script-buttons">
+          <button class="script-btn active" data-script="elder">
+            Elder Futhark
+            <span class="rune-preview">ᚠᚢᚦ</span>
+          </button>
+          <button class="script-btn" data-script="younger">
+            Younger Futhark
+            <span class="rune-preview">ᚠᚢᚦ</span>
+          </button>
+          <button class="script-btn" data-script="anglo">
+            Anglo-Saxon
+            <span class="rune-preview">ᚠᚢᚦ</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <h3>Visual Style</h3>
+        <div class="style-buttons">
+          <button class="style-btn active" data-style="stone">
+            <span class="icon">🗿</span>
+            <span class="name">Carved Stone</span>
+          </button>
+          <button class="style-btn" data-style="magic">
+            <span class="icon">✨</span>
+            <span class="name">Glowing Magic</span>
+          </button>
+          <button class="style-btn" data-style="wood">
+            <span class="icon">🔥</span>
+            <span class="name">Burned Wood</span>
+          </button>
+          <button class="style-btn" data-style="frost">
+            <span class="icon">❄️</span>
+            <span class="name">Frost-Etched</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <h3>Audio</h3>
+        <label class="audio-toggle">
+          <input type="checkbox" id="audioToggle">
+          <span class="toggle-track">
+            <span class="toggle-thumb"></span>
+          </span>
+          <span class="label">Ambient Mystical Sound</span>
+        </label>
+      </div>
+    </div>
+
+    <section class="output-section">
+      <div class="output-header">
+        <h2>✦ Your Runes ✦</h2>
+        <div class="output-actions">
+          <div class="export-options">
+            <select class="export-select" id="exportFormat">
+              <option value="og">OG Image (1200×630)</option>
+              <option value="square">Square (1080×1080)</option>
+              <option value="story">Story (1080×1920)</option>
+            </select>
+          </div>
+          <button class="action-btn" id="copyBtn">
+            <span>📋</span> Copy Runes
+          </button>
+          <button class="action-btn primary" id="exportBtn">
+            <span>⬇️</span> Download PNG
+          </button>
+        </div>
+      </div>
+
+      <div class="rune-display style-stone" id="runeDisplay">
+        <div class="rune-text" id="runeOutput">
+          <p class="placeholder">Your runes will appear here...</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="reference-section">
+      <div class="reference-header" id="refHeader">
+        <h3>Rune Reference Chart</h3>
+        <span class="reference-toggle" id="refToggle">+</span>
+      </div>
+      <div class="reference-table" id="refTable"></div>
+    </section>
+
+    <footer>
+      <p>Crafted for fantasy enthusiasts, history lovers, and tattoo planners</p>
+      <p style="margin-top: 0.5rem;">✦ May the ancient wisdom guide your path ✦</p>
+    </footer>
+  </div>
+
+  <div class="tooltip" id="tooltip">
+    <div class="tooltip-rune"></div>
+    <div class="tooltip-name"></div>
+    <div class="tooltip-phonetic"></div>
+    <div class="tooltip-meaning"></div>
+  </div>
+
+  <canvas id="exportCanvas"></canvas>
+
+  <script>
+    // =====================================================
+    // RUNE DATA
+    // =====================================================
+    
+    const runeData = {
+      elder: {
+        name: 'Elder Futhark',
+        runes: {
+          'f': { char: 'ᚠ', name: 'Fehu', phonetic: 'F', meaning: 'Wealth, cattle, prosperity' },
+          'u': { char: 'ᚢ', name: 'Uruz', phonetic: 'U', meaning: 'Aurochs, strength, vitality' },
+          'th': { char: 'ᚦ', name: 'Thurisaz', phonetic: 'TH', meaning: 'Giant, thorn, protection' },
+          'a': { char: 'ᚨ', name: 'Ansuz', phonetic: 'A', meaning: 'God (Odin), wisdom, communication' },
+          'r': { char: 'ᚱ', name: 'Raido', phonetic: 'R', meaning: 'Journey, ride, movement' },
+          'k': { char: 'ᚲ', name: 'Kenaz', phonetic: 'K/C', meaning: 'Torch, knowledge, creativity' },
+          'c': { char: 'ᚲ', name: 'Kenaz', phonetic: 'K/C', meaning: 'Torch, knowledge, creativity' },
+          'g': { char: 'ᚷ', name: 'Gebo', phonetic: 'G', meaning: 'Gift, partnership, generosity' },
+          'w': { char: 'ᚹ', name: 'Wunjo', phonetic: 'W/V', meaning: 'Joy, pleasure, harmony' },
+          'v': { char: 'ᚹ', name: 'Wunjo', phonetic: 'W/V', meaning: 'Joy, pleasure, harmony' },
+          'h': { char: 'ᚺ', name: 'Hagalaz', phonetic: 'H', meaning: 'Hail, disruption, transformation' },
+          'n': { char: 'ᚾ', name: 'Nauthiz', phonetic: 'N', meaning: 'Need, constraint, necessity' },
+          'i': { char: 'ᛁ', name: 'Isa', phonetic: 'I', meaning: 'Ice, stillness, concentration' },
+          'j': { char: 'ᛃ', name: 'Jera', phonetic: 'J/Y', meaning: 'Year, harvest, cycles' },
+          'y': { char: 'ᛃ', name: 'Jera', phonetic: 'J/Y', meaning: 'Year, harvest, cycles' },
+          'æ': { char: 'ᛇ', name: 'Eihwaz', phonetic: 'Æ/EI', meaning: 'Yew tree, endurance, death' },
+          'p': { char: 'ᛈ', name: 'Perthro', phonetic: 'P', meaning: 'Mystery, fate, secrets' },
+          'z': { char: 'ᛉ', name: 'Algiz', phonetic: 'Z', meaning: 'Elk, protection, sanctuary' },
+          's': { char: 'ᛊ', name: 'Sowilo', phonetic: 'S', meaning: 'Sun, success, victory' },
+          't': { char: 'ᛏ', name: 'Tiwaz', phonetic: 'T', meaning: 'Tyr, justice, honor' },
+          'b': { char: 'ᛒ', name: 'Berkano', phonetic: 'B', meaning: 'Birch, birth, growth' },
+          'e': { char: 'ᛖ', name: 'Ehwaz', phonetic: 'E', meaning: 'Horse, partnership, trust' },
+          'm': { char: 'ᛗ', name: 'Mannaz', phonetic: 'M', meaning: 'Man, humanity, self' },
+          'l': { char: 'ᛚ', name: 'Laguz', phonetic: 'L', meaning: 'Water, intuition, flow' },
+          'ng': { char: 'ᛜ', name: 'Ingwaz', phonetic: 'NG', meaning: 'Ing (god), fertility, completion' },
+          'd': { char: 'ᛞ', name: 'Dagaz', phonetic: 'D', meaning: 'Day, breakthrough, awakening' },
+          'o': { char: 'ᛟ', name: 'Othala', phonetic: 'O', meaning: 'Heritage, homeland, ancestry' },
+          'q': { char: 'ᚲ', name: 'Kenaz', phonetic: 'K/Q', meaning: 'Torch, knowledge, creativity' },
+          'x': { char: 'ᚲᛊ', name: 'Kenaz-Sowilo', phonetic: 'KS/X', meaning: 'Combined: knowledge and success' }
+        }
+      },
+      younger: {
+        name: 'Younger Futhark',
+        runes: {
+          'f': { char: 'ᚠ', name: 'Fé', phonetic: 'F', meaning: 'Wealth, money' },
+          'v': { char: 'ᚠ', name: 'Fé', phonetic: 'F/V', meaning: 'Wealth, money' },
+          'u': { char: 'ᚢ', name: 'Úr', phonetic: 'U/O/V/W', meaning: 'Drizzle, slag, aurochs' },
+          'o': { char: 'ᚢ', name: 'Úr', phonetic: 'U/O', meaning: 'Drizzle, slag' },
+          'w': { char: 'ᚢ', name: 'Úr', phonetic: 'U/W', meaning: 'Drizzle, slag' },
+          'th': { char: 'ᚦ', name: 'Þurs', phonetic: 'TH', meaning: 'Giant, demon' },
+          'a': { char: 'ᚬ', name: 'Óss', phonetic: 'A/O', meaning: 'God, estuary' },
+          'æ': { char: 'ᚬ', name: 'Óss', phonetic: 'Æ', meaning: 'God, estuary' },
+          'r': { char: 'ᚱ', name: 'Reið', phonetic: 'R', meaning: 'Ride, journey' },
+          'k': { char: 'ᚴ', name: 'Kaun', phonetic: 'K/G/C', meaning: 'Ulcer, sore' },
+          'c': { char: 'ᚴ', name: 'Kaun', phonetic: 'K/C', meaning: 'Ulcer, sore' },
+          'g': { char: 'ᚴ', name: 'Kaun', phonetic: 'K/G', meaning: 'Ulcer, sore' },
+          'h': { char: 'ᚼ', name: 'Hagall', phonetic: 'H', meaning: 'Hail' },
+          'n': { char: 'ᚾ', name: 'Nauðr', phonetic: 'N', meaning: 'Need, distress' },
+          'i': { char: 'ᛁ', name: 'Íss', phonetic: 'I/E', meaning: 'Ice' },
+          'e': { char: 'ᛁ', name: 'Íss', phonetic: 'I/E', meaning: 'Ice' },
+          'j': { char: 'ᛅ', name: 'Ár', phonetic: 'A/J', meaning: 'Plenty, good year' },
+          'y': { char: 'ᛅ', name: 'Ár', phonetic: 'A/Y', meaning: 'Plenty, good year' },
+          's': { char: 'ᛋ', name: 'Sól', phonetic: 'S', meaning: 'Sun' },
+          't': { char: 'ᛏ', name: 'Týr', phonetic: 'T/D', meaning: 'The god Týr' },
+          'd': { char: 'ᛏ', name: 'Týr', phonetic: 'T/D', meaning: 'The god Týr' },
+          'b': { char: 'ᛒ', name: 'Bjarkan', phonetic: 'B/P', meaning: 'Birch twig' },
+          'p': { char: 'ᛒ', name: 'Bjarkan', phonetic: 'B/P', meaning: 'Birch twig' },
+          'm': { char: 'ᛘ', name: 'Maðr', phonetic: 'M', meaning: 'Man, human' },
+          'l': { char: 'ᛚ', name: 'Lögr', phonetic: 'L', meaning: 'Water, lake' },
+          'z': { char: 'ᛦ', name: 'Ýr', phonetic: 'R/Z', meaning: 'Yew bow' },
+          'q': { char: 'ᚴ', name: 'Kaun', phonetic: 'K/Q', meaning: 'Ulcer, sore' },
+          'x': { char: 'ᚴᛋ', name: 'Kaun-Sól', phonetic: 'KS/X', meaning: 'Combined runes' }
+        }
+      },
+      anglo: {
+        name: 'Anglo-Saxon Futhorc',
+        runes: {
+          'f': { char: 'ᚠ', name: 'Feoh', phonetic: 'F', meaning: 'Wealth, cattle' },
+          'u': { char: 'ᚢ', name: 'Ur', phonetic: 'U', meaning: 'Aurochs, strength' },
+          'th': { char: 'ᚦ', name: 'Thorn', phonetic: 'TH', meaning: 'Thorn, giant' },
+          'o': { char: 'ᚩ', name: 'Os', phonetic: 'O', meaning: 'God, mouth' },
+          'r': { char: 'ᚱ', name: 'Rad', phonetic: 'R', meaning: 'Riding, journey' },
+          'c': { char: 'ᚳ', name: 'Cen', phonetic: 'C/K', meaning: 'Torch' },
+          'k': { char: 'ᚳ', name: 'Cen', phonetic: 'C/K', meaning: 'Torch' },
+          'g': { char: 'ᚷ', name: 'Gyfu', phonetic: 'G', meaning: 'Gift' },
+          'w': { char: 'ᚹ', name: 'Wynn', phonetic: 'W', meaning: 'Joy' },
+          'h': { char: 'ᚻ', name: 'Hægl', phonetic: 'H', meaning: 'Hail' },
+          'n': { char: 'ᚾ', name: 'Nyd', phonetic: 'N', meaning: 'Need, necessity' },
+          'i': { char: 'ᛁ', name: 'Is', phonetic: 'I', meaning: 'Ice' },
+          'j': { char: 'ᛄ', name: 'Ger', phonetic: 'J/Y', meaning: 'Year, harvest' },
+          'y': { char: 'ᛄ', name: 'Ger', phonetic: 'J/Y', meaning: 'Year, harvest' },
+          'eo': { char: 'ᛇ', name: 'Eoh', phonetic: 'EO', meaning: 'Yew tree' },
+          'p': { char: 'ᛈ', name: 'Peorth', phonetic: 'P', meaning: 'Gaming piece, mystery' },
+          'x': { char: 'ᛉ', name: 'Eolhx', phonetic: 'X/Z', meaning: 'Elk-sedge, protection' },
+          'z': { char: 'ᛉ', name: 'Eolhx', phonetic: 'X/Z', meaning: 'Elk-sedge, protection' },
+          's': { char: 'ᛋ', name: 'Sigel', phonetic: 'S', meaning: 'Sun' },
+          't': { char: 'ᛏ', name: 'Tir', phonetic: 'T', meaning: 'Tir, glory' },
+          'b': { char: 'ᛒ', name: 'Beorc', phonetic: 'B', meaning: 'Birch' },
+          'e': { char: 'ᛖ', name: 'Eh', phonetic: 'E', meaning: 'Horse' },
+          'm': { char: 'ᛗ', name: 'Mann', phonetic: 'M', meaning: 'Man' },
+          'l': { char: 'ᛚ', name: 'Lagu', phonetic: 'L', meaning: 'Water, lake' },
+          'ng': { char: 'ᛝ', name: 'Ing', phonetic: 'NG', meaning: 'The god Ing' },
+          'œ': { char: 'ᛟ', name: 'Ethel', phonetic: 'Œ', meaning: 'Estate, homeland' },
+          'd': { char: 'ᛞ', name: 'Dæg', phonetic: 'D', meaning: 'Day' },
+          'a': { char: 'ᚪ', name: 'Ac', phonetic: 'A', meaning: 'Oak tree' },
+          'æ': { char: 'ᚫ', name: 'Æsc', phonetic: 'Æ', meaning: 'Ash tree' },
+          'ea': { char: 'ᛠ', name: 'Ear', phonetic: 'EA', meaning: 'Earth, grave' },
+          'io': { char: 'ᛡ', name: 'Ior', phonetic: 'IO', meaning: 'Serpent, eel' },
+          'q': { char: 'ᚳᚹ', name: 'Cweorth', phonetic: 'Q/CW', meaning: 'Fire-twirl' },
+          'v': { char: 'ᚠ', name: 'Feoh', phonetic: 'F/V', meaning: 'Wealth, cattle' }
+        }
+      }
+    };
+
+    // =====================================================
+    // AUDIO SYSTEM
+    // =====================================================
+    
+    class AudioSystem {
+      constructor() {
+        this.ctx = null;
+        this.isPlaying = false;
+        this.masterGain = null;
+        this.nodes = [];
+      }
+
+      init() {
+        if (this.ctx) return;
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.value = 0.3;
+        this.masterGain.connect(this.ctx.destination);
+      }
+
+      startAmbient() {
+        if (this.isPlaying) return;
+        this.init();
+        this.isPlaying = true;
+
+        // Deep drone
+        const drone = this.ctx.createOscillator();
+        const droneGain = this.ctx.createGain();
+        drone.type = 'sine';
+        drone.frequency.value = 55; // A1
+        droneGain.gain.value = 0.15;
+        drone.connect(droneGain);
+        droneGain.connect(this.masterGain);
+        drone.start();
+        this.nodes.push(drone, droneGain);
+
+        // Ethereal pad
+        const pad = this.ctx.createOscillator();
+        const padGain = this.ctx.createGain();
+        const padFilter = this.ctx.createBiquadFilter();
+        pad.type = 'triangle';
+        pad.frequency.value = 220;
+        padFilter.type = 'lowpass';
+        padFilter.frequency.value = 800;
+        padGain.gain.value = 0.08;
+        pad.connect(padFilter);
+        padFilter.connect(padGain);
+        padGain.connect(this.masterGain);
+        pad.start();
+        this.nodes.push(pad, padGain, padFilter);
+
+        // LFO for movement
+        const lfo = this.ctx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.value = 0.1;
+        const lfoGain = this.ctx.createGain();
+        lfoGain.gain.value = 30;
+        lfo.connect(lfoGain);
+        lfoGain.connect(padFilter.frequency);
+        lfo.start();
+        this.nodes.push(lfo, lfoGain);
+
+        // Occasional sparkle
+        this.sparkleInterval = setInterval(() => {
+          if (Math.random() > 0.7) this.playSparkle();
+        }, 2000);
+      }
+
+      stopAmbient() {
+        this.isPlaying = false;
+        this.nodes.forEach(node => {
+          try { node.stop?.(); } catch(e) {}
+          try { node.disconnect(); } catch(e) {}
+        });
+        this.nodes = [];
+        if (this.sparkleInterval) clearInterval(this.sparkleInterval);
+      }
+
+      playSparkle() {
+        if (!this.ctx || !this.isPlaying) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = 800 + Math.random() * 1200;
+        gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+        gain.gain.exponentialDecayTo?.(0.001, this.ctx.currentTime + 0.5) ||
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.5);
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.5);
+      }
+
+      playRuneSound() {
+        if (!this.ctx) this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.value = 150 + Math.random() * 100;
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.3);
+      }
+    }
+
+    const audio = new AudioSystem();
+
+    // =====================================================
+    // PARTICLE SYSTEM
+    // =====================================================
+    
+    class ParticleSystem {
+      constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.particles = [];
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.animate();
+      }
+
+      resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+
+      createParticle() {
+        return {
+          x: Math.random() * this.canvas.width,
+          y: Math.random() * this.canvas.height,
+          size: Math.random() * 2 + 0.5,
+          speedX: (Math.random() - 0.5) * 0.3,
+          speedY: (Math.random() - 0.5) * 0.3 - 0.2,
+          opacity: Math.random() * 0.5 + 0.1,
+          hue: 40 + Math.random() * 20
+        };
+      }
+
+      animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Maintain particle count
+        while (this.particles.length < 50) {
+          this.particles.push(this.createParticle());
+        }
+
+        this.particles.forEach((p, i) => {
+          p.x += p.speedX;
+          p.y += p.speedY;
+          p.opacity -= 0.002;
+
+          if (p.opacity <= 0 || p.y < 0 || p.x < 0 || p.x > this.canvas.width) {
+            this.particles[i] = this.createParticle();
+            return;
+          }
+
+          this.ctx.beginPath();
+          this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          this.ctx.fillStyle = `hsla(${p.hue}, 70%, 60%, ${p.opacity})`;
+          this.ctx.fill();
+        });
+
+        requestAnimationFrame(() => this.animate());
+      }
+    }
+
+    // =====================================================
+    // MAIN APPLICATION
+    // =====================================================
+    
+    class RuneWriter {
+      constructor() {
+        this.currentScript = 'elder';
+        this.currentStyle = 'stone';
+        this.inputEl = document.getElementById('inputText');
+        this.outputEl = document.getElementById('runeOutput');
+        this.displayEl = document.getElementById('runeDisplay');
+        this.tooltipEl = document.getElementById('tooltip');
+        this.particles = new ParticleSystem(document.getElementById('particles'));
+
+        this.init();
+      }
+
+      init() {
+        // Script buttons
+        document.querySelectorAll('.script-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.script-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            this.currentScript = btn.dataset.script;
+            this.convert();
+            this.updateReferenceTable();
+          });
+        });
+
+        // Style buttons
+        document.querySelectorAll('.style-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            this.currentStyle = btn.dataset.style;
+            this.displayEl.className = `rune-display style-${this.currentStyle}`;
+            this.convert(); // Re-animate
+          });
+        });
+
+        // Input handling
+        this.inputEl.addEventListener('input', () => this.convert());
+
+        // Audio toggle
+        document.getElementById('audioToggle').addEventListener('change', (e) => {
+          if (e.target.checked) {
+            audio.startAmbient();
+          } else {
+            audio.stopAmbient();
+          }
+        });
+
+        // Copy button
+        document.getElementById('copyBtn').addEventListener('click', () => this.copyRunes());
+
+        // Export button
+        document.getElementById('exportBtn').addEventListener('click', () => this.exportImage());
+
+        // Reference table toggle
+        document.getElementById('refHeader').addEventListener('click', () => {
+          document.getElementById('refTable').classList.toggle('visible');
+          document.getElementById('refToggle').classList.toggle('open');
+        });
+
+        // Initialize reference table
+        this.updateReferenceTable();
+
+        // Tooltip handling
+        document.addEventListener('mousemove', (e) => this.updateTooltipPosition(e));
+      }
+
+      convert() {
+        const text = this.inputEl.value.toLowerCase();
+        if (!text.trim()) {
+          this.outputEl.innerHTML = '<p class="placeholder">Your runes will appear here...</p>';
+          return;
+        }
+
+        const script = runeData[this.currentScript];
+        const runes = [];
+        let i = 0;
+
+        while (i < text.length) {
+          // Check for digraphs first (th, ng, eo, ea, io)
+          const digraphs = ['th', 'ng', 'eo', 'ea', 'io'];
+          let found = false;
+
+          for (const digraph of digraphs) {
+            if (text.substr(i, digraph.length) === digraph && script.runes[digraph]) {
+              runes.push({ ...script.runes[digraph], isSpace: false });
+              i += digraph.length;
+              found = true;
+              break;
+            }
+          }
+
+          if (!found) {
+            const char = text[i];
+            if (char === ' ') {
+              runes.push({ char: ' ', isSpace: true });
+            } else if (script.runes[char]) {
+              runes.push({ ...script.runes[char], isSpace: false });
+            } else if (/[a-z]/.test(char)) {
+              // Unknown letter - use placeholder
+              runes.push({ char: '�', name: 'Unknown', phonetic: char.toUpperCase(), meaning: 'No rune equivalent', isSpace: false });
+            }
+            // Skip non-alphabetic characters (except space)
+            i++;
+          }
+        }
+
+        this.renderRunes(runes);
+      }
+
+      renderRunes(runes) {
+        this.outputEl.innerHTML = '';
+        
+        runes.forEach((rune, index) => {
+          const span = document.createElement('span');
+          span.className = rune.isSpace ? 'rune space' : 'rune';
+          span.textContent = rune.char;
+          span.style.animationDelay = `${index * 0.05}s`;
+
+          if (!rune.isSpace) {
+            span.dataset.name = rune.name;
+            span.dataset.phonetic = rune.phonetic;
+            span.dataset.meaning = rune.meaning;
+            span.dataset.char = rune.char;
+
+            span.addEventListener('mouseenter', (e) => this.showTooltip(e, rune));
+            span.addEventListener('mouseleave', () => this.hideTooltip());
+            span.addEventListener('click', () => audio.playRuneSound());
+          }
+
+          this.outputEl.appendChild(span);
+
+          // Play sound on reveal if audio is on
+          if (document.getElementById('audioToggle').checked && !rune.isSpace) {
+            setTimeout(() => audio.playRuneSound(), index * 50);
+          }
+        });
+      }
+
+      showTooltip(e, rune) {
+        this.tooltipEl.querySelector('.tooltip-rune').textContent = rune.char;
+        this.tooltipEl.querySelector('.tooltip-name').textContent = rune.name;
+        this.tooltipEl.querySelector('.tooltip-phonetic').textContent = `Sound: "${rune.phonetic}"`;
+        this.tooltipEl.querySelector('.tooltip-meaning').textContent = rune.meaning;
+        this.tooltipEl.classList.add('visible');
+        this.updateTooltipPosition(e);
+      }
+
+      hideTooltip() {
+        this.tooltipEl.classList.remove('visible');
+      }
+
+      updateTooltipPosition(e) {
+        const tooltip = this.tooltipEl;
+        const padding = 15;
+        let x = e.clientX + padding;
+        let y = e.clientY + padding;
+
+        // Keep tooltip in viewport
+        if (x + tooltip.offsetWidth > window.innerWidth) {
+          x = e.clientX - tooltip.offsetWidth - padding;
+        }
+        if (y + tooltip.offsetHeight > window.innerHeight) {
+          y = e.clientY - tooltip.offsetHeight - padding;
+        }
+
+        tooltip.style.left = `${x}px`;
+        tooltip.style.top = `${y}px`;
+      }
+
+      copyRunes() {
+        const runes = Array.from(this.outputEl.querySelectorAll('.rune'))
+          .map(el => el.textContent)
+          .join('');
+        
+        navigator.clipboard.writeText(runes).then(() => {
+          const btn = document.getElementById('copyBtn');
+          const original = btn.innerHTML;
+          btn.innerHTML = '<span>✓</span> Copied!';
+          setTimeout(() => btn.innerHTML = original, 2000);
+        });
+      }
+
+      async exportImage() {
+        const format = document.getElementById('exportFormat').value;
+        const dimensions = {
+          og: { width: 1200, height: 630 },
+          square: { width: 1080, height: 1080 },
+          story: { width: 1080, height: 1920 }
+        };
+
+        const { width, height } = dimensions[format];
+        const canvas = document.getElementById('exportCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw background based on style
+        this.drawStyledBackground(ctx, width, height);
+
+        // Get runes text
+        const runes = Array.from(this.outputEl.querySelectorAll('.rune'))
+          .map(el => el.textContent)
+          .join('');
+
+        if (runes) {
+          // Draw runes
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          
+          // Calculate font size based on text length and canvas size
+          const maxWidth = width * 0.8;
+          let fontSize = Math.min(120, width / (runes.length * 0.6));
+          fontSize = Math.max(40, fontSize);
+          
+          ctx.font = `${fontSize}px "Segoe UI Historic", "Noto Sans Runic", serif`;
+          
+          // Apply style-specific text styling
+          this.applyTextStyle(ctx, width, height);
+          
+          // Word wrap if needed
+          const lines = this.wrapText(ctx, runes, maxWidth);
+          const lineHeight = fontSize * 1.2;
+          const startY = height / 2 - (lines.length - 1) * lineHeight / 2;
+
+          lines.forEach((line, i) => {
+            ctx.fillText(line, width / 2, startY + i * lineHeight);
+          });
+        }
+
+        // Add watermark
+        ctx.font = '16px system-ui, sans-serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.textAlign = 'right';
+        ctx.fillText('Rune Writer', width - 20, height - 20);
+
+        // Download
+        const link = document.createElement('a');
+        link.download = `runes-${format}-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }
+
+      drawStyledBackground(ctx, width, height) {
+        const style = this.currentStyle;
+
+        if (style === 'stone') {
+          // Stone gradient
+          const grad = ctx.createLinearGradient(0, 0, width, height);
+          grad.addColorStop(0, '#3a3a3a');
+          grad.addColorStop(1, '#2a2a2a');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, width, height);
+
+          // Add noise texture
+          for (let i = 0; i < 5000; i++) {
+            ctx.fillStyle = `rgba(${Math.random() > 0.5 ? 255 : 0}, ${Math.random() > 0.5 ? 255 : 0}, ${Math.random() > 0.5 ? 255 : 0}, 0.02)`;
+            ctx.fillRect(Math.random() * width, Math.random() * height, 2, 2);
+          }
+        } else if (style === 'magic') {
+          // Magic gradient
+          const grad = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
+          grad.addColorStop(0, '#1a0a2e');
+          grad.addColorStop(1, '#0a0a15');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, width, height);
+
+          // Add glowing orbs
+          for (let i = 0; i < 20; i++) {
+            const x = Math.random() * width;
+            const y = Math.random() * height;
+            const r = Math.random() * 100 + 50;
+            const orbGrad = ctx.createRadialGradient(x, y, 0, x, y, r);
+            orbGrad.addColorStop(0, 'rgba(168, 85, 247, 0.1)');
+            orbGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = orbGrad;
+            ctx.fillRect(x - r, y - r, r * 2, r * 2);
+          }
+        } else if (style === 'wood') {
+          // Wood gradient
+          const grad = ctx.createLinearGradient(0, 0, width, height);
+          grad.addColorStop(0, '#2d1810');
+          grad.addColorStop(1, '#1a0f0a');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, width, height);
+
+          // Wood grain lines
+          ctx.strokeStyle = 'rgba(139, 90, 43, 0.1)';
+          ctx.lineWidth = 1;
+          for (let i = 0; i < height; i += 20) {
+            ctx.beginPath();
+            ctx.moveTo(0, i + Math.sin(i * 0.05) * 5);
+            ctx.lineTo(width, i + Math.sin(i * 0.05 + 2) * 5);
+            ctx.stroke();
+          }
+        } else if (style === 'frost') {
+          // Frost gradient
+          const grad = ctx.createLinearGradient(0, 0, width, height);
+          grad.addColorStop(0, '#0a1628');
+          grad.addColorStop(1, '#051020');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, width, height);
+
+          // Ice crystals
+          for (let i = 0; i < 30; i++) {
+            const x = Math.random() * width;
+            const y = Math.random() * height;
+            const r = Math.random() * 80 + 20;
+            const iceGrad = ctx.createRadialGradient(x, y, 0, x, y, r);
+            iceGrad.addColorStop(0, 'rgba(56, 189, 248, 0.08)');
+            iceGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = iceGrad;
+            ctx.fillRect(x - r, y - r, r * 2, r * 2);
+          }
+        }
+      }
+
+      applyTextStyle(ctx, width, height) {
+        const style = this.currentStyle;
+
+        if (style === 'stone') {
+          ctx.fillStyle = '#d4d4d4';
+          ctx.shadowColor = '#1a1a1a';
+          ctx.shadowBlur = 4;
+          ctx.shadowOffsetX = 3;
+          ctx.shadowOffsetY = 3;
+        } else if (style === 'magic') {
+          ctx.fillStyle = '#e0b0ff';
+          ctx.shadowColor = '#a855f7';
+          ctx.shadowBlur = 30;
+        } else if (style === 'wood') {
+          ctx.fillStyle = '#1a0a00';
+          ctx.shadowColor = 'rgba(255, 140, 0, 0.8)';
+          ctx.shadowBlur = 8;
+        } else if (style === 'frost') {
+          ctx.fillStyle = '#e0f7ff';
+          ctx.shadowColor = 'rgba(56, 189, 248, 0.8)';
+          ctx.shadowBlur = 20;
+        }
+      }
+
+      wrapText(ctx, text, maxWidth) {
+        const words = text.split(' ');
+        const lines = [];
+        let currentLine = '';
+
+        words.forEach(word => {
+          const testLine = currentLine ? currentLine + ' ' + word : word;
+          const metrics = ctx.measureText(testLine);
+          
+          if (metrics.width > maxWidth && currentLine) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        });
+        
+        if (currentLine) lines.push(currentLine);
+        return lines;
+      }
+
+      updateReferenceTable() {
+        const table = document.getElementById('refTable');
+        const script = runeData[this.currentScript];
+        
+        // Get unique runes (avoid duplicates like k/c)
+        const seen = new Set();
+        const uniqueRunes = [];
+        
+        for (const [key, rune] of Object.entries(script.runes)) {
+          if (!seen.has(rune.char)) {
+            seen.add(rune.char);
+            uniqueRunes.push({ key, ...rune });
+          }
+        }
+
+        table.innerHTML = uniqueRunes.map(rune => `
+          <div class="ref-rune" data-name="${rune.name}" data-phonetic="${rune.phonetic}" data-meaning="${rune.meaning}" data-char="${rune.char}">
+            <span class="char">${rune.char}</span>
+            <span class="latin">${rune.phonetic}</span>
+          </div>
+        `).join('');
+
+        // Add hover events
+        table.querySelectorAll('.ref-rune').forEach(el => {
+          el.addEventListener('mouseenter', (e) => {
+            this.showTooltip(e, {
+              char: el.dataset.char,
+              name: el.dataset.name,
+              phonetic: el.dataset.phonetic,
+              meaning: el.dataset.meaning
+            });
+          });
+          el.addEventListener('mouseleave', () => this.hideTooltip());
+          el.addEventListener('click', () => {
+            this.inputEl.value += el.dataset.char;
+            this.convert();
+          });
+        });
+      }
+    }
+
+    // Initialize on DOM ready
+    document.addEventListener('DOMContentLoaded', () => {
+      new RuneWriter();
+    });
+  </script>
+</body>
+</html>
