@@ -39,6 +39,57 @@
             --radius: 12px;
         }
         
+        [data-theme="light"] {
+            --bg: #fafafa;
+            --bg-elevated: #ffffff;
+            --bg-card: #f5f5f5;
+            --text: #0a0a0a;
+            --text-muted: #666;
+            --accent: #1a1a1a;
+            --border: #e0e0e0;
+        }
+        
+        @media (prefers-color-scheme: light) {
+            :root:not([data-theme="dark"]) {
+                --bg: #fafafa;
+                --bg-elevated: #ffffff;
+                --bg-card: #f5f5f5;
+                --text: #0a0a0a;
+                --text-muted: #666;
+                --accent: #1a1a1a;
+                --border: #e0e0e0;
+            }
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.3s ease;
+            z-index: 100;
+            padding: 0;
+        }
+        
+        .theme-toggle:hover { border-color: var(--text); }
+        .theme-icon { width: 20px; height: 20px; stroke: var(--text); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+        .icon-sun { display: none; }
+        .icon-moon { display: block; }
+        [data-theme="light"] .icon-sun { display: block; }
+        [data-theme="light"] .icon-moon { display: none; }
+        @media (prefers-color-scheme: light) {
+            :root:not([data-theme="dark"]) .icon-sun { display: block; }
+            :root:not([data-theme="dark"]) .icon-moon { display: none; }
+        }
+        
         html {
             font-size: 16px;
             -webkit-font-smoothing: antialiased;
@@ -285,6 +336,10 @@
     </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700;800</head>display=swap" rel="stylesheet"></head>
 <body>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg class="theme-icon icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="theme-icon icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+    </button>
     <main>
         <section class="hero">
             <div class="container">
@@ -292,7 +347,7 @@
                 <p class="tagline">One AI project. Every day.</p>
                 <div class="day-counter">
                     <span class="pulse"></span>
-                    <span>Day 002 — Shipping daily</span>
+                    <span>Day 005 — Shipping daily</span>
                 </div>
             </div>
         </section>
@@ -306,8 +361,8 @@
                 <div class="projects-grid">
                     <a href="https://day001.aikemist.com" class="project-card">
                         <span class="project-day">Day 001</span>
-                        <h3 class="project-name">Color Palette Generator</h3>
-                        <p class="project-desc">Extract colors from images. Generate harmonies, gradients, and export to CSS/Tailwind.</p>
+                        <h3 class="project-name">Color DNA</h3>
+                        <p class="project-desc">Extract color palettes from any URL or image. Generate mesh gradients. Export to CSS, Tailwind, or JSON.</p>
                         <span class="project-arrow">→</span>
                     </a>
                     
@@ -315,6 +370,27 @@
                         <span class="project-day">Day 002</span>
                         <h3 class="project-name">Rune Writer</h3>
                         <p class="project-desc">Transform text into ancient runes. Elder Futhark, Viking, and Anglo-Saxon scripts with mystical effects.</p>
+                        <span class="project-arrow">→</span>
+                    </a>
+                    
+                    <a href="https://day003.aikemist.com" class="project-card">
+                        <span class="project-day">Day 003</span>
+                        <h3 class="project-name">Hva Slags Fjord Er Du?</h3>
+                        <p class="project-desc">Norwegian fjord personality quiz. Answer 7 questions to discover your inner fjord.</p>
+                        <span class="project-arrow">→</span>
+                    </a>
+                    
+                    <a href="https://day004.aikemist.com" class="project-card">
+                        <span class="project-day">Day 004</span>
+                        <h3 class="project-name">Hypernormal Objects</h3>
+                        <p class="project-desc">Toggle between polished interfaces and their hidden architecture. What you see. What's underneath.</p>
+                        <span class="project-arrow">→</span>
+                    </a>
+                    
+                    <a href="https://day005.aikemist.com" class="project-card">
+                        <span class="project-day">Day 005</span>
+                        <h3 class="project-name">Meeting Cost Calculator</h3>
+                        <p class="project-desc">Watch your meeting budget evaporate in real-time. Add attendees, start the timer, cringe at the total.</p>
                         <span class="project-arrow">→</span>
                     </a>
                     
@@ -333,5 +409,22 @@
             </div>
         </div>
     </footer>
+    <script>
+        function toggleTheme() {
+            const root = document.documentElement;
+            const current = root.getAttribute('data-theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            let newTheme;
+            if (current === 'dark') newTheme = 'light';
+            else if (current === 'light') newTheme = 'dark';
+            else newTheme = prefersDark ? 'light' : 'dark';
+            root.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        (function() {
+            const saved = localStorage.getItem('theme');
+            if (saved) document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
 </body>
 </html>

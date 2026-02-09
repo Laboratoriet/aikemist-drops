@@ -1,0 +1,17 @@
+{
+  "name": "color-dna",
+  "version": "1.0.0",
+  "description": "Extract color palettes from any URL",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "keywords": ["color", "palette", "gradient", "design"],
+  "author": "Alkemist",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}

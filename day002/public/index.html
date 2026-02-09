@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rune Writer — Mystical Text Converter</title>
-  <meta name="description" content="Transform your words into ancient runes. Elder Futhark, Younger Futhark, Anglo-Saxon Futhorc. Perfect for fantasy enthusiasts and tattoo planning.">
-  <meta property="og:title" content="Rune Writer — Mystical Text Converter">
-  <meta property="og:description" content="Transform your words into ancient runes">
+  <title>Rune Writer — Ancient Script Converter</title>
+  <meta name="description" content="Convert text to Elder Futhark, Younger Futhark, or Anglo-Saxon runes. Visual styles, historical context, PNG export.">
+  <meta property="og:title" content="Rune Writer — Ancient Script Converter">
+  <meta property="og:description" content="Convert text to Elder Futhark, Younger Futhark, or Anglo-Saxon runes">
   <meta property="og:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>ᚱ</text></svg>">
   <style>
     * {
@@ -23,6 +23,57 @@
       --text-secondary: #888;
       --accent: #c9a227;
       --accent-glow: #ffd700;
+    }
+    
+    [data-theme="light"] {
+      --bg-primary: #f8f9fa;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #e8e8e8;
+      --text-primary: #1a1a1a;
+      --text-secondary: #555;
+      --accent: #b8860b;
+      --accent-glow: #daa520;
+    }
+    
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        --bg-primary: #f8f9fa;
+        --bg-secondary: #ffffff;
+        --bg-tertiary: #e8e8e8;
+        --text-primary: #1a1a1a;
+        --text-secondary: #555;
+        --accent: #b8860b;
+        --accent-glow: #daa520;
+      }
+    }
+    
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.3s ease;
+      z-index: 100;
+      padding: 0;
+    }
+    
+    .theme-toggle:hover { border-color: var(--text-primary); }
+    .theme-icon { width: 20px; height: 20px; stroke: var(--text-primary); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .icon-sun { display: none; }
+    .icon-moon { display: block; }
+    [data-theme="light"] .icon-sun { display: block; }
+    [data-theme="light"] .icon-moon { display: none; }
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) .icon-sun { display: block; }
+      :root:not([data-theme="dark"]) .icon-moon { display: none; }
     }
 
     @font-face {
@@ -361,7 +412,7 @@
         0 0 20px #a855f7,
         0 0 40px #7c3aed,
         0 0 60px #6d28d9;
-      animation: magicPulse 2s ease-in-out infinite;
+      animation: magicFade 0.8s ease forwards, magicPulse 2s ease-in-out 0.8s infinite;
     }
 
     @keyframes magicPulse {
@@ -505,11 +556,6 @@
           -1px -1px 0 rgba(255,255,255,0.1),
           0 0 10px rgba(0,0,0,0.5);
       }
-    }
-
-    /* Magic fade animation */
-    .style-magic .rune {
-      animation: magicFade 0.8s ease forwards;
     }
 
     @keyframes magicFade {
@@ -861,13 +907,17 @@
   </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700</head>display=swap" rel="stylesheet"></head>
 <body>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+    <svg class="theme-icon icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    <svg class="theme-icon icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+  </button>
   <canvas id="particles"></canvas>
   
   <div class="container">
     <header>
       <div class="logo">ᚱᚢᚾᛖ</div>
       <h1>Rune Writer</h1>
-      <p class="tagline">Transform your words into ancient mystical scripts</p>
+      <p class="tagline">Convert text to Elder Futhark, Younger Futhark, or Anglo-Saxon runes</p>
     </header>
 
     <div class="controls">
@@ -894,6 +944,7 @@
             <span class="rune-preview">ᚠᚢᚦ</span>
           </button>
         </div>
+        <p id="script-history" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.75rem; line-height: 1.5;"></p>
       </div>
 
       <div class="control-group">
@@ -932,7 +983,7 @@
 
     <section class="output-section">
       <div class="output-header">
-        <h2>✦ Your Runes ✦</h2>
+        <h2>Your Runes</h2>
         <div class="output-actions">
           <div class="export-options">
             <select class="export-select" id="exportFormat">
@@ -966,8 +1017,7 @@
     </section>
 
     <footer>
-      <p>Crafted for fantasy enthusiasts, history lovers, and tattoo planners</p>
-      <p style="margin-top: 0.5rem;">✦ May the ancient wisdom guide your path ✦</p>
+      <p><a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a></p>
     </footer>
   </div>
 
@@ -1280,6 +1330,13 @@
       }
 
       init() {
+        // Script history data
+        this.scriptHistory = {
+          elder: "Elder Futhark (c. 150–800 AD) — The oldest runic alphabet, used across Germanic tribes from Scandinavia to Central Europe. 24 characters. Found on weapons, jewelry, and runestones.",
+          younger: "Younger Futhark (c. 800–1100 AD) — Simplified to 16 runes during the Viking Age. Used across Scandinavia for inscriptions, memorials, and everyday writing.",
+          anglo: "Anglo-Saxon Futhorc (c. 400–1100 AD) — Expanded to 33 runes in England. Adapted for Old English sounds. Found in manuscripts and on artifacts like the Thames scramasax."
+        };
+        
         // Script buttons
         document.querySelectorAll('.script-btn').forEach(btn => {
           btn.addEventListener('click', () => {
@@ -1288,8 +1345,12 @@
             this.currentScript = btn.dataset.script;
             this.convert();
             this.updateReferenceTable();
+            this.updateScriptHistory();
           });
         });
+        
+        // Initialize history
+        this.updateScriptHistory();
 
         // Style buttons
         document.querySelectorAll('.style-btn').forEach(btn => {
@@ -1628,6 +1689,13 @@
         return lines;
       }
 
+      updateScriptHistory() {
+        const historyEl = document.getElementById('script-history');
+        if (historyEl && this.scriptHistory) {
+          historyEl.textContent = this.scriptHistory[this.currentScript];
+        }
+      }
+
       updateReferenceTable() {
         const table = document.getElementById('refTable');
         const script = runeData[this.currentScript];
@@ -1683,5 +1751,22 @@
   </p>
   <p>Made by <a href="https://alkemist.no" target="_blank" rel="noopener" style="color: #f5f5f5; text-decoration: none; font-weight: 500;">Alkemist</a></p>
 </footer>
+<script>
+  function toggleTheme() {
+    const root = document.documentElement;
+    const current = root.getAttribute('data-theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let newTheme;
+    if (current === 'dark') newTheme = 'light';
+    else if (current === 'light') newTheme = 'dark';
+    else newTheme = prefersDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  }
+  (function() {
+    const saved = localStorage.getItem('theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  })();
+</script>
 </body>
 </html>

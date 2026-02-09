@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hva Slags Fjord Er Du? — Personlighetstest</title>
+  <meta name="description" content="Finn ut hvilken norsk fjord som matcher din personlighet! En morsom personlighetstest.">
+  <meta property="og:title" content="Hva Slags Fjord Er Du?">
+  <meta property="og:description" content="Finn ut hvilken norsk fjord som matcher din personlighet!">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    button { font-family: inherit; color: inherit; }
+    
+    :root {
+      --bg: #0a0a0a;
+      --bg-card: #141414;
+      --bg-elevated: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #f5f5f5;
+      --text-muted: #888;
+      --accent: #3b82f6;
+      --accent-hover: #60a5fa;
+    }
+    
+    [data-theme="light"] {
+      --bg: #f8f9fa;
+      --bg-card: #ffffff;
+      --bg-elevated: #f0f0f0;
+      --border: #e0e0e0;
+      --text: #1a1a1a;
+      --text-muted: #666;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+    }
+    
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        --bg: #f8f9fa;
+        --bg-card: #ffffff;
+        --bg-elevated: #f0f0f0;
+        --border: #e0e0e0;
+        --text: #1a1a1a;
+        --text-muted: #666;
+        --accent: #2563eb;
+        --accent-hover: #1d4ed8;
+      }
+    }
+    
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.3s ease;
+      z-index: 100;
+      padding: 0;
+    }
+    
+    .theme-toggle:hover { border-color: var(--accent); }
+    .theme-icon { width: 20px; height: 20px; stroke: var(--text); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .icon-sun { display: none; }
+    .icon-moon { display: block; }
+    [data-theme="light"] .icon-sun { display: block; }
+    [data-theme="light"] .icon-moon { display: none; }
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) .icon-sun { display: block; }
+      :root:not([data-theme="dark"]) .icon-moon { display: none; }
+    }
+    
+    body {
+      font-family: 'Jost', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .logo {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+    
+    /* Quiz Container */
+    .quiz-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+    }
+    
+    /* Progress Bar */
+    .progress-container {
+      margin-bottom: 2rem;
+    }
+    
+    .progress-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    
+    .progress-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+    
+    /* Question */
+    .question {
+      margin-bottom: 1.5rem;
+    }
+    
+    .question h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+    
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .option {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+      width: 100%;
+    }
+    
+    .option:hover {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.1);
+    }
+    
+    .option.selected {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.15);
+    }
+    
+    /* Result */
+    .result {
+      display: none;
+      text-align: center;
+    }
+    
+    .result.active {
+      display: block;
+    }
+    
+    .result-image {
+      width: 100%;
+      max-width: 400px;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+    
+    .result-fjord {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .result-tagline {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    
+    .result-description {
+      color: var(--text);
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+    
+    .traits {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    
+    .trait {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+    }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.875rem 1.5rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--bg-card);
+      border-color: var(--text-muted);
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .footer-brand {
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+    }
+    
+    .footer-brand:hover {
+      color: var(--accent);
+    }
+    
+    .footer-tagline {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.4s ease;
+    }
+    
+    /* Share section */
+    .share-section {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .share-title {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+    <svg class="theme-icon icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    <svg class="theme-icon icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+  </button>
+  <div class="container">
+    <header>
+      <div class="logo">🏔️</div>
+      <h1>Hva Slags Fjord Er Du?</h1>
+      <p class="subtitle">Finn ut hvilken norsk fjord som matcher din personlighet</p>
+    </header>
+    
+    <div class="quiz-container">
+      <div id="quiz">
+        <div class="progress-container">
+          <div class="progress-text">
+            <span>Spørsmål <span id="current-q">1</span> av <span id="total-q">7</span></span>
+            <span id="progress-percent">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+        
+        <div class="question fade-in" id="question-container">
+          <!-- Question content loaded dynamically -->
+        </div>
+      </div>
+      
+      <div class="result" id="result">
+        <!-- Result loaded dynamically -->
+      </div>
+    </div>
+    
+    <footer>
+      <a href="https://aikemist.com" class="footer-brand">aikemist</a>
+      <p class="footer-tagline">One AI project. Every day.</p>
+    </footer>
+  </div>
+  
+  <script>
+    const questions = [
+      {
+        question: "Hvordan foretrekker du å tilbringe en lørdag?",
+        options: [
+          { text: "🧗 Ute på eventyr — fjelltur, kajakk, noe som får pulsen opp", traits: ["adventurous", "dramatic"] },
+          { text: "📚 Rolig hjemme med en god bok og te", traits: ["calm", "deep"] },
+          { text: "👥 Sosial sammenkomst med venner og familie", traits: ["social", "warm"] },
+          { text: "🎨 Kreativt prosjekt eller utforske noe nytt", traits: ["creative", "mysterious"] }
+        ]
+      },
+      {
+        question: "Hvilken årstid føler du deg mest som deg selv?",
+        options: [
+          { text: "☀️ Sommer — lys, energi og muligheter", traits: ["social", "warm"] },
+          { text: "🍂 Høst — refleksjon og forandring", traits: ["deep", "mysterious"] },
+          { text: "❄️ Vinter — stillhet og indre ro", traits: ["calm", "dramatic"] },
+          { text: "🌸 Vår — fornyelse og optimisme", traits: ["adventurous", "creative"] }
+        ]
+      },
+      {
+        question: "Du står overfor en stor utfordring. Hva gjør du?",
+        options: [
+          { text: "💪 Tar den head-on — ingen fjell for høye", traits: ["adventurous", "dramatic"] },
+          { text: "🤔 Tar et skritt tilbake og tenker grundig gjennom", traits: ["deep", "calm"] },
+          { text: "📞 Ringer noen jeg stoler på for råd", traits: ["social", "warm"] },
+          { text: "🔄 Finner en kreativ løsning ingen har tenkt på", traits: ["creative", "mysterious"] }
+        ]
+      },
+      {
+        question: "Hva verdsetter du mest i vennskap?",
+        options: [
+          { text: "🎢 Delte opplevelser og eventyr", traits: ["adventurous", "social"] },
+          { text: "💭 Dype, meningsfulle samtaler", traits: ["deep", "mysterious"] },
+          { text: "🤝 Lojalitet og tillit over tid", traits: ["calm", "warm"] },
+          { text: "✨ Gjensidig inspirasjon og vekst", traits: ["creative", "dramatic"] }
+        ]
+      },
+      {
+        question: "Hvilken type landskap tiltrekker deg mest?",
+        options: [
+          { text: "🏔️ Dramatiske fjell og bratte klipper", traits: ["dramatic", "adventurous"] },
+          { text: "🌊 Stille vann og fredelige bukter", traits: ["calm", "deep"] },
+          { text: "🏘️ Koselige bygder med historie", traits: ["warm", "social"] },
+          { text: "🌫️ Mystiske daler og skjulte steder", traits: ["mysterious", "creative"] }
+        ]
+      },
+      {
+        question: "Hvordan håndterer du stress?",
+        options: [
+          { text: "🏃 Fysisk aktivitet — må bare ut og bevege meg", traits: ["adventurous", "dramatic"] },
+          { text: "🧘 Stille tid alene for å samle tankene", traits: ["calm", "deep"] },
+          { text: "☕ Prater med noen over en kopp kaffe", traits: ["social", "warm"] },
+          { text: "🎵 Fordyper meg i musikk, kunst eller noe kreativt", traits: ["creative", "mysterious"] }
+        ]
+      },
+      {
+        question: "Hva ønsker du at folk skal huske deg for?",
+        options: [
+          { text: "🌟 Motet til å ta sjanser og leve fullt ut", traits: ["adventurous", "dramatic"] },
+          { text: "🦉 Visdom og evnen til å se det store bildet", traits: ["deep", "mysterious"] },
+          { text: "❤️ Varmen og omsorgen for andre", traits: ["warm", "social"] },
+          { text: "💡 Kreativiteten og evnen til å tenke annerledes", traits: ["creative", "calm"] }
+        ]
+      }
+    ];
+    
+    const fjords = {
+      geiranger: {
+        name: "Geirangerfjorden",
+        tagline: "Den Dramatiske Drømmeren",
+        image: "https://images.unsplash.com/photo-1516576430-97595b7b8b03?w=800&q=80",
+        description: "Du er som Geirangerfjorden — spektakulær, uforglemmelig, og full av dybde. Du gjør inntrykk på alle du møter, og livet ditt er alt annet enn kjedelig. Som de mektige fossene som styrter ned fjellsidene, har du en naturlig kraft og tilstedeværelse som er umulig å ignorere.",
+        traits: ["Dramatisk", "Imponerende", "Dyptgående", "Minneverdig"],
+        dominantTraits: ["dramatic", "deep"]
+      },
+      sogne: {
+        name: "Sognefjorden",
+        tagline: "Den Dype Tenkeren",
+        image: "https://images.unsplash.com/photo-1520769669658-f07657f5a307?w=800&q=80",
+        description: "Du er som Sognefjorden — Norges lengste og dypeste. Under overflaten skjuler det seg enorm dybde og kompleksitet. Du tar deg tid til å forstå ting ordentlig, og dine innsikter kommer fra et sted andre sjelden når. Rolig på utsiden, uendelig dyp på innsiden.",
+        traits: ["Reflektert", "Dyp", "Stabil", "Vis"],
+        dominantTraits: ["deep", "calm"]
+      },
+      hardanger: {
+        name: "Hardangerfjorden",
+        tagline: "Den Varme Velkomsten",
+        image: "https://images.unsplash.com/photo-1502920514313-52581002a659?w=800&q=80",
+        description: "Du er som Hardangerfjorden — kjent for fruktbare bredder, blomstrende frukthager og en mildere atmosfære. Du har en naturlig varme som får mennesker til å føle seg velkomne. Som fjorden som nærer alt rundt seg, løfter du opp de rundt deg.",
+        traits: ["Varm", "Næringsrik", "Inkluderende", "Blomstrende"],
+        dominantTraits: ["warm", "social"]
+      },
+      lyse: {
+        name: "Lysefjorden",
+        tagline: "Den Eventyrlystne Sjelen",
+        image: "https://images.unsplash.com/photo-1527004013197-933c4bb611b3?w=800&q=80",
+        description: "Du er som Lysefjorden — hjemmet til Preikestolen og Kjerag. Du trekkes mot spenning, utfordringer og det spektakulære. Der andre ser hindringer, ser du muligheter for eventyr. Livet er ikke ment å leves forsiktig, og det vet du.",
+        traits: ["Eventyrlystig", "Modig", "Energisk", "Inspirerende"],
+        dominantTraits: ["adventurous", "dramatic"]
+      },
+      naerøy: {
+        name: "Nærøyfjorden",
+        tagline: "Den Mystiske Kunstneren",
+        image: "https://images.unsplash.com/photo-1601439678777-b2b3c56fa627?w=800&q=80",
+        description: "Du er som Nærøyfjorden — UNESCO-vernet og magisk smal. Du har noe mystisk og kunstnerisk over deg som fascinerer andre. Som fjorden som slynger seg mellom bratte fjell, finner du skjønnhet i det uventede og ser verden på din helt egen måte.",
+        traits: ["Kreativ", "Mystisk", "Unik", "Fascinerende"],
+        dominantTraits: ["mysterious", "creative"]
+      },
+      aurland: {
+        name: "Aurlandsfjorden",
+        tagline: "Den Balanserte Utforskeren",
+        image: "https://images.unsplash.com/photo-1548785064-7cc4602c5946?w=800&q=80",
+        description: "Du er som Aurlandsfjorden — en perfekt balanse mellom tilgjengelighet og eventyr. Du mestrer kunsten å være både jordnær og utforskende. Stegastein-utsikten symboliserer deg perfekt: med føttene på bakken, men blikket mot det spektakulære.",
+        traits: ["Balansert", "Allsidig", "Utforskende", "Tilpasningsdyktig"],
+        dominantTraits: ["adventurous", "calm"]
+      }
+    };
+    
+    let currentQuestion = 0;
+    let traitScores = {
+      dramatic: 0,
+      deep: 0,
+      calm: 0,
+      warm: 0,
+      social: 0,
+      adventurous: 0,
+      mysterious: 0,
+      creative: 0
+    };
+    
+    function renderQuestion() {
+      const q = questions[currentQuestion];
+      const container = document.getElementById('question-container');
+      
+      container.innerHTML = `
+        <h2>${q.question}</h2>
+        <div class="options">
+          ${q.options.map((opt, i) => `
+            <button class="option" onclick="selectOption(${i})">${opt.text}</button>
+          `).join('')}
+        </div>
+      `;
+      
+      // Update progress
+      document.getElementById('current-q').textContent = currentQuestion + 1;
+      const progress = ((currentQuestion) / questions.length) * 100;
+      document.getElementById('progress-fill').style.width = progress + '%';
+      document.getElementById('progress-percent').textContent = Math.round(progress) + '%';
+      
+      // Animate in
+      container.classList.remove('fade-in');
+      void container.offsetWidth; // Trigger reflow
+      container.classList.add('fade-in');
+    }
+    
+    function selectOption(index) {
+      const q = questions[currentQuestion];
+      const selectedTraits = q.options[index].traits;
+      
+      // Add scores for selected traits
+      selectedTraits.forEach(trait => {
+        traitScores[trait] += 1;
+      });
+      
+      // Visual feedback
+      const options = document.querySelectorAll('.option');
+      options[index].classList.add('selected');
+      
+      // Move to next question after brief delay
+      setTimeout(() => {
+        currentQuestion++;
+        
+        if (currentQuestion < questions.length) {
+          renderQuestion();
+        } else {
+          showResult();
+        }
+      }, 300);
+    }
+    
+    function calculateFjord() {
+      // Find top 2 traits
+      const sortedTraits = Object.entries(traitScores)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 2)
+        .map(entry => entry[0]);
+      
+      // Match with fjord
+      let bestMatch = 'sogne'; // default
+      let bestScore = 0;
+      
+      for (const [fjordKey, fjord] of Object.entries(fjords)) {
+        const matchScore = fjord.dominantTraits.filter(t => sortedTraits.includes(t)).length;
+        if (matchScore > bestScore) {
+          bestScore = matchScore;
+          bestMatch = fjordKey;
+        }
+      }
+      
+      return fjords[bestMatch];
+    }
+    
+    function showResult() {
+      const fjord = calculateFjord();
+      
+      document.getElementById('quiz').style.display = 'none';
+      document.getElementById('progress-fill').style.width = '100%';
+      document.getElementById('progress-percent').textContent = '100%';
+      
+      const resultEl = document.getElementById('result');
+      resultEl.innerHTML = `
+        <img src="${fjord.image}" alt="${fjord.name}" class="result-image">
+        <div class="result-fjord">${fjord.name}</div>
+        <div class="result-tagline">${fjord.tagline}</div>
+        <p class="result-description">${fjord.description}</p>
+        <div class="traits">
+          ${fjord.traits.map(t => `<span class="trait">${t}</span>`).join('')}
+        </div>
+        <div class="btn-group">
+          <button class="btn" onclick="shareResult('${fjord.name}')">
+            📤 Del resultatet
+          </button>
+          <button class="btn btn-secondary" onclick="restartQuiz()">
+            🔄 Ta testen på nytt
+          </button>
+        </div>
+        <div class="share-section">
+          <p class="share-title">Del med venner og se hvilken fjord de er!</p>
+        </div>
+      `;
+      
+      resultEl.classList.add('active', 'fade-in');
+    }
+    
+    function shareResult(fjordName) {
+      const text = `Jeg er ${fjordName}! 🏔️ Hvilken norsk fjord er du?`;
+      const url = window.location.href;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: 'Hva Slags Fjord Er Du?',
+          text: text,
+          url: url
+        });
+      } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(`${text}\n${url}`).then(() => {
+          alert('Kopiert til utklippstavlen!');
+        });
+      }
+    }
+    
+    function restartQuiz() {
+      currentQuestion = 0;
+      traitScores = {
+        dramatic: 0,
+        deep: 0,
+        calm: 0,
+        warm: 0,
+        social: 0,
+        adventurous: 0,
+        mysterious: 0,
+        creative: 0
+      };
+      
+      document.getElementById('quiz').style.display = 'block';
+      document.getElementById('result').classList.remove('active');
+      renderQuestion();
+    }
+    
+    // Start quiz
+    renderQuestion();
+    
+    // Theme toggle
+    function toggleTheme() {
+      const root = document.documentElement;
+      const current = root.getAttribute('data-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      let newTheme;
+      if (current === 'dark') {
+        newTheme = 'light';
+      } else if (current === 'light') {
+        newTheme = 'dark';
+      } else {
+        newTheme = prefersDark ? 'light' : 'dark';
+      }
+      
+      root.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    }
+    
+    // Apply saved theme
+    (function() {
+      const saved = localStorage.getItem('theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    })();
+  </script>
+</body>
+</html>
