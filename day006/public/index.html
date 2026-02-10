@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mesh Gradient Generator — Create Beautiful Backgrounds</title>
+  <meta name="description" content="Create stunning mesh gradients inspired by OpenAI, Stripe, and Linear. Animate, export PNG/CSS/SVG, or copy to clipboard. Free tool by Alkemist.">
+  <meta property="og:title" content="Mesh Gradient Generator — Free Tool">
+  <meta property="og:description" content="Create stunning mesh gradients like OpenAI, Stripe, and Linear. Animate and export.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://day006.aikemist.com">
+  <meta property="og:image" content="https://day006.aikemist.com/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect rx='20' width='100' height='100' fill='%236366f1'/><circle cx='35' cy='40' r='20' fill='%23ec4899' opacity='0.8'/><circle cx='65' cy='60' r='25' fill='%2310b981' opacity='0.8'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fafafa;
+      --bg-alt: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #666;
+      --border: #e0e0e0;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --gradient-bg: #f5f5f5;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --bg-alt: #141414;
+      --text: #f0f0f0;
+      --text-muted: #888;
+      --border: #2a2a2a;
+      --accent: #818cf8;
+      --accent-hover: #a5b4fc;
+      --gradient-bg: #0a0a0a;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+      .container { padding: 1rem; }
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1 0%, #ec4899 50%, #10b981 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+    }
+    
+    .logo h1 {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    
+    .logo h1 span {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    
+    @media (max-width: 480px) {
+      .logo h1 { font-size: 1rem; }
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    
+    .icon-btn {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.55rem;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .icon-btn:hover {
+      background: var(--border);
+      transform: translateY(-1px);
+    }
+    
+    .icon-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 1.5rem;
+      min-height: calc(100vh - 200px);
+    }
+    
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .controls {
+        order: -1;
+        max-height: none;
+      }
+    }
+    
+    .canvas-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .canvas-container {
+      position: relative;
+      background: var(--gradient-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    
+    #meshCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    
+    .noise-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    
+    .canvas-actions {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .controls {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      max-height: calc(100vh - 140px);
+      overflow-y: auto;
+    }
+    
+    .control-section h3 {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+    
+    .presets {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.4rem;
+    }
+    
+    .preset {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .preset::after {
+      content: attr(data-name);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0.2rem;
+      font-size: 0.5rem;
+      font-weight: 600;
+      text-align: center;
+      color: white;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    .preset:hover::after {
+      opacity: 1;
+    }
+    
+    .preset:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    
+    .preset.active {
+      border-color: var(--accent);
+    }
+    
+    .color-points {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    
+    .color-point {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.5rem;
+      background: var(--bg);
+      border-radius: 8px;
+    }
+    
+    .color-point input[type="color"] {
+      width: 26px;
+      height: 26px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: none;
+      flex-shrink: 0;
+    }
+    
+    .color-point input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    .color-point input[type="color"]::-webkit-color-swatch {
+      border: 2px solid var(--border);
+      border-radius: 4px;
+    }
+    
+    .color-point-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .color-point-label {
+      font-size: 0.7rem;
+      color: var(--text);
+    }
+    
+    .color-point-value {
+      font-family: 'SF Mono', 'Consolas', monospace;
+      font-size: 0.6rem;
+      color: var(--text-muted);
+    }
+    
+    .remove-point {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.15rem;
+      opacity: 0.4;
+      transition: all 0.2s;
+      font-size: 0.8rem;
+    }
+    
+    .remove-point:hover {
+      opacity: 1;
+      color: #ef4444;
+    }
+    
+    .add-point-btn {
+      background: var(--bg);
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+    
+    .add-point-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    
+    .slider-group label {
+      font-size: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .slider-group label span {
+      color: var(--text-muted);
+      font-family: 'SF Mono', 'Consolas', monospace;
+      font-size: 0.65rem;
+    }
+    
+    input[type="range"] {
+      width: 100%;
+      height: 5px;
+      background: var(--bg);
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+    
+    .toggle {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      background: var(--bg);
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    
+    .toggle.active {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 14px;
+      height: 14px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    
+    .toggle.active::after {
+      transform: translateX(16px);
+    }
+    
+    .btn {
+      padding: 0.6rem 0.9rem;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+    
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+    
+    .btn-magic {
+      background: linear-gradient(135deg, #6366f1, #ec4899, #10b981);
+      background-size: 200% 200%;
+      animation: gradient-shift 4s ease infinite;
+      color: white;
+      font-weight: 600;
+    }
+    
+    .btn-magic:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+    }
+    
+    @keyframes gradient-shift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    .export-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem;
+    }
+    
+    .export-buttons .btn:first-child {
+      grid-column: span 2;
+    }
+    
+    .pro-teaser {
+      background: linear-gradient(135deg, var(--bg) 0%, var(--accent)08 100%);
+      border: 1px dashed var(--accent);
+      border-radius: 10px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+    
+    .pro-teaser h4 {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+    
+    .pro-teaser p {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    
+    .pro-teaser input {
+      width: 100%;
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.7rem;
+      background: var(--bg-alt);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+    }
+    
+    .pro-teaser input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+    
+    footer a {
+      color: var(--text);
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.7rem 1.25rem;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 1000;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
+    .mesh-point {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      cursor: grab;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s, box-shadow 0.15s;
+      z-index: 10;
+    }
+    
+    .mesh-point:hover {
+      transform: translate(-50%, -50%) scale(1.3);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+    
+    .mesh-point:active { cursor: grabbing; }
+    
+    .mesh-point-index {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+      pointer-events: none;
+    }
+    
+    .animation-badge {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(8px);
+      color: white;
+      padding: 0.35rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.6rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      z-index: 5;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .animation-badge.visible { opacity: 1; }
+    
+    .animation-badge .dot {
+      width: 5px;
+      height: 5px;
+      background: #ef4444;
+      border-radius: 50%;
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    
+    /* Mobile adjustments */
+    @media (max-width: 480px) {
+      .presets { grid-template-columns: repeat(3, 1fr); }
+      .export-buttons { grid-template-columns: 1fr; }
+      .export-buttons .btn:first-child { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <div class="container">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">M</div>
+        <h1>Mesh <span>Gradient</span></h1>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="animateBtn" onclick="toggleAnimation()" title="Animate (A)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </button>
+        <button class="icon-btn" onclick="randomize()" title="Randomize (R)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>
+          </svg>
+        </button>
+        <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="themeIcon">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+    
+    <main class="main-layout">
+      <div class="canvas-wrapper">
+        <div class="canvas-container" id="canvasContainer">
+          <canvas id="meshCanvas"></canvas>
+          <div class="noise-overlay" id="noiseOverlay"></div>
+          <div class="animation-badge" id="animationBadge">
+            <span class="dot"></span>
+            ANIMATING
+          </div>
+        </div>
+        <div class="canvas-actions">
+          <button class="btn btn-magic" onclick="randomize()">
+            ✨ New Gradient
+          </button>
+          <button class="btn btn-secondary" onclick="shareGradient()">
+            📤 Share
+          </button>
+        </div>
+      </div>
+      
+      <div class="controls">
+        <div class="control-section">
+          <h3>Presets</h3>
+          <div class="presets" id="presets"></div>
+        </div>
+        
+        <div class="control-section">
+          <h3>Colors</h3>
+          <div class="color-points" id="colorPoints"></div>
+          <button class="add-point-btn" onclick="addPoint()">+ Add Point</button>
+        </div>
+        
+        <div class="control-section">
+          <h3>Adjust</h3>
+          <div class="slider-group">
+            <label>Blur <span id="blurValue">90</span>%</label>
+            <input type="range" id="blurSlider" min="30" max="160" value="90" oninput="updateBlur(this.value)">
+          </div>
+          <div class="slider-group">
+            <label>Noise <span id="grainValue">0</span>%</label>
+            <input type="range" id="grainSlider" min="0" max="40" value="0" oninput="updateGrain(this.value)">
+          </div>
+          <div class="slider-group">
+            <label>Scale <span id="sizeValue">100</span>%</label>
+            <input type="range" id="sizeSlider" min="60" max="150" value="100" oninput="updateSize(this.value)">
+          </div>
+        </div>
+        
+        <div class="control-section">
+          <h3>Animation</h3>
+          <div class="toggle-row">
+            <span>Animate</span>
+            <div class="toggle" id="animToggle" onclick="toggleAnimation()"></div>
+          </div>
+          <div class="slider-group" style="margin-top: 0.5rem">
+            <label>Speed <span id="speedValue">50</span>%</label>
+            <input type="range" id="speedSlider" min="10" max="100" value="50" oninput="updateSpeed(this.value)">
+          </div>
+        </div>
+        
+        <div class="control-section">
+          <h3>Export</h3>
+          <div class="export-buttons">
+            <button class="btn btn-primary" onclick="exportPNG()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+              </svg>
+              PNG 1920×1080
+            </button>
+            <button class="btn btn-secondary" onclick="copyCSS()">CSS</button>
+            <button class="btn btn-secondary" onclick="copySVG()">SVG</button>
+          </div>
+        </div>
+        
+        <div class="pro-teaser">
+          <h4>🚀 Pro Export Coming Soon</h4>
+          <p>4K PNG, Video/GIF, Figma plugin</p>
+          <input type="email" placeholder="Get notified..." id="proEmail" onkeypress="if(event.key==='Enter')submitEmail()">
+        </div>
+      </div>
+    </main>
+    
+    <footer>
+      <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+  
+  <script>
+    const canvas = document.getElementById('meshCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('canvasContainer');
+    const noiseOverlay = document.getElementById('noiseOverlay');
+    const animationBadge = document.getElementById('animationBadge');
+    
+    let points = [];
+    let blur = 90;
+    let grain = 0;
+    let sizeMultiplier = 1;
+    let animating = false;
+    let animSpeed = 0.5;
+    let draggedPoint = null;
+    let animFrame = null;
+    let velocities = [];
+    let currentBg = '#0a0a0a';
+    
+    const presets = [
+      { name: 'OpenAI', colors: ['#10a37f', '#0066cc', '#6366f1', '#1a1a2e'], bg: '#0a0a0a' },
+      { name: 'Stripe', colors: ['#635bff', '#00d4ff', '#80e9ff', '#0a2540'], bg: '#0a2540' },
+      { name: 'Linear', colors: ['#5e6ad2', '#8a8fff', '#4a4e69', '#0d0d1a'], bg: '#0d0d1a' },
+      { name: 'Vercel', colors: ['#ffffff', '#888888', '#444444', '#000000'], bg: '#000000' },
+      { name: 'Aurora', colors: ['#00d4aa', '#7c3aed', '#ec4899', '#06b6d4'], bg: '#0f172a' },
+      { name: 'Sunset', colors: ['#ff6b6b', '#feca57', '#ff9ff3', '#ff6348'], bg: '#1a0a0a' },
+      { name: 'Ocean', colors: ['#0077b6', '#00b4d8', '#90e0ef', '#023e8a'], bg: '#03045e' },
+      { name: 'Candy', colors: ['#ff9ff3', '#f368e0', '#48dbfb', '#ff6b81'], bg: '#1a0a1a' },
+      { name: 'Forest', colors: ['#2d6a4f', '#40916c', '#52b788', '#1b4332'], bg: '#081c15' },
+      { name: 'Fire', colors: ['#e74c3c', '#f39c12', '#ff6b35', '#c0392b'], bg: '#1a0a0a' },
+      { name: 'Grape', colors: ['#7c3aed', '#a855f7', '#c084fc', '#4c1d95'], bg: '#0f0a1a' },
+      { name: 'Mint', colors: ['#10b981', '#34d399', '#6ee7b7', '#059669'], bg: '#0a1a14' },
+    ];
+    
+    function init() {
+      resizeCanvas();
+      loadPreset(0);
+      renderPresets();
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+        renderDraggablePoints();
+      });
+      
+      // Keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT') return;
+        if (e.key === 'r' || e.key === 'R') randomize();
+        if (e.key === 'a' || e.key === 'A') toggleAnimation();
+        if (e.key === 's' || e.key === 'S') exportPNG();
+      });
+    }
+    
+    function resizeCanvas() {
+      const rect = container.getBoundingClientRect();
+      canvas.width = rect.width * 2;
+      canvas.height = rect.height * 2;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      render();
+    }
+    
+    function renderPresets() {
+      const presetsContainer = document.getElementById('presets');
+      presetsContainer.innerHTML = presets.map((p, i) => `
+        <div class="preset" onclick="loadPreset(${i})" 
+             style="background: ${p.bg}; background-image: radial-gradient(at 30% 30%, ${p.colors[0]}88, transparent 50%), radial-gradient(at 70% 60%, ${p.colors[1]}88, transparent 50%), radial-gradient(at 40% 80%, ${p.colors[2]}88, transparent 50%);"
+             data-name="${p.name}"
+             title="${p.name}"></div>
+      `).join('');
+    }
+    
+    function loadPreset(index) {
+      const preset = presets[index];
+      currentBg = preset.bg;
+      document.documentElement.style.setProperty('--gradient-bg', preset.bg);
+      
+      const positions = [
+        { x: 0.25, y: 0.3 },
+        { x: 0.75, y: 0.35 },
+        { x: 0.35, y: 0.7 },
+        { x: 0.7, y: 0.75 },
+      ];
+      
+      points = preset.colors.slice(0, 4).map((color, i) => ({
+        x: positions[i].x + (Math.random() - 0.5) * 0.1,
+        y: positions[i].y + (Math.random() - 0.5) * 0.1,
+        color: color,
+        radius: 0.35 + Math.random() * 0.1
+      }));
+      
+      velocities = points.map(() => ({
+        x: (Math.random() - 0.5) * 0.002,
+        y: (Math.random() - 0.5) * 0.002
+      }));
+      
+      renderColorPoints();
+      renderDraggablePoints();
+      render();
+      
+      document.querySelectorAll('.preset').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
+    }
+    
+    function renderColorPoints() {
+      const c = document.getElementById('colorPoints');
+      c.innerHTML = points.map((p, i) => `
+        <div class="color-point">
+          <input type="color" value="${p.color}" onchange="updatePointColor(${i}, this.value)">
+          <div class="color-point-info">
+            <div class="color-point-label">Point ${i + 1}</div>
+            <div class="color-point-value">${p.color.toUpperCase()}</div>
+          </div>
+          ${points.length > 2 ? `<button class="remove-point" onclick="removePoint(${i})" title="Remove">✕</button>` : ''}
+        </div>
+      `).join('');
+    }
+    
+    function renderDraggablePoints() {
+      document.querySelectorAll('.mesh-point').forEach(el => el.remove());
+      const rect = container.getBoundingClientRect();
+      
+      points.forEach((p, i) => {
+        const el = document.createElement('div');
+        el.className = 'mesh-point';
+        el.style.background = p.color;
+        el.style.left = (p.x * rect.width) + 'px';
+        el.style.top = (p.y * rect.height) + 'px';
+        el.innerHTML = `<span class="mesh-point-index">${i + 1}</span>`;
+        el.dataset.index = i;
+        
+        el.addEventListener('mousedown', startDrag);
+        el.addEventListener('touchstart', startDrag, { passive: false });
+        
+        container.appendChild(el);
+      });
+    }
+    
+    function startDrag(e) {
+      e.preventDefault();
+      draggedPoint = parseInt(e.target.closest('.mesh-point').dataset.index);
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('mouseup', stopDrag);
+      document.addEventListener('touchmove', drag, { passive: false });
+      document.addEventListener('touchend', stopDrag);
+    }
+    
+    function drag(e) {
+      if (draggedPoint === null) return;
+      e.preventDefault();
+      
+      const rect = container.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      
+      const x = Math.max(0.05, Math.min(0.95, (clientX - rect.left) / rect.width));
+      const y = Math.max(0.05, Math.min(0.95, (clientY - rect.top) / rect.height));
+      
+      points[draggedPoint].x = x;
+      points[draggedPoint].y = y;
+      
+      const pointEl = document.querySelector(`.mesh-point[data-index="${draggedPoint}"]`);
+      if (pointEl) {
+        pointEl.style.left = (x * rect.width) + 'px';
+        pointEl.style.top = (y * rect.height) + 'px';
+      }
+      
+      if (!animating) render();
+    }
+    
+    function stopDrag() {
+      draggedPoint = null;
+      document.removeEventListener('mousemove', drag);
+      document.removeEventListener('mouseup', stopDrag);
+      document.removeEventListener('touchmove', drag);
+      document.removeEventListener('touchend', stopDrag);
+    }
+    
+    function updatePointColor(index, color) {
+      points[index].color = color;
+      const pointEl = document.querySelector(`.mesh-point[data-index="${index}"]`);
+      if (pointEl) pointEl.style.background = color;
+      document.querySelector(`.color-point:nth-child(${index + 1}) .color-point-value`).textContent = color.toUpperCase();
+      render();
+    }
+    
+    function addPoint() {
+      if (points.length >= 6) {
+        showToast('Maximum 6 color points');
+        return;
+      }
+      const newPoint = {
+        x: 0.3 + Math.random() * 0.4,
+        y: 0.3 + Math.random() * 0.4,
+        color: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'),
+        radius: 0.3 + Math.random() * 0.15
+      };
+      points.push(newPoint);
+      velocities.push({
+        x: (Math.random() - 0.5) * 0.002,
+        y: (Math.random() - 0.5) * 0.002
+      });
+      renderColorPoints();
+      renderDraggablePoints();
+      render();
+    }
+    
+    function removePoint(index) {
+      if (points.length <= 2) return;
+      points.splice(index, 1);
+      velocities.splice(index, 1);
+      renderColorPoints();
+      renderDraggablePoints();
+      render();
+    }
+    
+    function updateBlur(value) {
+      blur = parseInt(value);
+      document.getElementById('blurValue').textContent = value;
+      if (!animating) render();
+    }
+    
+    function updateGrain(value) {
+      grain = parseInt(value);
+      document.getElementById('grainValue').textContent = value;
+      noiseOverlay.style.opacity = grain / 100;
+    }
+    
+    function updateSize(value) {
+      sizeMultiplier = parseInt(value) / 100;
+      document.getElementById('sizeValue').textContent = value;
+      if (!animating) render();
+    }
+    
+    function updateSpeed(value) {
+      animSpeed = parseInt(value) / 100;
+      document.getElementById('speedValue').textContent = value;
+    }
+    
+    function toggleAnimation() {
+      animating = !animating;
+      const btn = document.getElementById('animateBtn');
+      const toggle = document.getElementById('animToggle');
+      
+      btn.classList.toggle('active', animating);
+      toggle.classList.toggle('active', animating);
+      animationBadge.classList.toggle('visible', animating);
+      
+      // Update button icon
+      btn.innerHTML = animating 
+        ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'
+        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+      
+      if (animating) {
+        animateLoop();
+      } else if (animFrame) {
+        cancelAnimationFrame(animFrame);
+        animFrame = null;
+      }
+    }
+    
+    function animateLoop() {
+      if (!animating) return;
+      
+      const rect = container.getBoundingClientRect();
+      
+      points.forEach((p, i) => {
+        p.x += velocities[i].x * animSpeed;
+        p.y += velocities[i].y * animSpeed;
+        
+        if (p.x < 0.1 || p.x > 0.9) velocities[i].x *= -1;
+        if (p.y < 0.1 || p.y > 0.9) velocities[i].y *= -1;
+        
+        p.x = Math.max(0.1, Math.min(0.9, p.x));
+        p.y = Math.max(0.1, Math.min(0.9, p.y));
+        
+        const pointEl = document.querySelector(`.mesh-point[data-index="${i}"]`);
+        if (pointEl) {
+          pointEl.style.left = (p.x * rect.width) + 'px';
+          pointEl.style.top = (p.y * rect.height) + 'px';
+        }
+      });
+      
+      render();
+      animFrame = requestAnimationFrame(animateLoop);
+    }
+    
+    function randomize() {
+      const bgColors = ['#0a0a0a', '#0f172a', '#1a0a0a', '#0a1a14', '#0a0a1a', '#1a1a1a', '#0a2540', '#081c15'];
+      currentBg = bgColors[Math.floor(Math.random() * bgColors.length)];
+      document.documentElement.style.setProperty('--gradient-bg', currentBg);
+      
+      const numPoints = 3 + Math.floor(Math.random() * 2);
+      points = [];
+      velocities = [];
+      
+      // Generate harmonious colors
+      const hue = Math.random() * 360;
+      for (let i = 0; i < numPoints; i++) {
+        const h = (hue + i * (360 / numPoints) + Math.random() * 30) % 360;
+        const s = 60 + Math.random() * 30;
+        const l = 50 + Math.random() * 20;
+        
+        points.push({
+          x: 0.15 + Math.random() * 0.7,
+          y: 0.15 + Math.random() * 0.7,
+          color: hslToHex(h, s, l),
+          radius: 0.3 + Math.random() * 0.2
+        });
+        velocities.push({
+          x: (Math.random() - 0.5) * 0.002,
+          y: (Math.random() - 0.5) * 0.002
+        });
+      }
+      
+      document.querySelectorAll('.preset').forEach(el => el.classList.remove('active'));
+      renderColorPoints();
+      renderDraggablePoints();
+      render();
+    }
+    
+    function hslToHex(h, s, l) {
+      s /= 100;
+      l /= 100;
+      const a = s * Math.min(l, 1 - l);
+      const f = n => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color).toString(16).padStart(2, '0');
+      };
+      return `#${f(0)}${f(8)}${f(4)}`;
+    }
+    
+    function render() {
+      const w = canvas.width;
+      const h = canvas.height;
+      
+      ctx.fillStyle = currentBg;
+      ctx.fillRect(0, 0, w, h);
+      
+      ctx.save();
+      ctx.filter = `blur(${blur * (w / 900)}px)`;
+      
+      points.forEach(point => {
+        const x = point.x * w;
+        const y = point.y * h;
+        const radius = point.radius * Math.min(w, h) * sizeMultiplier;
+        
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+        gradient.addColorStop(0, point.color);
+        gradient.addColorStop(0.5, point.color + 'aa');
+        gradient.addColorStop(1, point.color + '00');
+        
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      
+      ctx.restore();
+    }
+    
+    function exportPNG() {
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = 1920;
+      tempCanvas.height = 1080;
+      const tempCtx = tempCanvas.getContext('2d');
+      
+      tempCtx.fillStyle = currentBg;
+      tempCtx.fillRect(0, 0, 1920, 1080);
+      
+      tempCtx.save();
+      tempCtx.filter = `blur(${blur * 2.1}px)`;
+      
+      points.forEach(point => {
+        const x = point.x * 1920;
+        const y = point.y * 1080;
+        const radius = point.radius * 1080 * sizeMultiplier;
+        
+        const gradient = tempCtx.createRadialGradient(x, y, 0, x, y, radius);
+        gradient.addColorStop(0, point.color);
+        gradient.addColorStop(0.5, point.color + 'aa');
+        gradient.addColorStop(1, point.color + '00');
+        
+        tempCtx.fillStyle = gradient;
+        tempCtx.beginPath();
+        tempCtx.arc(x, y, radius, 0, Math.PI * 2);
+        tempCtx.fill();
+      });
+      
+      tempCtx.restore();
+      
+      if (grain > 0) {
+        tempCtx.save();
+        tempCtx.globalAlpha = grain / 100;
+        tempCtx.globalCompositeOperation = 'overlay';
+        
+        const noiseCanvas = document.createElement('canvas');
+        noiseCanvas.width = 256;
+        noiseCanvas.height = 256;
+        const noiseCtx = noiseCanvas.getContext('2d');
+        const noiseData = noiseCtx.createImageData(256, 256);
+        
+        for (let i = 0; i < noiseData.data.length; i += 4) {
+          const v = Math.random() * 255;
+          noiseData.data[i] = v;
+          noiseData.data[i + 1] = v;
+          noiseData.data[i + 2] = v;
+          noiseData.data[i + 3] = 255;
+        }
+        
+        noiseCtx.putImageData(noiseData, 0, 0);
+        
+        const pattern = tempCtx.createPattern(noiseCanvas, 'repeat');
+        tempCtx.fillStyle = pattern;
+        tempCtx.fillRect(0, 0, 1920, 1080);
+        tempCtx.restore();
+      }
+      
+      const link = document.createElement('a');
+      link.download = 'mesh-gradient-1920x1080.png';
+      link.href = tempCanvas.toDataURL('image/png');
+      link.click();
+      
+      showToast('✓ PNG downloaded!');
+    }
+    
+    function copyCSS() {
+      const css = `background: ${currentBg};
+background-image: ${points.map(p => 
+  `radial-gradient(at ${Math.round(p.x * 100)}% ${Math.round(p.y * 100)}%, ${p.color}88 0%, transparent ${Math.round(p.radius * 100 * sizeMultiplier)}%)`
+).join(',\n  ')};
+filter: blur(${Math.round(blur / 10)}px);`;
+      
+      navigator.clipboard.writeText(css);
+      showToast('✓ CSS copied!');
+    }
+    
+    function copySVG() {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <defs>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="${blur}"/>
+    </filter>
+    ${points.map((p, i) => `
+    <radialGradient id="g${i}" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="${p.color}"/>
+      <stop offset="50%" stop-color="${p.color}" stop-opacity="0.67"/>
+      <stop offset="100%" stop-color="${p.color}" stop-opacity="0"/>
+    </radialGradient>`).join('')}
+  </defs>
+  <rect width="100%" height="100%" fill="${currentBg}"/>
+  <g filter="url(#blur)">
+    ${points.map((p, i) => `<circle cx="${Math.round(p.x * 1920)}" cy="${Math.round(p.y * 1080)}" r="${Math.round(p.radius * 1080 * sizeMultiplier)}" fill="url(#g${i})"/>`).join('\n    ')}
+  </g>
+</svg>`;
+      
+      navigator.clipboard.writeText(svg);
+      showToast('✓ SVG copied!');
+    }
+    
+    function shareGradient() {
+      // Encode current state in URL
+      const state = {
+        bg: currentBg,
+        pts: points.map(p => ({
+          x: Math.round(p.x * 100) / 100,
+          y: Math.round(p.y * 100) / 100,
+          c: p.color,
+          r: Math.round(p.radius * 100) / 100
+        })),
+        b: blur,
+        s: Math.round(sizeMultiplier * 100)
+      };
+      
+      const encoded = btoa(JSON.stringify(state));
+      const url = `${window.location.origin}${window.location.pathname}?g=${encoded}`;
+      
+      navigator.clipboard.writeText(url);
+      showToast('✓ Link copied to clipboard!');
+    }
+    
+    function loadFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const g = params.get('g');
+      if (g) {
+        try {
+          const state = JSON.parse(atob(g));
+          currentBg = state.bg;
+          document.documentElement.style.setProperty('--gradient-bg', currentBg);
+          
+          points = state.pts.map(p => ({
+            x: p.x,
+            y: p.y,
+            color: p.c,
+            radius: p.r
+          }));
+          
+          velocities = points.map(() => ({
+            x: (Math.random() - 0.5) * 0.002,
+            y: (Math.random() - 0.5) * 0.002
+          }));
+          
+          blur = state.b || 90;
+          sizeMultiplier = (state.s || 100) / 100;
+          
+          document.getElementById('blurSlider').value = blur;
+          document.getElementById('blurValue').textContent = blur;
+          document.getElementById('sizeSlider').value = Math.round(sizeMultiplier * 100);
+          document.getElementById('sizeValue').textContent = Math.round(sizeMultiplier * 100);
+          
+          renderColorPoints();
+          renderDraggablePoints();
+          render();
+          
+          showToast('Gradient loaded from link!');
+        } catch (e) {
+          console.error('Failed to load gradient from URL', e);
+        }
+      }
+    }
+    
+    function submitEmail() {
+      const email = document.getElementById('proEmail').value;
+      if (email && email.includes('@')) {
+        showToast("Thanks! We'll notify you when Pro launches.");
+        document.getElementById('proEmail').value = '';
+        // In a real app, send to backend
+      }
+    }
+    
+    function toggleTheme() {
+      const body = document.body;
+      const isDark = body.dataset.theme === 'dark';
+      body.dataset.theme = isDark ? 'light' : 'dark';
+      localStorage.setItem('theme', body.dataset.theme);
+      
+      const icon = document.getElementById('themeIcon');
+      icon.innerHTML = isDark 
+        ? '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>'
+        : '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+    }
+    
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+    
+    // Load saved theme
+    if (localStorage.getItem('theme')) {
+      document.body.dataset.theme = localStorage.getItem('theme');
+    }
+    
+    // Start with dark for better gradient visibility
+    document.body.dataset.theme = 'dark';
+    
+    init();
+    loadFromURL();
+  </script>
+</body>
+</html>
