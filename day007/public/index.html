@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Favicon Generator — Instant Icons for Your Site</title>
+  <meta name="description" content="Generate beautiful favicons from text, emoji, or initials. Preview in a real browser tab, download all sizes. Free tool by Alkemist.">
+  <meta property="og:title" content="Favicon Generator — Free Tool">
+  <meta property="og:description" content="Generate beautiful favicons from text or emoji. Preview and download all sizes.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://day007.aikemist.com">
+  <link rel="icon" id="dynamicFavicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366f1'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white'>F</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fafafa;
+      --bg-alt: #ffffff;
+      --text: #0a0a0a;
+      --text-muted: #666;
+      --border: #e5e5e5;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --bg-alt: #141414;
+      --text: #fafafa;
+      --text-muted: #888;
+      --border: #262626;
+      --accent: #818cf8;
+      --accent-hover: #a5b4fc;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Jost', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    
+    @media (max-width: 600px) {
+      .container { padding: 1rem; }
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    
+    .logo h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    .logo h1 span { color: var(--text-muted); font-weight: 400; }
+    
+    .theme-btn {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+    }
+    
+    .theme-btn:hover { background: var(--border); }
+    
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    
+    @media (max-width: 800px) {
+      .main-grid { 
+        grid-template-columns: 1fr; 
+      }
+      .controls { order: -1; }
+    }
+    
+    .preview-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    
+    .browser-mockup {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .browser-toolbar {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    
+    .browser-dots {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .browser-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+    
+    .browser-tabs {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+    
+    .browser-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-alt);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px 6px 0 0;
+      font-size: 0.75rem;
+      color: var(--text);
+      max-width: 180px;
+    }
+    
+    .browser-tab .tab-favicon {
+      width: 14px;
+      height: 14px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    
+    .browser-tab .tab-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .browser-content {
+      padding: 2.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 220px;
+      gap: 1rem;
+    }
+    
+    .preview-favicon {
+      width: 96px;
+      height: 96px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    }
+    
+    .preview-sizes {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+    
+    .preview-size {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    
+    .preview-size canvas {
+      border-radius: 3px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    
+    .preview-size span {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+    }
+    
+    .controls {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .control-group h3 {
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    
+    .text-input {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      font-size: 1.75rem;
+      text-align: center;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      transition: border-color 0.2s;
+    }
+    
+    .text-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    .quick-picks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+    
+    .quick-pick {
+      padding: 0.4rem 0.6rem;
+      font-size: 1.1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .quick-pick:hover {
+      border-color: var(--accent);
+      transform: scale(1.1);
+    }
+    
+    .pick-tabs {
+      display: flex;
+      gap: 0.25rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .pick-tab {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.7rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-family: 'Jost', sans-serif;
+    }
+    
+    .pick-tab.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    
+    .color-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    
+    .color-row label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      width: 30px;
+    }
+    
+    .color-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      flex: 1;
+    }
+    
+    .color-swatch {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    
+    .color-swatch:hover {
+      transform: scale(1.2);
+      z-index: 1;
+    }
+    
+    .color-swatch.active {
+      border-color: var(--text);
+    }
+    
+    .custom-color-row {
+      display: flex;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
+    
+    .custom-color-row input[type="color"] {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: none;
+    }
+    
+    .custom-color-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    .custom-color-row input[type="color"]::-webkit-color-swatch {
+      border: 2px solid var(--border);
+      border-radius: 4px;
+    }
+    
+    .custom-color-row input[type="text"] {
+      flex: 1;
+      padding: 0.4rem;
+      font-family: 'SF Mono', monospace;
+      font-size: 0.7rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+    }
+    
+    .shape-options {
+      display: flex;
+      gap: 0.4rem;
+    }
+    
+    .shape-btn {
+      flex: 1;
+      padding: 0.5rem;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+    
+    .shape-btn.active {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+    
+    .download-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    
+    .btn {
+      padding: 0.65rem 0.9rem;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+    
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-secondary:hover { background: var(--border); }
+    
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem;
+    }
+    
+    .format-note {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    
+    .pro-teaser {
+      background: linear-gradient(135deg, var(--accent)08, var(--accent)15);
+      border: 1px dashed var(--accent);
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+    
+    .pro-teaser h4 {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+    }
+    
+    .pro-teaser p {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+    }
+    
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+    
+    footer a {
+      color: var(--text);
+      text-decoration: none;
+    }
+    
+    footer a:hover { text-decoration: underline; }
+    
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.65rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 1000;
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <div class="container">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">F</div>
+        <h1>Favicon <span>Generator</span></h1>
+      </div>
+      <button class="theme-btn" onclick="toggleTheme()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="themeIcon">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+        </svg>
+      </button>
+    </header>
+    
+    <main class="main-grid">
+      <div class="preview-section">
+        <div class="browser-mockup">
+          <div class="browser-toolbar">
+            <div class="browser-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="browser-tabs">
+              <div class="browser-tab">
+                <canvas class="tab-favicon" id="tabFavicon" width="14" height="14"></canvas>
+                <span class="tab-title">Your Website</span>
+              </div>
+            </div>
+          </div>
+          <div class="browser-content">
+            <canvas class="preview-favicon" id="previewLarge" width="96" height="96"></canvas>
+            <div class="preview-sizes">
+              <div class="preview-size">
+                <canvas id="preview16" width="16" height="16"></canvas>
+                <span>16px</span>
+              </div>
+              <div class="preview-size">
+                <canvas id="preview32" width="32" height="32"></canvas>
+                <span>32px</span>
+              </div>
+              <div class="preview-size">
+                <canvas id="preview48" width="48" height="48"></canvas>
+                <span>48px</span>
+              </div>
+              <div class="preview-size">
+                <canvas id="preview64" width="64" height="64"></canvas>
+                <span>64px</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="controls">
+        <div class="control-group">
+          <h3>Icon</h3>
+          <input type="text" class="text-input" id="iconText" placeholder="A" maxlength="2" value="A">
+        </div>
+        
+        <div class="control-group">
+          <h3>Quick Picks</h3>
+          <div class="pick-tabs">
+            <button class="pick-tab active" onclick="showPicks('emoji')">Emoji</button>
+            <button class="pick-tab" onclick="showPicks('letters')">Letters</button>
+          </div>
+          <div class="quick-picks" id="quickPicks"></div>
+        </div>
+        
+        <div class="control-group">
+          <h3>Colors</h3>
+          <div class="color-row">
+            <label>BG</label>
+            <div class="color-grid" id="bgColors"></div>
+          </div>
+          <div class="color-row" style="margin-top: 0.5rem">
+            <label>Text</label>
+            <div class="color-grid" id="textColors"></div>
+          </div>
+          <div class="custom-color-row">
+            <input type="color" id="customBgColor" value="#6366f1" onchange="setBgColor(this.value)">
+            <input type="text" id="bgHex" value="#6366f1" onchange="setBgColor(this.value)" placeholder="Background">
+            <input type="color" id="customTextColor" value="#ffffff" onchange="setTextColor(this.value)">
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <h3>Shape</h3>
+          <div class="shape-options">
+            <button class="shape-btn active" data-shape="rounded" onclick="setShape('rounded')">Rounded</button>
+            <button class="shape-btn" data-shape="circle" onclick="setShape('circle')">Circle</button>
+            <button class="shape-btn" data-shape="square" onclick="setShape('square')">Square</button>
+          </div>
+        </div>
+        
+        <div class="control-group download-section">
+          <h3>Download</h3>
+          <button class="btn btn-primary" onclick="downloadAll()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            Download ZIP
+          </button>
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="downloadSVG()">SVG</button>
+            <button class="btn btn-secondary" onclick="copyDataURL()">Copy URL</button>
+          </div>
+          <p class="format-note">16, 32, 48, 180, 192, 512px + .ico + .svg</p>
+        </div>
+        
+        <div class="pro-teaser">
+          <h4>✨ Pro Features Coming</h4>
+          <p>Animated favicons, icon library, bulk generation</p>
+        </div>
+      </div>
+    </main>
+    
+    <footer>
+      <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script>
+    const bgColorPalette = [
+      '#ef4444', '#f97316', '#eab308', '#22c55e', '#10b981', '#06b6d4',
+      '#3b82f6', '#6366f1', '#8b5cf6', '#ec4899', '#1f2937', '#000000',
+    ];
+    
+    const textColorPalette = [
+      '#ffffff', '#fafafa', '#f5f5f5', '#000000', '#1f2937', '#fef08a',
+    ];
+    
+    const emojiPicks = ['🚀', '⚡', '🎨', '💡', '🔥', '✨', '🌟', '💎', '🎯', '🔮', '📦', '🛠️', '💻', '🌈', '🎪'];
+    const letterPicks = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'M', 'N', 'S', 'T', 'W', 'X', 'Z'];
+    
+    let currentText = 'A';
+    let currentBgColor = '#6366f1';
+    let currentTextColor = '#ffffff';
+    let currentShape = 'rounded';
+    let currentPickTab = 'emoji';
+    
+    function init() {
+      renderBgColors();
+      renderTextColors();
+      showPicks('emoji');
+      renderFavicon();
+      
+      document.getElementById('iconText').addEventListener('input', (e) => {
+        currentText = e.target.value || 'A';
+        renderFavicon();
+        updatePageFavicon();
+      });
+    }
+    
+    function renderBgColors() {
+      document.getElementById('bgColors').innerHTML = bgColorPalette.map(c => `
+        <div class="color-swatch ${c === currentBgColor ? 'active' : ''}" 
+             style="background: ${c}" onclick="setBgColor('${c}')"></div>
+      `).join('');
+    }
+    
+    function renderTextColors() {
+      document.getElementById('textColors').innerHTML = textColorPalette.map(c => `
+        <div class="color-swatch ${c === currentTextColor ? 'active' : ''}" 
+             style="background: ${c}; ${c === '#ffffff' || c === '#fafafa' || c === '#f5f5f5' ? 'border: 1px solid var(--border);' : ''}" 
+             onclick="setTextColor('${c}')"></div>
+      `).join('');
+    }
+    
+    function showPicks(tab) {
+      currentPickTab = tab;
+      document.querySelectorAll('.pick-tab').forEach(t => t.classList.toggle('active', t.textContent.toLowerCase() === tab));
+      
+      const picks = tab === 'emoji' ? emojiPicks : letterPicks;
+      document.getElementById('quickPicks').innerHTML = picks.map(p => `
+        <button class="quick-pick" onclick="setIcon('${p}')">${p}</button>
+      `).join('');
+    }
+    
+    function setIcon(text) {
+      currentText = text;
+      document.getElementById('iconText').value = text;
+      renderFavicon();
+      updatePageFavicon();
+    }
+    
+    function setBgColor(color) {
+      currentBgColor = color;
+      document.getElementById('customBgColor').value = color;
+      document.getElementById('bgHex').value = color;
+      renderBgColors();
+      renderFavicon();
+      updatePageFavicon();
+    }
+    
+    function setTextColor(color) {
+      currentTextColor = color;
+      document.getElementById('customTextColor').value = color;
+      renderTextColors();
+      renderFavicon();
+      updatePageFavicon();
+    }
+    
+    function setShape(shape) {
+      currentShape = shape;
+      document.querySelectorAll('.shape-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.shape === shape);
+      });
+      renderFavicon();
+      updatePageFavicon();
+    }
+    
+    function renderFavicon() {
+      [14, 16, 32, 48, 64, 96].forEach(size => {
+        let canvas;
+        if (size === 96) canvas = document.getElementById('previewLarge');
+        else if (size === 14) canvas = document.getElementById('tabFavicon');
+        else canvas = document.getElementById(`preview${size}`);
+        if (canvas) renderToCanvas(canvas, size);
+      });
+    }
+    
+    function renderToCanvas(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      const isEmoji = /\p{Emoji}/u.test(currentText);
+      
+      ctx.clearRect(0, 0, size, size);
+      
+      // Background
+      ctx.fillStyle = currentBgColor;
+      const radius = currentShape === 'circle' ? size / 2 : 
+                     currentShape === 'rounded' ? size * 0.2 : 0;
+      
+      if (currentShape === 'circle') {
+        ctx.beginPath();
+        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        roundRect(ctx, 0, 0, size, size, radius);
+        ctx.fill();
+      }
+      
+      // Text
+      const fontSize = size * (isEmoji ? 0.6 : 0.55);
+      ctx.font = `700 ${fontSize}px "Jost", "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = isEmoji ? '' : currentTextColor;
+      ctx.fillText(isEmoji ? currentText : currentText.toUpperCase(), size / 2, size / 2 + size * 0.04);
+    }
+    
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+    
+    function generateCanvas(size) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      renderToCanvas(canvas, size);
+      return canvas;
+    }
+    
+    function updatePageFavicon() {
+      const svg = generateSVG();
+      const encoded = encodeURIComponent(svg);
+      document.getElementById('dynamicFavicon').href = `data:image/svg+xml,${encoded}`;
+    }
+    
+    async function downloadAll() {
+      const zip = new JSZip();
+      const sizes = [16, 32, 48, 180, 192, 512];
+      
+      for (const size of sizes) {
+        const canvas = generateCanvas(size);
+        const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+        zip.file(`favicon-${size}x${size}.png`, blob);
+      }
+      
+      const ico32 = generateCanvas(32);
+      const icoBlob = await new Promise(r => ico32.toBlob(r, 'image/png'));
+      zip.file('favicon.ico', icoBlob);
+      zip.file('favicon.svg', generateSVG());
+      
+      const html = `<!-- Favicon - Generated at day007.aikemist.com -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">`;
+      zip.file('html-snippet.txt', html);
+      
+      const content = await zip.generateAsync({ type: 'blob' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(content);
+      link.download = 'favicon-pack.zip';
+      link.click();
+      
+      showToast('✓ Downloaded!');
+    }
+    
+    function generateSVG() {
+      const isEmoji = /\p{Emoji}/u.test(currentText);
+      const r = currentShape === 'circle' ? 50 : currentShape === 'rounded' ? 18 : 0;
+      
+      const shape = currentShape === 'circle' 
+        ? `<circle cx="50" cy="50" r="50" fill="${currentBgColor}"/>`
+        : `<rect width="100" height="100" rx="${r}" fill="${currentBgColor}"/>`;
+      
+      const text = `<text x="50" y="54" font-size="55" font-weight="700" font-family="system-ui, sans-serif" text-anchor="middle" dominant-baseline="middle" fill="${isEmoji ? 'transparent' : currentTextColor}">${isEmoji ? currentText : currentText.toUpperCase()}</text>`;
+      
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${shape}${text}</svg>`;
+    }
+    
+    function downloadSVG() {
+      const blob = new Blob([generateSVG()], { type: 'image/svg+xml' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'favicon.svg';
+      link.click();
+      showToast('✓ SVG downloaded!');
+    }
+    
+    function copyDataURL() {
+      const canvas = generateCanvas(32);
+      navigator.clipboard.writeText(canvas.toDataURL('image/png'));
+      showToast('✓ Data URL copied!');
+    }
+    
+    function toggleTheme() {
+      const body = document.body;
+      const isDark = body.dataset.theme === 'dark';
+      body.dataset.theme = isDark ? 'light' : 'dark';
+      localStorage.setItem('theme', body.dataset.theme);
+      
+      document.getElementById('themeIcon').innerHTML = isDark 
+        ? '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>'
+        : '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+    }
+    
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+    
+    if (localStorage.getItem('theme')) {
+      document.body.dataset.theme = localStorage.getItem('theme');
+    }
+    
+    init();
+    updatePageFavicon();
+  </script>
+</body>
+</html>
