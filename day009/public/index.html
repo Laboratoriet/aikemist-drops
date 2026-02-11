@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradient Text Generator — Aikemist</title>
+    <meta name="description" content="Create stunning gradient text with CSS. Choose from presets or create custom gradients. Copy CSS with one click.">
+    <meta property="og:title" content="Gradient Text Generator — Aikemist">
+    <meta property="og:description" content="Create stunning gradient text with CSS. Presets and custom colors.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://day009.aikemist.com">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23667eea'/><stop offset='100%25' stop-color='%23f093fb'/></linearGradient></defs><text y='.9em' font-size='90' font-weight='bold' fill='url(%23g)'>A</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0a0a0a;
+            --bg-card: #141414;
+            --bg-input: #1a1a1a;
+            --text: #ffffff;
+            --text-muted: #888;
+            --border: #2a2a2a;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #22c55e;
+        }
+
+        [data-theme="light"] {
+            --bg: #f5f5f5;
+            --bg-card: #ffffff;
+            --bg-input: #f0f0f0;
+            --text: #0a0a0a;
+            --text-muted: #666;
+            --border: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Jost', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        .logo-text {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .theme-toggle {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: var(--text);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent);
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: clamp(1.75rem, 5vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .preview-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-text {
+            font-size: clamp(2.5rem, 10vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            word-break: break-word;
+            max-width: 100%;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .panel-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .preset-btn {
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 0.6rem 0.4rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--text-muted);
+        }
+
+        .preset-btn.active {
+            border-color: var(--accent);
+        }
+
+        .preset-swatch {
+            height: 20px;
+            border-radius: 4px;
+            margin-bottom: 0.25rem;
+        }
+
+        .preset-label {
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .color-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .color-group {
+            flex: 1;
+        }
+
+        .color-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+        }
+
+        .color-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .color-swatch input {
+            position: absolute;
+            inset: -10px;
+            width: calc(100% + 20px);
+            height: calc(100% + 20px);
+            cursor: pointer;
+            border: none;
+        }
+
+        .color-hex {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            color: var(--text);
+            font-family: monospace;
+            font-size: 0.85rem;
+            width: 100%;
+        }
+
+        .direction-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .direction-btn {
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 0.6rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            font-size: 1.25rem;
+            color: var(--text);
+        }
+
+        .direction-btn:hover {
+            border-color: var(--text-muted);
+        }
+
+        .direction-btn.active {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .css-output {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .css-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .css-code {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--text);
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .btn.copied {
+            background: var(--success);
+        }
+
+        .pro-teaser {
+            margin-top: 2rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(240, 147, 251, 0.08));
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .pro-teaser h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pro-teaser p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            .preview-section {
+                padding: 2rem 1rem;
+            }
+            .panel {
+                padding: 1rem;
+            }
+            .presets-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="https://aikemist.com" class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <span class="logo-text">aikemist</span>
+            </a>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="themeIcon">☀️</span> Light
+            </button>
+        </header>
+
+        <div class="hero">
+            <h1>Gradient Text Generator</h1>
+            <p class="subtitle">Create stunning CSS gradient text in seconds</p>
+        </div>
+
+        <div class="preview-section">
+            <div class="preview-text" id="previewText">Hello World</div>
+        </div>
+
+        <div class="controls">
+            <div class="panel">
+                <div class="panel-title">Text</div>
+                <div class="input-group">
+                    <input type="text" id="textInput" value="Hello World" placeholder="Enter your text...">
+                </div>
+
+                <div class="panel-title">Presets</div>
+                <div class="presets-grid" id="presetsGrid"></div>
+
+                <div class="panel-title">Custom Colors</div>
+                <div class="color-row">
+                    <div class="color-group">
+                        <label>Start</label>
+                        <div class="color-input-wrap">
+                            <div class="color-swatch" id="startSwatch">
+                                <input type="color" id="startColor" value="#667eea">
+                            </div>
+                            <input type="text" class="color-hex" id="startHex" value="#667eea">
+                        </div>
+                    </div>
+                    <div class="color-group">
+                        <label>End</label>
+                        <div class="color-input-wrap">
+                            <div class="color-swatch" id="endSwatch">
+                                <input type="color" id="endColor" value="#764ba2">
+                            </div>
+                            <input type="text" class="color-hex" id="endHex" value="#764ba2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">Direction</div>
+                <div class="direction-grid">
+                    <button class="direction-btn" data-dir="to right" onclick="setDirection('to right')">→</button>
+                    <button class="direction-btn" data-dir="to left" onclick="setDirection('to left')">←</button>
+                    <button class="direction-btn" data-dir="to bottom" onclick="setDirection('to bottom')">↓</button>
+                    <button class="direction-btn" data-dir="to top" onclick="setDirection('to top')">↑</button>
+                    <button class="direction-btn active" data-dir="135deg" onclick="setDirection('135deg')">↘</button>
+                    <button class="direction-btn" data-dir="45deg" onclick="setDirection('45deg')">↗</button>
+                    <button class="direction-btn" data-dir="225deg" onclick="setDirection('225deg')">↙</button>
+                    <button class="direction-btn" data-dir="315deg" onclick="setDirection('315deg')">↖</button>
+                </div>
+
+                <div class="pro-teaser">
+                    <h3>✨ Pro Features Coming</h3>
+                    <p>Multi-color gradients, animation effects, SVG export</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="css-output">
+            <div class="css-header">
+                <span class="panel-title" style="margin: 0;">CSS Code</span>
+                <button class="btn" id="copyBtn" onclick="copyCSS()">
+                    <svg fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+                    Copy CSS
+                </button>
+            </div>
+            <pre class="css-code" id="cssCode"></pre>
+        </div>
+
+        <footer>
+            <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+        </footer>
+    </div>
+
+    <script>
+        const presets = [
+            { name: 'Sunset', start: '#f093fb', end: '#f5576c' },
+            { name: 'Ocean', start: '#667eea', end: '#764ba2' },
+            { name: 'Mint', start: '#11998e', end: '#38ef7d' },
+            { name: 'Fire', start: '#f12711', end: '#f5af19' },
+            { name: 'Purple', start: '#8e2de2', end: '#4a00e0' },
+            { name: 'Sky', start: '#00c6ff', end: '#0072ff' },
+            { name: 'Peach', start: '#ff9a9e', end: '#fecfef' },
+            { name: 'Forest', start: '#134e5e', end: '#71b280' },
+            { name: 'Berry', start: '#8360c3', end: '#2ebf91' },
+        ];
+
+        let currentStart = '#667eea';
+        let currentEnd = '#764ba2';
+        let currentDirection = '135deg';
+        let currentText = 'Hello World';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initPresets();
+            updatePreview();
+            updateCSS();
+
+            document.getElementById('textInput').addEventListener('input', (e) => {
+                currentText = e.target.value || 'Hello World';
+                updatePreview();
+            });
+
+            document.getElementById('startColor').addEventListener('input', (e) => {
+                currentStart = e.target.value;
+                document.getElementById('startHex').value = currentStart;
+                document.getElementById('startSwatch').style.background = currentStart;
+                clearPresetActive();
+                updatePreview();
+                updateCSS();
+            });
+
+            document.getElementById('endColor').addEventListener('input', (e) => {
+                currentEnd = e.target.value;
+                document.getElementById('endHex').value = currentEnd;
+                document.getElementById('endSwatch').style.background = currentEnd;
+                clearPresetActive();
+                updatePreview();
+                updateCSS();
+            });
+
+            document.getElementById('startHex').addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+                    currentStart = val;
+                    document.getElementById('startColor').value = val;
+                    document.getElementById('startSwatch').style.background = val;
+                    clearPresetActive();
+                    updatePreview();
+                    updateCSS();
+                }
+            });
+
+            document.getElementById('endHex').addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+                    currentEnd = val;
+                    document.getElementById('endColor').value = val;
+                    document.getElementById('endSwatch').style.background = val;
+                    clearPresetActive();
+                    updatePreview();
+                    updateCSS();
+                }
+            });
+
+            // Init swatches
+            document.getElementById('startSwatch').style.background = currentStart;
+            document.getElementById('endSwatch').style.background = currentEnd;
+
+            // Theme
+            if (localStorage.getItem('theme') === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                document.getElementById('themeIcon').textContent = '🌙';
+                document.querySelector('.theme-toggle').innerHTML = '<span id="themeIcon">🌙</span> Dark';
+            }
+        });
+
+        function initPresets() {
+            const grid = document.getElementById('presetsGrid');
+            presets.forEach((preset, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'preset-btn' + (i === 1 ? ' active' : '');
+                btn.innerHTML = `
+                    <div class="preset-swatch" style="background: linear-gradient(135deg, ${preset.start}, ${preset.end})"></div>
+                    <div class="preset-label">${preset.name}</div>
+                `;
+                btn.onclick = () => selectPreset(preset, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectPreset(preset, btn) {
+            currentStart = preset.start;
+            currentEnd = preset.end;
+
+            document.getElementById('startColor').value = currentStart;
+            document.getElementById('endColor').value = currentEnd;
+            document.getElementById('startHex').value = currentStart;
+            document.getElementById('endHex').value = currentEnd;
+            document.getElementById('startSwatch').style.background = currentStart;
+            document.getElementById('endSwatch').style.background = currentEnd;
+
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            updatePreview();
+            updateCSS();
+        }
+
+        function clearPresetActive() {
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        }
+
+        function setDirection(dir) {
+            currentDirection = dir;
+            document.querySelectorAll('.direction-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.dir === dir);
+            });
+            updatePreview();
+            updateCSS();
+        }
+
+        function updatePreview() {
+            const preview = document.getElementById('previewText');
+            preview.textContent = currentText;
+            preview.style.background = `linear-gradient(${currentDirection}, ${currentStart}, ${currentEnd})`;
+            preview.style.webkitBackgroundClip = 'text';
+            preview.style.webkitTextFillColor = 'transparent';
+            preview.style.backgroundClip = 'text';
+        }
+
+        function updateCSS() {
+            const css = `.gradient-text {
+  background: linear-gradient(${currentDirection}, ${currentStart}, ${currentEnd});
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}`;
+            document.getElementById('cssCode').textContent = css;
+        }
+
+        function copyCSS() {
+            const css = document.getElementById('cssCode').textContent;
+            navigator.clipboard.writeText(css).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.classList.add('copied');
+                btn.innerHTML = '<svg fill="currentColor" viewBox="0 0 16 16"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg> Copied!';
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = '<svg fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> Copy CSS';
+                }, 1500);
+            });
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'light' ? '' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            
+            const icon = newTheme === 'light' ? '🌙' : '☀️';
+            const label = newTheme === 'light' ? 'Dark' : 'Light';
+            document.querySelector('.theme-toggle').innerHTML = `<span id="themeIcon">${icon}</span> ${label}`;
+            
+            localStorage.setItem('theme', newTheme || 'dark');
+        }
+    </script>
+</body>
+</html>
