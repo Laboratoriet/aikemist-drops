@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Favicon Generator — Instant Icons for Your Site</title>
-  <meta name="description" content="Generate beautiful favicons from text, emoji, or initials. Preview in a real browser tab, download all sizes. Free tool by Alkemist.">
+  <meta name="description" content="Generate beautiful favicons from text, emoji, or your own image. Preview in a real browser tab, download all sizes. Free tool by Alkemist.">
   <meta property="og:title" content="Favicon Generator — Free Tool">
-  <meta property="og:description" content="Generate beautiful favicons from text or emoji. Preview and download all sizes.">
+  <meta property="og:description" content="Generate beautiful favicons from text, emoji, or images. Preview and download all sizes.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://day007.aikemist.com">
   <link rel="icon" id="dynamicFavicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366f1'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white'>F</text></svg>">
@@ -237,6 +237,40 @@
       margin-bottom: 0.5rem;
     }
     
+    .mode-tabs {
+      display: flex;
+      gap: 0.3rem;
+      margin-bottom: 0.75rem;
+    }
+    
+    .mode-tab {
+      flex: 1;
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-family: 'Jost', sans-serif;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .mode-tab.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    
+    .mode-content {
+      display: none;
+    }
+    
+    .mode-content.active {
+      display: block;
+    }
+    
     .text-input {
       width: 100%;
       padding: 0.6rem 0.75rem;
@@ -259,6 +293,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 0.3rem;
+      margin-top: 0.5rem;
     }
     
     .quick-pick {
@@ -279,7 +314,6 @@
     .pick-tabs {
       display: flex;
       gap: 0.25rem;
-      margin-bottom: 0.5rem;
     }
     
     .pick-tab {
@@ -297,6 +331,92 @@
       background: var(--accent);
       color: white;
       border-color: var(--accent);
+    }
+    
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.05);
+    }
+    
+    .upload-zone input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    
+    .upload-zone-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .upload-zone-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    
+    .upload-zone-text strong {
+      color: var(--accent);
+    }
+    
+    .uploaded-preview {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .uploaded-preview.show {
+      display: flex;
+    }
+    
+    .uploaded-image-wrap {
+      position: relative;
+    }
+    
+    .uploaded-image {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+    }
+    
+    .remove-image {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 22px;
+      height: 22px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    
+    .uploaded-name {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     
     .color-row {
@@ -496,6 +616,14 @@
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
+    
+    .image-colors {
+      display: none;
+    }
+    
+    .image-colors.show {
+      display: block;
+    }
   </style>
 </head>
 <body data-theme="dark">
@@ -552,20 +680,41 @@
       
       <div class="controls">
         <div class="control-group">
-          <h3>Icon</h3>
-          <input type="text" class="text-input" id="iconText" placeholder="A" maxlength="2" value="A">
-        </div>
-        
-        <div class="control-group">
-          <h3>Quick Picks</h3>
-          <div class="pick-tabs">
-            <button class="pick-tab active" onclick="showPicks('emoji')">Emoji</button>
-            <button class="pick-tab" onclick="showPicks('letters')">Letters</button>
+          <h3>Source</h3>
+          <div class="mode-tabs">
+            <button class="mode-tab active" onclick="setMode('text')">✏️ Text</button>
+            <button class="mode-tab" onclick="setMode('image')">🖼️ Image</button>
           </div>
-          <div class="quick-picks" id="quickPicks"></div>
+          
+          <div class="mode-content active" id="textMode">
+            <input type="text" class="text-input" id="iconText" placeholder="A" maxlength="2" value="A">
+            <div class="pick-tabs" style="margin-top: 0.75rem;">
+              <button class="pick-tab active" onclick="showPicks('emoji')">Emoji</button>
+              <button class="pick-tab" onclick="showPicks('letters')">Letters</button>
+            </div>
+            <div class="quick-picks" id="quickPicks"></div>
+          </div>
+          
+          <div class="mode-content" id="imageMode">
+            <div class="upload-zone" id="uploadZone">
+              <input type="file" accept="image/*" id="imageInput" onchange="handleImageUpload(event)">
+              <div class="upload-zone-icon">📁</div>
+              <div class="upload-zone-text">
+                <strong>Click to upload</strong> or drag & drop<br>
+                PNG, JPG, SVG, WebP
+              </div>
+            </div>
+            <div class="uploaded-preview" id="uploadedPreview">
+              <div class="uploaded-image-wrap">
+                <img class="uploaded-image" id="uploadedImage" src="" alt="Uploaded">
+                <button class="remove-image" onclick="removeImage()">×</button>
+              </div>
+              <div class="uploaded-name" id="uploadedName"></div>
+            </div>
+          </div>
         </div>
         
-        <div class="control-group">
+        <div class="control-group" id="textColors">
           <h3>Colors</h3>
           <div class="color-row">
             <label>BG</label>
@@ -573,12 +722,24 @@
           </div>
           <div class="color-row" style="margin-top: 0.5rem">
             <label>Text</label>
-            <div class="color-grid" id="textColors"></div>
+            <div class="color-grid" id="fgColors"></div>
           </div>
           <div class="custom-color-row">
             <input type="color" id="customBgColor" value="#6366f1" onchange="setBgColor(this.value)">
             <input type="text" id="bgHex" value="#6366f1" onchange="setBgColor(this.value)" placeholder="Background">
             <input type="color" id="customTextColor" value="#ffffff" onchange="setTextColor(this.value)">
+          </div>
+        </div>
+        
+        <div class="control-group image-colors" id="imageColors">
+          <h3>Background</h3>
+          <div class="color-row">
+            <label>BG</label>
+            <div class="color-grid" id="imgBgColors"></div>
+          </div>
+          <div class="custom-color-row">
+            <input type="color" id="customImgBgColor" value="#6366f1" onchange="setBgColor(this.value)">
+            <input type="text" id="imgBgHex" value="#6366f1" onchange="setBgColor(this.value)" placeholder="Background">
           </div>
         </div>
         
@@ -634,23 +795,98 @@
     const emojiPicks = ['🚀', '⚡', '🎨', '💡', '🔥', '✨', '🌟', '💎', '🎯', '🔮', '📦', '🛠️', '💻', '🌈', '🎪'];
     const letterPicks = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'M', 'N', 'S', 'T', 'W', 'X', 'Z'];
     
+    let currentMode = 'text';
     let currentText = 'A';
     let currentBgColor = '#6366f1';
     let currentTextColor = '#ffffff';
     let currentShape = 'rounded';
     let currentPickTab = 'emoji';
+    let uploadedImage = null;
     
     function init() {
       renderBgColors();
       renderTextColors();
+      renderImgBgColors();
       showPicks('emoji');
       renderFavicon();
+      setupDragDrop();
       
       document.getElementById('iconText').addEventListener('input', (e) => {
         currentText = e.target.value || 'A';
         renderFavicon();
         updatePageFavicon();
       });
+    }
+    
+    function setMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.textContent.includes(mode === 'text' ? 'Text' : 'Image')));
+      document.getElementById('textMode').classList.toggle('active', mode === 'text');
+      document.getElementById('imageMode').classList.toggle('active', mode === 'image');
+      document.getElementById('textColors').style.display = mode === 'text' ? 'block' : 'none';
+      document.getElementById('imageColors').classList.toggle('show', mode === 'image');
+      renderFavicon();
+      updatePageFavicon();
+    }
+    
+    function setupDragDrop() {
+      const zone = document.getElementById('uploadZone');
+      
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
+        zone.addEventListener(event, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        });
+      });
+      
+      ['dragenter', 'dragover'].forEach(event => {
+        zone.addEventListener(event, () => zone.classList.add('dragover'));
+      });
+      
+      ['dragleave', 'drop'].forEach(event => {
+        zone.addEventListener(event, () => zone.classList.remove('dragover'));
+      });
+      
+      zone.addEventListener('drop', (e) => {
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+          processImageFile(file);
+        }
+      });
+    }
+    
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        processImageFile(file);
+      }
+    }
+    
+    function processImageFile(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          uploadedImage = img;
+          document.getElementById('uploadZone').style.display = 'none';
+          document.getElementById('uploadedPreview').classList.add('show');
+          document.getElementById('uploadedImage').src = e.target.result;
+          document.getElementById('uploadedName').textContent = file.name;
+          renderFavicon();
+          updatePageFavicon();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    function removeImage() {
+      uploadedImage = null;
+      document.getElementById('uploadZone').style.display = 'block';
+      document.getElementById('uploadedPreview').classList.remove('show');
+      document.getElementById('imageInput').value = '';
+      renderFavicon();
+      updatePageFavicon();
     }
     
     function renderBgColors() {
@@ -660,8 +896,15 @@
       `).join('');
     }
     
+    function renderImgBgColors() {
+      document.getElementById('imgBgColors').innerHTML = bgColorPalette.map(c => `
+        <div class="color-swatch ${c === currentBgColor ? 'active' : ''}" 
+             style="background: ${c}" onclick="setBgColor('${c}')"></div>
+      `).join('');
+    }
+    
     function renderTextColors() {
-      document.getElementById('textColors').innerHTML = textColorPalette.map(c => `
+      document.getElementById('fgColors').innerHTML = textColorPalette.map(c => `
         <div class="color-swatch ${c === currentTextColor ? 'active' : ''}" 
              style="background: ${c}; ${c === '#ffffff' || c === '#fafafa' || c === '#f5f5f5' ? 'border: 1px solid var(--border);' : ''}" 
              onclick="setTextColor('${c}')"></div>
@@ -689,7 +932,10 @@
       currentBgColor = color;
       document.getElementById('customBgColor').value = color;
       document.getElementById('bgHex').value = color;
+      document.getElementById('customImgBgColor').value = color;
+      document.getElementById('imgBgHex').value = color;
       renderBgColors();
+      renderImgBgColors();
       renderFavicon();
       updatePageFavicon();
     }
@@ -723,14 +969,13 @@
     
     function renderToCanvas(canvas, size) {
       const ctx = canvas.getContext('2d');
-      const isEmoji = /\p{Emoji}/u.test(currentText);
-      
       ctx.clearRect(0, 0, size, size);
       
-      // Background
-      ctx.fillStyle = currentBgColor;
+      // Background shape
       const radius = currentShape === 'circle' ? size / 2 : 
                      currentShape === 'rounded' ? size * 0.2 : 0;
+      
+      ctx.fillStyle = currentBgColor;
       
       if (currentShape === 'circle') {
         ctx.beginPath();
@@ -741,13 +986,48 @@
         ctx.fill();
       }
       
-      // Text
-      const fontSize = size * (isEmoji ? 0.6 : 0.55);
-      ctx.font = `700 ${fontSize}px "Jost", "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = isEmoji ? '' : currentTextColor;
-      ctx.fillText(isEmoji ? currentText : currentText.toUpperCase(), size / 2, size / 2 + size * 0.04);
+      // Content: image or text
+      if (currentMode === 'image' && uploadedImage) {
+        // Clip to shape
+        ctx.save();
+        if (currentShape === 'circle') {
+          ctx.beginPath();
+          ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+          ctx.clip();
+        } else if (currentShape === 'rounded') {
+          ctx.beginPath();
+          roundRect(ctx, 0, 0, size, size, radius);
+          ctx.clip();
+        }
+        
+        // Draw image centered and covering
+        const imgAspect = uploadedImage.width / uploadedImage.height;
+        let drawW, drawH, drawX, drawY;
+        
+        if (imgAspect > 1) {
+          drawH = size;
+          drawW = size * imgAspect;
+          drawX = (size - drawW) / 2;
+          drawY = 0;
+        } else {
+          drawW = size;
+          drawH = size / imgAspect;
+          drawX = 0;
+          drawY = (size - drawH) / 2;
+        }
+        
+        ctx.drawImage(uploadedImage, drawX, drawY, drawW, drawH);
+        ctx.restore();
+      } else {
+        // Text mode
+        const isEmoji = /\p{Emoji}/u.test(currentText);
+        const fontSize = size * (isEmoji ? 0.6 : 0.55);
+        ctx.font = `700 ${fontSize}px "Jost", "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = isEmoji ? '' : currentTextColor;
+        ctx.fillText(isEmoji ? currentText : currentText.toUpperCase(), size / 2, size / 2 + size * 0.04);
+      }
     }
     
     function roundRect(ctx, x, y, w, h, r) {
@@ -773,9 +1053,8 @@
     }
     
     function updatePageFavicon() {
-      const svg = generateSVG();
-      const encoded = encodeURIComponent(svg);
-      document.getElementById('dynamicFavicon').href = `data:image/svg+xml,${encoded}`;
+      const canvas = generateCanvas(32);
+      document.getElementById('dynamicFavicon').href = canvas.toDataURL('image/png');
     }
     
     async function downloadAll() {
@@ -791,10 +1070,12 @@
       const ico32 = generateCanvas(32);
       const icoBlob = await new Promise(r => ico32.toBlob(r, 'image/png'));
       zip.file('favicon.ico', icoBlob);
-      zip.file('favicon.svg', generateSVG());
+      
+      if (currentMode === 'text') {
+        zip.file('favicon.svg', generateSVG());
+      }
       
       const html = `<!-- Favicon - Generated at day007.aikemist.com -->
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">`;
@@ -823,6 +1104,10 @@
     }
     
     function downloadSVG() {
+      if (currentMode === 'image') {
+        showToast('SVG not available for image mode');
+        return;
+      }
       const blob = new Blob([generateSVG()], { type: 'image/svg+xml' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
