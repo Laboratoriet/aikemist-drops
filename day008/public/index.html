@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator — Aikemist</title>
+    <meta name="description" content="Create beautiful, customizable QR codes. Custom colors, logo embedding, multiple styles. Free from Alkemist.">
+    <meta property="og:title" content="QR Code Generator — Aikemist">
+    <meta property="og:description" content="Create beautiful, customizable QR codes with custom colors and styles.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://day008.aikemist.com">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%23111'/><rect x='15' y='15' width='25' height='25' rx='4' fill='%23fff'/><rect x='60' y='15' width='25' height='25' rx='4' fill='%23fff'/><rect x='15' y='60' width='25' height='25' rx='4' fill='%23fff'/><rect x='60' y='60' width='12' height='12' rx='2' fill='%23fff'/><rect x='73' y='73' width='12' height='12' rx='2' fill='%23fff'/></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0a0a0a;
+            --bg-card: #141414;
+            --bg-input: #1a1a1a;
+            --text: #ffffff;
+            --text-muted: #888;
+            --border: #2a2a2a;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --warning: #f59e0b;
+            --success: #22c55e;
+        }
+
+        [data-theme="light"] {
+            --bg: #f5f5f5;
+            --bg-card: #ffffff;
+            --bg-input: #f0f0f0;
+            --text: #0a0a0a;
+            --text-muted: #666;
+            --border: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Jost', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        .logo-text {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .theme-toggle {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: var(--text);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent);
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: clamp(1.75rem, 5vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .preview-panel {
+                order: -1;
+            }
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .panel-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        textarea, input[type="text"], input[type="url"] {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        textarea {
+            min-height: 80px;
+        }
+
+        .quick-inputs {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+        }
+
+        .quick-input-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.35rem 0.6rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+
+        .quick-input-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+
+        .row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .row > * {
+            flex: 1;
+        }
+
+        .color-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+        }
+
+        .color-picker-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .color-swatch {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .color-swatch input {
+            position: absolute;
+            inset: -10px;
+            width: calc(100% + 20px);
+            height: calc(100% + 20px);
+            cursor: pointer;
+            border: none;
+        }
+
+        .color-presets {
+            display: flex;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+        }
+
+        .color-preset {
+            width: 24px;
+            height: 24px;
+            border-radius: 5px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s;
+            padding: 0;
+        }
+
+        .color-preset:hover {
+            transform: scale(1.1);
+        }
+
+        .color-preset.active {
+            border-color: var(--accent);
+        }
+
+        .contrast-warning {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 0.8rem;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--warning);
+            margin-bottom: 1rem;
+        }
+
+        .contrast-warning.show {
+            display: flex;
+        }
+
+        .style-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .style-btn {
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem 0.25rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            color: var(--text);
+        }
+
+        .style-btn:hover {
+            border-color: var(--text-muted);
+        }
+
+        .style-btn.active {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .style-btn-icon {
+            font-size: 1.25rem;
+            margin-bottom: 0.15rem;
+        }
+
+        .style-btn-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .size-btn {
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem 0.25rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            color: var(--text);
+            font-family: inherit;
+        }
+
+        .size-btn:hover {
+            border-color: var(--text-muted);
+        }
+
+        .size-btn.active {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .size-btn-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .size-btn-dim {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+        }
+
+        .preview-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .qr-preview {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        .qr-preview::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.05);
+            pointer-events: none;
+        }
+
+        #qrCanvas {
+            display: block;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.65rem 1rem;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .pro-teaser {
+            margin-top: 1.5rem;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.08));
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .pro-teaser h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pro-teaser p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .pro-features {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .pro-features span::before {
+            content: "✦ ";
+            color: var(--accent);
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .scanned-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.75rem;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--success);
+        }
+
+        .scanned-badge::before {
+            content: '✓';
+            font-weight: bold;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            .panel {
+                padding: 1rem;
+            }
+            .size-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .quick-inputs {
+                gap: 0.3rem;
+            }
+            .quick-input-btn {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="https://aikemist.com" class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24"><path d="M3 3h7v7H3V3zm11 0h7v7h-7V3zM3 14h7v7H3v-7zm14 3h-3v4h-1v-4h-3v-1h3v-3h1v3h3v1z"/></svg>
+                </div>
+                <span class="logo-text">aikemist</span>
+            </a>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="themeIcon">☀️</span> Light
+            </button>
+        </header>
+
+        <div class="hero">
+            <h1>QR Code Generator</h1>
+            <p class="subtitle">Create beautiful, customizable QR codes in seconds</p>
+        </div>
+
+        <div class="main-grid">
+            <div class="controls-panel">
+                <div class="panel">
+                    <div class="panel-title">Content</div>
+                    
+                    <div class="quick-inputs">
+                        <button class="quick-input-btn" onclick="setQuickInput('url')">🔗 URL</button>
+                        <button class="quick-input-btn" onclick="setQuickInput('email')">✉️ Email</button>
+                        <button class="quick-input-btn" onclick="setQuickInput('phone')">📞 Phone</button>
+                        <button class="quick-input-btn" onclick="setQuickInput('wifi')">📶 WiFi</button>
+                        <button class="quick-input-btn" onclick="setQuickInput('vcard')">👤 Contact</button>
+                    </div>
+
+                    <div class="input-group">
+                        <textarea id="qrContent" placeholder="https://yourwebsite.com">https://aikemist.com</textarea>
+                    </div>
+
+                    <div id="contrastWarning" class="contrast-warning">
+                        <span>⚠️</span>
+                        <span>Low contrast — QR may be hard to scan</span>
+                    </div>
+
+                    <div class="row">
+                        <div class="color-group">
+                            <label>Foreground</label>
+                            <div class="color-picker-wrap">
+                                <div class="color-swatch" id="fgSwatch">
+                                    <input type="color" id="fgColor" value="#000000">
+                                </div>
+                                <div class="color-presets" id="fgPresets"></div>
+                            </div>
+                        </div>
+                        <div class="color-group">
+                            <label>Background</label>
+                            <div class="color-picker-wrap">
+                                <div class="color-swatch" id="bgSwatch">
+                                    <input type="color" id="bgColor" value="#ffffff">
+                                </div>
+                                <div class="color-presets" id="bgPresets"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-title">Style</div>
+                    <div class="style-grid">
+                        <button class="style-btn active" data-style="square" onclick="setStyle('square')">
+                            <div class="style-btn-icon">⬛</div>
+                            <div class="style-btn-label">Square</div>
+                        </button>
+                        <button class="style-btn" data-style="rounded" onclick="setStyle('rounded')">
+                            <div class="style-btn-icon">🔲</div>
+                            <div class="style-btn-label">Rounded</div>
+                        </button>
+                        <button class="style-btn" data-style="dots" onclick="setStyle('dots')">
+                            <div class="style-btn-icon">⚫</div>
+                            <div class="style-btn-label">Dots</div>
+                        </button>
+                    </div>
+
+                    <div class="panel-title">Export Size</div>
+                    <div class="size-grid">
+                        <button class="size-btn" data-size="128" onclick="setSize(128)">
+                            <div class="size-btn-label">S</div>
+                            <div class="size-btn-dim">128px</div>
+                        </button>
+                        <button class="size-btn" data-size="256" onclick="setSize(256)">
+                            <div class="size-btn-label">M</div>
+                            <div class="size-btn-dim">256px</div>
+                        </button>
+                        <button class="size-btn active" data-size="512" onclick="setSize(512)">
+                            <div class="size-btn-label">L</div>
+                            <div class="size-btn-dim">512px</div>
+                        </button>
+                        <button class="size-btn" data-size="1024" onclick="setSize(1024)">
+                            <div class="size-btn-label">XL</div>
+                            <div class="size-btn-dim">1024px</div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pro-teaser">
+                    <h3>✨ Pro Features Coming</h3>
+                    <p>Logo embedding, gradient fills, bulk generation</p>
+                    <div class="pro-features">
+                        <span>Logo center</span>
+                        <span>Gradients</span>
+                        <span>Analytics</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-panel">
+                <div class="panel">
+                    <div class="panel-title">Preview</div>
+                    <div class="preview-area">
+                        <div class="qr-preview">
+                            <canvas id="qrCanvas" width="200" height="200"></canvas>
+                        </div>
+                        <div class="scanned-badge">Scannable</div>
+                        <div class="download-buttons">
+                            <button class="btn" onclick="downloadPNG()">
+                                <svg fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                                PNG
+                            </button>
+                            <button class="btn btn-secondary" onclick="downloadSVG()">
+                                <svg fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                                SVG
+                            </button>
+                            <button class="btn btn-secondary" onclick="copyDataURL()">
+                                <svg fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+        </footer>
+    </div>
+
+    <script>
+        const fgColors = ['#000000', '#1a1a2e', '#16213e', '#0f3460', '#533483', '#e94560'];
+        const bgColors = ['#ffffff', '#f8f9fa', '#fff3cd', '#d4edda', '#cce5ff', '#f8d7da'];
+
+        let currentStyle = 'square';
+        let currentFg = '#000000';
+        let currentBg = '#ffffff';
+        let exportSize = 512;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initColorPresets();
+            generateQR();
+            
+            document.getElementById('qrContent').addEventListener('input', debounce(generateQR, 300));
+            document.getElementById('fgColor').addEventListener('input', (e) => {
+                currentFg = e.target.value;
+                updateSwatches();
+                checkContrast();
+                generateQR();
+            });
+            document.getElementById('bgColor').addEventListener('input', (e) => {
+                currentBg = e.target.value;
+                updateSwatches();
+                checkContrast();
+                generateQR();
+            });
+
+            if (localStorage.getItem('theme') === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                document.getElementById('themeIcon').textContent = '🌙';
+                document.querySelector('.theme-toggle').innerHTML = '<span id="themeIcon">🌙</span> Dark';
+            }
+        });
+
+        function initColorPresets() {
+            const fgPresetsEl = document.getElementById('fgPresets');
+            const bgPresetsEl = document.getElementById('bgPresets');
+
+            fgColors.forEach(color => {
+                const btn = document.createElement('button');
+                btn.className = 'color-preset' + (color === currentFg ? ' active' : '');
+                btn.style.background = color;
+                btn.onclick = () => selectFgColor(color);
+                fgPresetsEl.appendChild(btn);
+            });
+
+            bgColors.forEach(color => {
+                const btn = document.createElement('button');
+                btn.className = 'color-preset' + (color === currentBg ? ' active' : '');
+                btn.style.background = color;
+                btn.onclick = () => selectBgColor(color);
+                bgPresetsEl.appendChild(btn);
+            });
+
+            updateSwatches();
+        }
+
+        function selectFgColor(color) {
+            currentFg = color;
+            document.getElementById('fgColor').value = color;
+            updateSwatches();
+            updatePresetActive('fgPresets', color);
+            checkContrast();
+            generateQR();
+        }
+
+        function selectBgColor(color) {
+            currentBg = color;
+            document.getElementById('bgColor').value = color;
+            updateSwatches();
+            updatePresetActive('bgPresets', color);
+            checkContrast();
+            generateQR();
+        }
+
+        function updateSwatches() {
+            document.getElementById('fgSwatch').style.background = currentFg;
+            document.getElementById('bgSwatch').style.background = currentBg;
+        }
+
+        function updatePresetActive(containerId, activeColor) {
+            const presets = document.querySelectorAll(`#${containerId} .color-preset`);
+            presets.forEach(p => {
+                p.classList.toggle('active', rgbToHex(p.style.background) === activeColor.toLowerCase());
+            });
+        }
+
+        function rgbToHex(rgb) {
+            if (rgb.startsWith('#')) return rgb.toLowerCase();
+            const match = rgb.match(/\d+/g);
+            if (!match) return rgb;
+            return '#' + match.slice(0, 3).map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function getLuminance(r, g, b) {
+            const [rs, gs, bs] = [r, g, b].map(c => {
+                c = c / 255;
+                return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+            });
+            return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+        }
+
+        function getContrastRatio(fg, bg) {
+            const fgRgb = hexToRgb(fg);
+            const bgRgb = hexToRgb(bg);
+            if (!fgRgb || !bgRgb) return 21;
+            const l1 = getLuminance(fgRgb.r, fgRgb.g, fgRgb.b);
+            const l2 = getLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
+            const lighter = Math.max(l1, l2);
+            const darker = Math.min(l1, l2);
+            return (lighter + 0.05) / (darker + 0.05);
+        }
+
+        function checkContrast() {
+            const ratio = getContrastRatio(currentFg, currentBg);
+            const warning = document.getElementById('contrastWarning');
+            const badge = document.querySelector('.scanned-badge');
+            
+            if (ratio < 3) {
+                warning.classList.add('show');
+                badge.textContent = 'Low contrast';
+                badge.style.background = 'rgba(245, 158, 11, 0.1)';
+                badge.style.borderColor = 'rgba(245, 158, 11, 0.2)';
+                badge.style.color = 'var(--warning)';
+            } else {
+                warning.classList.remove('show');
+                badge.textContent = 'Scannable';
+                badge.style.background = 'rgba(34, 197, 94, 0.1)';
+                badge.style.borderColor = 'rgba(34, 197, 94, 0.2)';
+                badge.style.color = 'var(--success)';
+            }
+        }
+
+        function setStyle(style) {
+            currentStyle = style;
+            document.querySelectorAll('.style-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.style === style);
+            });
+            generateQR();
+        }
+
+        function setSize(size) {
+            exportSize = size;
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.size) === size);
+            });
+        }
+
+        function setQuickInput(type) {
+            const templates = {
+                url: 'https://yourwebsite.com',
+                email: 'mailto:hello@example.com',
+                phone: 'tel:+1234567890',
+                wifi: 'WIFI:T:WPA;S:NetworkName;P:Password;;',
+                vcard: 'BEGIN:VCARD\nVERSION:3.0\nN:Doe;John\nFN:John Doe\nTEL:+1234567890\nEMAIL:john@example.com\nEND:VCARD'
+            };
+            document.getElementById('qrContent').value = templates[type] || '';
+            generateQR();
+        }
+
+        function generateQR() {
+            const content = document.getElementById('qrContent').value || 'https://aikemist.com';
+            const canvas = document.getElementById('qrCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const qr = qrcode(0, 'M');
+            qr.addData(content);
+            qr.make();
+
+            const moduleCount = qr.getModuleCount();
+            const size = 200;
+            const moduleSize = size / moduleCount;
+            
+            ctx.fillStyle = currentBg;
+            ctx.fillRect(0, 0, size, size);
+
+            ctx.fillStyle = currentFg;
+            
+            for (let row = 0; row < moduleCount; row++) {
+                for (let col = 0; col < moduleCount; col++) {
+                    if (qr.isDark(row, col)) {
+                        const x = col * moduleSize;
+                        const y = row * moduleSize;
+                        
+                        if (currentStyle === 'dots') {
+                            ctx.beginPath();
+                            ctx.arc(x + moduleSize / 2, y + moduleSize / 2, moduleSize / 2.5, 0, Math.PI * 2);
+                            ctx.fill();
+                        } else if (currentStyle === 'rounded') {
+                            roundRect(ctx, x + 0.5, y + 0.5, moduleSize - 1, moduleSize - 1, moduleSize / 4);
+                        } else {
+                            ctx.fillRect(x, y, moduleSize, moduleSize);
+                        }
+                    }
+                }
+            }
+        }
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function downloadPNG() {
+            const content = document.getElementById('qrContent').value || 'https://aikemist.com';
+            
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = exportSize;
+            exportCanvas.height = exportSize;
+            const ctx = exportCanvas.getContext('2d');
+            
+            const qr = qrcode(0, 'M');
+            qr.addData(content);
+            qr.make();
+
+            const moduleCount = qr.getModuleCount();
+            const moduleSize = exportSize / moduleCount;
+            
+            ctx.fillStyle = currentBg;
+            ctx.fillRect(0, 0, exportSize, exportSize);
+
+            ctx.fillStyle = currentFg;
+            
+            for (let row = 0; row < moduleCount; row++) {
+                for (let col = 0; col < moduleCount; col++) {
+                    if (qr.isDark(row, col)) {
+                        const x = col * moduleSize;
+                        const y = row * moduleSize;
+                        
+                        if (currentStyle === 'dots') {
+                            ctx.beginPath();
+                            ctx.arc(x + moduleSize / 2, y + moduleSize / 2, moduleSize / 2.5, 0, Math.PI * 2);
+                            ctx.fill();
+                        } else if (currentStyle === 'rounded') {
+                            roundRect(ctx, x + 0.5, y + 0.5, moduleSize - 1, moduleSize - 1, moduleSize / 4);
+                        } else {
+                            ctx.fillRect(x, y, moduleSize, moduleSize);
+                        }
+                    }
+                }
+            }
+            
+            const link = document.createElement('a');
+            link.download = `qrcode-${exportSize}px.png`;
+            link.href = exportCanvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function downloadSVG() {
+            const content = document.getElementById('qrContent').value || 'https://aikemist.com';
+            
+            const qr = qrcode(0, 'M');
+            qr.addData(content);
+            qr.make();
+
+            const moduleCount = qr.getModuleCount();
+            const size = exportSize;
+            const moduleSize = size / moduleCount;
+            
+            let paths = '';
+            
+            for (let row = 0; row < moduleCount; row++) {
+                for (let col = 0; col < moduleCount; col++) {
+                    if (qr.isDark(row, col)) {
+                        const x = col * moduleSize;
+                        const y = row * moduleSize;
+                        
+                        if (currentStyle === 'dots') {
+                            paths += `<circle cx="${x + moduleSize/2}" cy="${y + moduleSize/2}" r="${moduleSize/2.5}"/>`;
+                        } else if (currentStyle === 'rounded') {
+                            const r = moduleSize / 4;
+                            paths += `<rect x="${x}" y="${y}" width="${moduleSize}" height="${moduleSize}" rx="${r}"/>`;
+                        } else {
+                            paths += `<rect x="${x}" y="${y}" width="${moduleSize}" height="${moduleSize}"/>`;
+                        }
+                    }
+                }
+            }
+
+            const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+  <rect width="${size}" height="${size}" fill="${currentBg}"/>
+  <g fill="${currentFg}">${paths}</g>
+</svg>`;
+
+            const blob = new Blob([svg], { type: 'image/svg+xml' });
+            const link = document.createElement('a');
+            link.download = `qrcode-${exportSize}px.svg`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
+        }
+
+        function copyDataURL() {
+            const canvas = document.getElementById('qrCanvas');
+            const dataURL = canvas.toDataURL('image/png');
+            
+            navigator.clipboard.writeText(dataURL).then(() => {
+                const btn = document.querySelector('.download-buttons .btn-secondary:last-child');
+                const original = btn.innerHTML;
+                btn.innerHTML = '✓ Copied!';
+                setTimeout(() => btn.innerHTML = original, 1500);
+            });
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'light' ? '' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            
+            const icon = newTheme === 'light' ? '🌙' : '☀️';
+            const label = newTheme === 'light' ? 'Dark' : 'Light';
+            document.querySelector('.theme-toggle').innerHTML = `<span id="themeIcon">${icon}</span> ${label}`;
+            
+            localStorage.setItem('theme', newTheme || 'dark');
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    </script>
+</body>
+</html>
