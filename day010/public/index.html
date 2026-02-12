@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OG Image Generator — Create Beautiful Social Cards | Alkemist</title>
+  <meta name="description" content="Generate stunning Open Graph images for Twitter, LinkedIn, and Facebook. Beautiful templates, custom gradients, one-click export.">
+  <meta property="og:title" content="OG Image Generator — Alkemist">
+  <meta property="og:description" content="Generate stunning Open Graph images for social sharing. Beautiful templates, custom gradients, one-click export.">
+  <meta property="og:image" content="https://day010.aikemist.com/og.png">
+  <meta property="og:url" content="https://day010.aikemist.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>">
+  <style>
+    :root {
+      --bg: #fafafa;
+      --bg-secondary: #ffffff;
+      --text: #1a1a1a;
+      --text-secondary: #666666;
+      --border: #e5e5e5;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --bg-secondary: #141414;
+      --text: #fafafa;
+      --text-secondary: #a3a3a3;
+      --border: #262626;
+      --accent: #818cf8;
+      --accent-hover: #a5b4fc;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--text);
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .theme-toggle {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      cursor: pointer;
+      font-size: 1.25rem;
+      line-height: 1;
+      transition: all 0.2s;
+    }
+    
+    .theme-toggle:hover {
+      border-color: var(--accent);
+    }
+    
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 2rem;
+    }
+    
+    @media (max-width: 1024px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .preview-section {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .preview-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .preview-size {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      background: var(--bg);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+    
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1200 / 630;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    }
+    
+    #preview-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    
+    .controls-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-height: calc(100vh - 200px);
+      overflow-y: auto;
+    }
+    
+    .control-panel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .panel-header {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .panel-content {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    input[type="text"],
+    textarea,
+    select {
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      transition: border-color 0.2s;
+    }
+    
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    textarea {
+      resize: none;
+      min-height: 60px;
+    }
+    
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+    
+    .template-btn {
+      aspect-ratio: 1200/630;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .template-btn::after {
+      content: attr(data-name);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0.25rem;
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      text-align: center;
+    }
+    
+    .template-btn:hover {
+      border-color: var(--accent);
+      transform: scale(1.02);
+    }
+    
+    .template-btn.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+    
+    .template-minimal { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .template-spotlight { background: radial-gradient(circle at 30% 70%, #f97316, #ec4899); }
+    .template-waves { background: linear-gradient(180deg, #0ea5e9, #6366f1); }
+    .template-mesh { background: 
+      radial-gradient(at 40% 20%, #f97316 0px, transparent 50%),
+      radial-gradient(at 80% 0%, #06b6d4 0px, transparent 50%),
+      radial-gradient(at 0% 50%, #ec4899 0px, transparent 50%),
+      #1a1a2e; }
+    .template-noir { background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%); }
+    .template-glass { background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)), linear-gradient(135deg, #667eea, #764ba2); }
+    
+    .gradient-presets {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+    }
+    
+    .gradient-preset {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    
+    .gradient-preset:hover {
+      transform: scale(1.1);
+    }
+    
+    .gradient-preset.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+    
+    .color-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    
+    .color-picker-wrapper {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+    }
+    
+    .color-picker {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+    }
+    
+    .color-picker::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    
+    .color-picker::-webkit-color-swatch {
+      border: 2px solid var(--border);
+      border-radius: 8px;
+    }
+    
+    .preset-colors {
+      display: flex;
+      gap: 0.375rem;
+      flex-wrap: wrap;
+    }
+    
+    .preset-color {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    
+    .preset-color:hover {
+      transform: scale(1.1);
+    }
+    
+    .preset-color.active {
+      border-color: var(--accent);
+    }
+    
+    .font-select {
+      width: 100%;
+    }
+    
+    .range-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .range-group input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+    }
+    
+    .range-value {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      min-width: 3rem;
+      text-align: right;
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+    
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+    }
+    
+    .toggle-label {
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+    
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .toggle.active {
+      background: var(--accent);
+    }
+    
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+    
+    .toggle.active::after {
+      transform: translateX(20px);
+    }
+    
+    .alignment-btns {
+      display: flex;
+      gap: 0.25rem;
+    }
+    
+    .align-btn {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 1rem;
+    }
+    
+    .align-btn:first-child {
+      border-radius: 8px 0 0 8px;
+    }
+    
+    .align-btn:last-child {
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .align-btn:hover {
+      border-color: var(--accent);
+    }
+    
+    .align-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    .export-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    
+    .btn-secondary:hover {
+      border-color: var(--accent);
+    }
+    
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    
+    footer {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+    
+    footer a {
+      color: var(--text);
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      color: var(--accent);
+    }
+    
+    .pro-teaser {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+    }
+    
+    .pro-teaser h4 {
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .pro-teaser ul {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem 1rem;
+      margin-bottom: 0;
+    }
+    
+    .pro-teaser li::before {
+      content: "✓ ";
+      color: var(--accent);
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 1000;
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="https://aikemist.com" class="logo">
+        <div class="logo-icon">🖼️</div>
+        OG Image Generator
+      </a>
+      <div class="header-actions">
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+      </div>
+    </header>
+    
+    <main class="main-content">
+      <div class="preview-section">
+        <div class="preview-header">
+          <span class="preview-title">Preview</span>
+          <span class="preview-size">1200 × 630px</span>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas id="preview-canvas" width="1200" height="630"></canvas>
+        </div>
+        
+        <div class="export-section" style="margin-top: 1.5rem;">
+          <button class="btn btn-primary" onclick="downloadImage()">
+            ⬇️ Download PNG
+          </button>
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="copyDataUrl()">📋 Copy Data URL</button>
+            <button class="btn btn-secondary" onclick="copyShareUrl()">🔗 Share Link</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="controls-section">
+        <div class="control-panel">
+          <div class="panel-header">📝 Content</div>
+          <div class="panel-content">
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" id="title" value="Ship faster with AI" oninput="render()">
+            </div>
+            <div class="form-group">
+              <label>Subtitle</label>
+              <input type="text" id="subtitle" value="Build beautiful products in half the time" oninput="render()">
+            </div>
+            <div class="form-group">
+              <label>Author / Brand</label>
+              <input type="text" id="author" value="alkemist.no" oninput="render()">
+            </div>
+          </div>
+        </div>
+        
+        <div class="control-panel">
+          <div class="panel-header">🎨 Template</div>
+          <div class="panel-content">
+            <div class="template-grid">
+              <button class="template-btn template-minimal active" data-template="minimal" data-name="Minimal" onclick="setTemplate('minimal')"></button>
+              <button class="template-btn template-spotlight" data-template="spotlight" data-name="Spotlight" onclick="setTemplate('spotlight')"></button>
+              <button class="template-btn template-waves" data-template="waves" data-name="Waves" onclick="setTemplate('waves')"></button>
+              <button class="template-btn template-mesh" data-template="mesh" data-name="Mesh" onclick="setTemplate('mesh')"></button>
+              <button class="template-btn template-noir" data-template="noir" data-name="Noir" onclick="setTemplate('noir')"></button>
+              <button class="template-btn template-glass" data-template="glass" data-name="Glass" onclick="setTemplate('glass')"></button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="control-panel">
+          <div class="panel-header">🌈 Colors</div>
+          <div class="panel-content">
+            <div class="form-group">
+              <label>Background Gradient</label>
+              <div class="gradient-presets">
+                <div class="gradient-preset active" data-gradient="indigo" style="background: linear-gradient(135deg, #667eea, #764ba2)" onclick="setGradient('indigo')"></div>
+                <div class="gradient-preset" data-gradient="sunset" style="background: linear-gradient(135deg, #f97316, #ec4899)" onclick="setGradient('sunset')"></div>
+                <div class="gradient-preset" data-gradient="ocean" style="background: linear-gradient(135deg, #06b6d4, #6366f1)" onclick="setGradient('ocean')"></div>
+                <div class="gradient-preset" data-gradient="emerald" style="background: linear-gradient(135deg, #10b981, #059669)" onclick="setGradient('emerald')"></div>
+                <div class="gradient-preset" data-gradient="rose" style="background: linear-gradient(135deg, #f43f5e, #ec4899)" onclick="setGradient('rose')"></div>
+                <div class="gradient-preset" data-gradient="amber" style="background: linear-gradient(135deg, #f59e0b, #ef4444)" onclick="setGradient('amber')"></div>
+                <div class="gradient-preset" data-gradient="sky" style="background: linear-gradient(135deg, #0ea5e9, #3b82f6)" onclick="setGradient('sky')"></div>
+                <div class="gradient-preset" data-gradient="violet" style="background: linear-gradient(135deg, #8b5cf6, #6366f1)" onclick="setGradient('violet')"></div>
+                <div class="gradient-preset" data-gradient="slate" style="background: linear-gradient(135deg, #334155, #1e293b)" onclick="setGradient('slate')"></div>
+                <div class="gradient-preset" data-gradient="zinc" style="background: linear-gradient(135deg, #52525b, #27272a)" onclick="setGradient('zinc')"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Custom Colors</label>
+              <div class="color-row">
+                <div class="color-picker-wrapper">
+                  <input type="color" class="color-picker" id="color1" value="#667eea" onchange="applyCustomGradient()">
+                </div>
+                <span style="color: var(--text-secondary)">→</span>
+                <div class="color-picker-wrapper">
+                  <input type="color" class="color-picker" id="color2" value="#764ba2" onchange="applyCustomGradient()">
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Text Color</label>
+              <div class="preset-colors">
+                <div class="preset-color active" data-text-color="#ffffff" style="background: #ffffff; border-color: #e5e5e5;" onclick="setTextColor('#ffffff')"></div>
+                <div class="preset-color" data-text-color="#f8fafc" style="background: #f8fafc; border-color: #e5e5e5;" onclick="setTextColor('#f8fafc')"></div>
+                <div class="preset-color" data-text-color="#fef3c7" style="background: #fef3c7;" onclick="setTextColor('#fef3c7')"></div>
+                <div class="preset-color" data-text-color="#000000" style="background: #000000;" onclick="setTextColor('#000000')"></div>
+                <div class="preset-color" data-text-color="#1e293b" style="background: #1e293b;" onclick="setTextColor('#1e293b')"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="control-panel">
+          <div class="panel-header">✏️ Typography</div>
+          <div class="panel-content">
+            <div class="form-group">
+              <label>Font</label>
+              <select id="font-select" class="font-select" onchange="render()">
+                <option value="Inter" selected>Inter (Modern)</option>
+                <option value="Space Grotesk">Space Grotesk (Tech)</option>
+                <option value="Playfair Display">Playfair Display (Elegant)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Title Size</label>
+              <div class="range-group">
+                <input type="range" id="title-size" min="40" max="100" value="72" oninput="render()">
+                <span class="range-value" id="title-size-value">72px</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Alignment</label>
+              <div class="alignment-btns">
+                <button class="align-btn" data-align="left" onclick="setAlignment('left')">⬅️</button>
+                <button class="align-btn active" data-align="center" onclick="setAlignment('center')">↔️</button>
+                <button class="align-btn" data-align="right" onclick="setAlignment('right')">➡️</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="control-panel">
+          <div class="panel-header">✨ Effects</div>
+          <div class="panel-content">
+            <div class="toggle-row">
+              <span class="toggle-label">Noise / Grain</span>
+              <div class="toggle active" id="toggle-noise" onclick="toggleNoise()"></div>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Vignette</span>
+              <div class="toggle" id="toggle-vignette" onclick="toggleVignette()"></div>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Text Shadow</span>
+              <div class="toggle active" id="toggle-shadow" onclick="toggleShadow()"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="pro-teaser">
+          <h4>✨ Pro Features Coming Soon</h4>
+          <ul>
+            <li>Logo upload</li>
+            <li>Custom fonts</li>
+            <li>Emoji support</li>
+            <li>Batch generation</li>
+          </ul>
+        </div>
+      </div>
+    </main>
+    
+    <footer>
+      <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+  
+  <script>
+    // State
+    const state = {
+      title: 'Ship faster with AI',
+      subtitle: 'Build beautiful products in half the time',
+      author: 'alkemist.no',
+      template: 'minimal',
+      gradient: 'indigo',
+      gradientColors: ['#667eea', '#764ba2'],
+      textColor: '#ffffff',
+      titleSize: 72,
+      alignment: 'center',
+      font: 'Inter',
+      noise: true,
+      vignette: false,
+      shadow: true
+    };
+    
+    // Gradient definitions
+    const gradients = {
+      indigo: ['#667eea', '#764ba2'],
+      sunset: ['#f97316', '#ec4899'],
+      ocean: ['#06b6d4', '#6366f1'],
+      emerald: ['#10b981', '#059669'],
+      rose: ['#f43f5e', '#ec4899'],
+      amber: ['#f59e0b', '#ef4444'],
+      sky: ['#0ea5e9', '#3b82f6'],
+      violet: ['#8b5cf6', '#6366f1'],
+      slate: ['#334155', '#1e293b'],
+      zinc: ['#52525b', '#27272a']
+    };
+    
+    // Canvas setup
+    const canvas = document.getElementById('preview-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Pregenerate noise
+    let noiseData = null;
+    function generateNoiseData() {
+      const imageData = ctx.createImageData(1200, 630);
+      const data = imageData.data;
+      for (let i = 0; i < data.length; i += 4) {
+        const noise = Math.random() * 30;
+        data[i] = noise;
+        data[i + 1] = noise;
+        data[i + 2] = noise;
+        data[i + 3] = 25; // Low alpha for subtle effect
+      }
+      noiseData = imageData;
+    }
+    generateNoiseData();
+    
+    function render() {
+      // Update state from inputs
+      state.title = document.getElementById('title').value;
+      state.subtitle = document.getElementById('subtitle').value;
+      state.author = document.getElementById('author').value;
+      state.titleSize = parseInt(document.getElementById('title-size').value);
+      state.font = document.getElementById('font-select').value;
+      
+      document.getElementById('title-size-value').textContent = state.titleSize + 'px';
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, 1200, 630);
+      
+      // Draw background based on template
+      drawBackground();
+      
+      // Draw effects
+      if (state.vignette) drawVignette();
+      if (state.noise) drawNoise();
+      
+      // Draw text
+      drawText();
+      
+      updateShareUrl();
+    }
+    
+    function drawBackground() {
+      const gradient = ctx.createLinearGradient(0, 0, 1200, 630);
+      gradient.addColorStop(0, state.gradientColors[0]);
+      gradient.addColorStop(1, state.gradientColors[1]);
+      
+      if (state.template === 'minimal') {
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 1200, 630);
+      }
+      else if (state.template === 'spotlight') {
+        // Radial gradient from bottom-left
+        const radial = ctx.createRadialGradient(200, 500, 0, 200, 500, 1000);
+        radial.addColorStop(0, state.gradientColors[0]);
+        radial.addColorStop(1, state.gradientColors[1]);
+        ctx.fillStyle = radial;
+        ctx.fillRect(0, 0, 1200, 630);
+      }
+      else if (state.template === 'waves') {
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 1200, 630);
+        
+        // Draw wave curves
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        ctx.beginPath();
+        ctx.moveTo(0, 400);
+        ctx.bezierCurveTo(400, 350, 800, 500, 1200, 380);
+        ctx.lineTo(1200, 630);
+        ctx.lineTo(0, 630);
+        ctx.closePath();
+        ctx.fill();
+        
+        ctx.fillStyle = 'rgba(255,255,255,0.05)';
+        ctx.beginPath();
+        ctx.moveTo(0, 480);
+        ctx.bezierCurveTo(300, 420, 900, 550, 1200, 450);
+        ctx.lineTo(1200, 630);
+        ctx.lineTo(0, 630);
+        ctx.closePath();
+        ctx.fill();
+      }
+      else if (state.template === 'mesh') {
+        // Dark base
+        ctx.fillStyle = '#0f0f23';
+        ctx.fillRect(0, 0, 1200, 630);
+        
+        // Multiple radial gradients for mesh effect
+        const spots = [
+          { x: 300, y: 200, r: 400, color: state.gradientColors[0] },
+          { x: 900, y: 100, r: 350, color: state.gradientColors[1] },
+          { x: 600, y: 500, r: 300, color: state.gradientColors[0] },
+          { x: 100, y: 450, r: 250, color: state.gradientColors[1] }
+        ];
+        
+        ctx.globalCompositeOperation = 'screen';
+        for (const spot of spots) {
+          const radial = ctx.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, spot.r);
+          radial.addColorStop(0, spot.color + 'aa');
+          radial.addColorStop(1, 'transparent');
+          ctx.fillStyle = radial;
+          ctx.fillRect(0, 0, 1200, 630);
+        }
+        ctx.globalCompositeOperation = 'source-over';
+      }
+      else if (state.template === 'noir') {
+        // Dark gradient
+        const darkGradient = ctx.createLinearGradient(0, 0, 1200, 630);
+        darkGradient.addColorStop(0, '#1a1a2e');
+        darkGradient.addColorStop(1, '#16213e');
+        ctx.fillStyle = darkGradient;
+        ctx.fillRect(0, 0, 1200, 630);
+        
+        // Accent line
+        const lineGradient = ctx.createLinearGradient(0, 0, 1200, 0);
+        lineGradient.addColorStop(0, state.gradientColors[0]);
+        lineGradient.addColorStop(1, state.gradientColors[1]);
+        ctx.fillStyle = lineGradient;
+        ctx.fillRect(0, 0, 1200, 6);
+        
+        // Subtle accent glow
+        const glow = ctx.createRadialGradient(600, 0, 0, 600, 0, 600);
+        glow.addColorStop(0, state.gradientColors[0] + '30');
+        glow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, 1200, 630);
+      }
+      else if (state.template === 'glass') {
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 1200, 630);
+        
+        // Frosted glass overlay
+        ctx.fillStyle = 'rgba(255,255,255,0.12)';
+        ctx.fillRect(80, 80, 1040, 470);
+        
+        // Border glow
+        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(80, 80, 1040, 470);
+      }
+    }
+    
+    function drawNoise() {
+      if (noiseData) {
+        ctx.putImageData(noiseData, 0, 0);
+      }
+    }
+    
+    function drawVignette() {
+      const radial = ctx.createRadialGradient(600, 315, 200, 600, 315, 800);
+      radial.addColorStop(0, 'transparent');
+      radial.addColorStop(1, 'rgba(0,0,0,0.4)');
+      ctx.fillStyle = radial;
+      ctx.fillRect(0, 0, 1200, 630);
+    }
+    
+    function drawText() {
+      ctx.fillStyle = state.textColor;
+      ctx.textAlign = state.alignment;
+      
+      const x = state.alignment === 'left' ? 100 : 
+                state.alignment === 'right' ? 1100 : 600;
+      
+      // Text shadow
+      if (state.shadow) {
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 30;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 10;
+      }
+      
+      // Draw title
+      ctx.font = `800 ${state.titleSize}px "${state.font}", sans-serif`;
+      
+      // Word wrap title
+      const maxWidth = state.template === 'glass' ? 900 : 1000;
+      const words = state.title.split(' ');
+      const lines = [];
+      let currentLine = '';
+      
+      for (const word of words) {
+        const testLine = currentLine ? currentLine + ' ' + word : word;
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && currentLine) {
+          lines.push(currentLine);
+          currentLine = word;
+        } else {
+          currentLine = testLine;
+        }
+      }
+      lines.push(currentLine);
+      
+      // Calculate vertical position (centered)
+      const lineHeight = state.titleSize * 1.15;
+      const subtitleHeight = state.subtitle ? 50 : 0;
+      const authorHeight = state.author ? 50 : 0;
+      const totalHeight = (lines.length * lineHeight) + subtitleHeight + authorHeight;
+      let y = (630 - totalHeight) / 2 + state.titleSize * 0.8;
+      
+      // Adjust for glass template
+      if (state.template === 'glass') {
+        y = 250;
+      }
+      
+      // Draw title lines
+      for (const line of lines) {
+        ctx.fillText(line, x, y);
+        y += lineHeight;
+      }
+      
+      // Reset shadow for subtitle
+      ctx.shadowBlur = state.shadow ? 15 : 0;
+      ctx.shadowOffsetY = state.shadow ? 5 : 0;
+      
+      // Draw subtitle
+      if (state.subtitle) {
+        ctx.font = `500 28px "${state.font}", sans-serif`;
+        ctx.globalAlpha = 0.85;
+        ctx.fillText(state.subtitle, x, y + 20);
+        ctx.globalAlpha = 1;
+      }
+      
+      // Reset shadow
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      
+      // Draw author
+      if (state.author) {
+        ctx.font = `500 20px "${state.font}", sans-serif`;
+        ctx.globalAlpha = 0.6;
+        ctx.fillText(state.author, x, 580);
+        ctx.globalAlpha = 1;
+      }
+    }
+    
+    function setTemplate(template) {
+      state.template = template;
+      document.querySelectorAll('.template-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.template === template);
+      });
+      
+      // Set appropriate defaults for template
+      if (template === 'noir') {
+        setTextColor('#ffffff');
+      }
+      
+      render();
+    }
+    
+    function setGradient(name) {
+      state.gradient = name;
+      state.gradientColors = [...gradients[name]];
+      
+      document.querySelectorAll('.gradient-preset').forEach(el => {
+        el.classList.toggle('active', el.dataset.gradient === name);
+      });
+      
+      // Update color pickers
+      document.getElementById('color1').value = state.gradientColors[0];
+      document.getElementById('color2').value = state.gradientColors[1];
+      
+      render();
+    }
+    
+    function applyCustomGradient() {
+      state.gradientColors = [
+        document.getElementById('color1').value,
+        document.getElementById('color2').value
+      ];
+      state.gradient = 'custom';
+      
+      document.querySelectorAll('.gradient-preset').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      render();
+    }
+    
+    function setTextColor(color) {
+      state.textColor = color;
+      document.querySelectorAll('.preset-color').forEach(el => {
+        el.classList.toggle('active', el.dataset.textColor === color);
+      });
+      render();
+    }
+    
+    function setAlignment(align) {
+      state.alignment = align;
+      document.querySelectorAll('.align-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.align === align);
+      });
+      render();
+    }
+    
+    function toggleNoise() {
+      state.noise = !state.noise;
+      document.getElementById('toggle-noise').classList.toggle('active', state.noise);
+      render();
+    }
+    
+    function toggleVignette() {
+      state.vignette = !state.vignette;
+      document.getElementById('toggle-vignette').classList.toggle('active', state.vignette);
+      render();
+    }
+    
+    function toggleShadow() {
+      state.shadow = !state.shadow;
+      document.getElementById('toggle-shadow').classList.toggle('active', state.shadow);
+      render();
+    }
+    
+    function downloadImage() {
+      const link = document.createElement('a');
+      link.download = 'og-image.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('Image downloaded! 🎉');
+    }
+    
+    function copyDataUrl() {
+      const dataUrl = canvas.toDataURL('image/png');
+      navigator.clipboard.writeText(dataUrl).then(() => {
+        showToast('Data URL copied!');
+      });
+    }
+    
+    function getShareUrl() {
+      const params = new URLSearchParams();
+      params.set('t', state.title);
+      params.set('s', state.subtitle);
+      params.set('a', state.author);
+      params.set('tp', state.template);
+      params.set('g', state.gradient);
+      params.set('c1', state.gradientColors[0]);
+      params.set('c2', state.gradientColors[1]);
+      params.set('tc', state.textColor);
+      params.set('ts', state.titleSize);
+      params.set('al', state.alignment);
+      params.set('f', state.font);
+      params.set('n', state.noise ? '1' : '0');
+      params.set('v', state.vignette ? '1' : '0');
+      params.set('sh', state.shadow ? '1' : '0');
+      return window.location.origin + window.location.pathname + '?' + params.toString();
+    }
+    
+    function updateShareUrl() {
+      const url = getShareUrl();
+      window.history.replaceState({}, '', url);
+    }
+    
+    function copyShareUrl() {
+      navigator.clipboard.writeText(getShareUrl()).then(() => {
+        showToast('Share link copied!');
+      });
+    }
+    
+    function loadFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      
+      if (params.has('t')) {
+        state.title = params.get('t');
+        document.getElementById('title').value = state.title;
+      }
+      if (params.has('s')) {
+        state.subtitle = params.get('s');
+        document.getElementById('subtitle').value = state.subtitle;
+      }
+      if (params.has('a')) {
+        state.author = params.get('a');
+        document.getElementById('author').value = state.author;
+      }
+      if (params.has('tp')) {
+        state.template = params.get('tp');
+        document.querySelectorAll('.template-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.template === state.template);
+        });
+      }
+      if (params.has('g')) {
+        state.gradient = params.get('g');
+      }
+      if (params.has('c1') && params.has('c2')) {
+        state.gradientColors = [params.get('c1'), params.get('c2')];
+        document.getElementById('color1').value = state.gradientColors[0];
+        document.getElementById('color2').value = state.gradientColors[1];
+      }
+      if (params.has('tc')) {
+        state.textColor = params.get('tc');
+        document.querySelectorAll('.preset-color').forEach(el => {
+          el.classList.toggle('active', el.dataset.textColor === state.textColor);
+        });
+      }
+      if (params.has('ts')) {
+        state.titleSize = parseInt(params.get('ts'));
+        document.getElementById('title-size').value = state.titleSize;
+      }
+      if (params.has('al')) {
+        state.alignment = params.get('al');
+        document.querySelectorAll('.align-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.align === state.alignment);
+        });
+      }
+      if (params.has('f')) {
+        state.font = params.get('f');
+        document.getElementById('font-select').value = state.font;
+      }
+      if (params.has('n')) {
+        state.noise = params.get('n') === '1';
+        document.getElementById('toggle-noise').classList.toggle('active', state.noise);
+      }
+      if (params.has('v')) {
+        state.vignette = params.get('v') === '1';
+        document.getElementById('toggle-vignette').classList.toggle('active', state.vignette);
+      }
+      if (params.has('sh')) {
+        state.shadow = params.get('sh') === '1';
+        document.getElementById('toggle-shadow').classList.toggle('active', state.shadow);
+      }
+      
+      // Update gradient preset selection
+      if (gradients[state.gradient]) {
+        document.querySelectorAll('.gradient-preset').forEach(el => {
+          el.classList.toggle('active', el.dataset.gradient === state.gradient);
+        });
+      }
+    }
+    
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+    
+    // Theme toggle
+    function toggleTheme() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      document.querySelector('.theme-toggle').textContent = isDark ? '🌙' : '☀️';
+      localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    }
+    
+    // Init
+    (function init() {
+      // Load theme
+      const savedTheme = localStorage.getItem('theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      document.querySelector('.theme-toggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+      
+      // Load from URL if params exist
+      loadFromUrl();
+      
+      // Initial render
+      render();
+    })();
+  </script>
+</body>
+</html>
