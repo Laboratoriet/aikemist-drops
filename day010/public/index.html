@@ -447,6 +447,100 @@
       border-radius: 8px 0 0 8px;
     }
     
+    /* Logo Upload */
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    
+    .upload-area:hover {
+      border-color: var(--accent);
+    }
+    
+    .upload-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.25rem;
+      cursor: pointer;
+      gap: 0.25rem;
+    }
+    
+    .upload-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .upload-label span {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    
+    .upload-hint {
+      font-size: 0.7rem !important;
+      opacity: 0.7;
+    }
+    
+    .logo-preview-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    
+    .logo-preview-img {
+      height: 48px;
+      width: auto;
+      max-width: 120px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+    
+    .btn-remove-logo {
+      margin-left: auto;
+      padding: 0.25rem 0.5rem;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 4px;
+      color: #ef4444;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    
+    .btn-remove-logo:hover {
+      background: rgba(239, 68, 68, 0.2);
+    }
+    
+    .position-grid {
+      display: flex;
+      gap: 0.25rem;
+    }
+    
+    .pos-btn {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 1rem;
+      border-radius: 6px;
+    }
+    
+    .pos-btn:hover {
+      border-color: var(--accent);
+    }
+    
+    .pos-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
     .align-btn:last-child {
       border-radius: 0 8px 8px 0;
     }
@@ -630,6 +724,41 @@
         </div>
         
         <div class="control-panel">
+          <div class="panel-header">🖼️ Logo / Image</div>
+          <div class="panel-content">
+            <div class="form-group">
+              <div class="upload-area" id="upload-area">
+                <input type="file" id="logo-upload" accept="image/*" onchange="handleLogoUpload(event)" style="display: none;">
+                <label for="logo-upload" class="upload-label" id="upload-label">
+                  <span class="upload-icon">📤</span>
+                  <span>Click to upload logo</span>
+                  <span class="upload-hint">PNG, JPG, SVG</span>
+                </label>
+              </div>
+              <div class="logo-preview-row" id="logo-preview-row" style="display: none;">
+                <img id="logo-preview" class="logo-preview-img">
+                <button class="btn-remove-logo" onclick="removeLogo()">✕</button>
+              </div>
+            </div>
+            <div class="form-group" id="logo-controls" style="display: none;">
+              <label>Position</label>
+              <div class="position-grid">
+                <button class="pos-btn" data-pos="top-left" onclick="setLogoPosition('top-left')">↖</button>
+                <button class="pos-btn active" data-pos="top-center" onclick="setLogoPosition('top-center')">↑</button>
+                <button class="pos-btn" data-pos="top-right" onclick="setLogoPosition('top-right')">↗</button>
+              </div>
+            </div>
+            <div class="form-group" id="logo-size-control" style="display: none;">
+              <label>Size</label>
+              <div class="range-group">
+                <input type="range" id="logo-size" min="40" max="200" value="80" oninput="updateLogoSize()">
+                <span class="range-value" id="logo-size-value">80px</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="control-panel">
           <div class="panel-header">🎨 Template</div>
           <div class="panel-content">
             <div class="template-grid">
@@ -736,10 +865,10 @@
         <div class="pro-teaser">
           <h4>✨ Pro Features Coming Soon</h4>
           <ul>
-            <li>Logo upload</li>
             <li>Custom fonts</li>
             <li>Emoji support</li>
             <li>Batch generation</li>
+            <li>API access</li>
           </ul>
         </div>
       </div>
@@ -767,7 +896,10 @@
       font: 'Inter',
       noise: true,
       vignette: false,
-      shadow: true
+      shadow: true,
+      logo: null,
+      logoPosition: 'top-center',
+      logoSize: 80
     };
     
     // Gradient definitions
@@ -823,6 +955,9 @@
       // Draw effects
       if (state.vignette) drawVignette();
       if (state.noise) drawNoise();
+      
+      // Draw logo
+      if (state.logo) drawLogo();
       
       // Draw text
       drawText();
@@ -942,6 +1077,106 @@
       radial.addColorStop(1, 'rgba(0,0,0,0.4)');
       ctx.fillStyle = radial;
       ctx.fillRect(0, 0, 1200, 630);
+    }
+    
+    function drawLogo() {
+      if (!state.logo) return;
+      
+      const img = state.logo;
+      const size = state.logoSize;
+      const aspectRatio = img.width / img.height;
+      
+      let drawWidth, drawHeight;
+      if (aspectRatio > 1) {
+        drawWidth = size;
+        drawHeight = size / aspectRatio;
+      } else {
+        drawHeight = size;
+        drawWidth = size * aspectRatio;
+      }
+      
+      let x, y;
+      const padding = 60;
+      
+      switch (state.logoPosition) {
+        case 'top-left':
+          x = padding;
+          y = padding;
+          break;
+        case 'top-center':
+          x = (1200 - drawWidth) / 2;
+          y = padding;
+          break;
+        case 'top-right':
+          x = 1200 - drawWidth - padding;
+          y = padding;
+          break;
+        default:
+          x = (1200 - drawWidth) / 2;
+          y = padding;
+      }
+      
+      // Add subtle shadow behind logo
+      ctx.shadowColor = 'rgba(0,0,0,0.2)';
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 5;
+      
+      ctx.drawImage(img, x, y, drawWidth, drawHeight);
+      
+      // Reset shadow
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+    }
+    
+    function handleLogoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          state.logo = img;
+          
+          // Show preview
+          document.getElementById('logo-preview').src = e.target.result;
+          document.getElementById('logo-preview-row').style.display = 'flex';
+          document.getElementById('upload-area').style.display = 'none';
+          document.getElementById('logo-controls').style.display = 'block';
+          document.getElementById('logo-size-control').style.display = 'block';
+          
+          render();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    function removeLogo() {
+      state.logo = null;
+      document.getElementById('logo-upload').value = '';
+      document.getElementById('logo-preview-row').style.display = 'none';
+      document.getElementById('upload-area').style.display = 'block';
+      document.getElementById('logo-controls').style.display = 'none';
+      document.getElementById('logo-size-control').style.display = 'none';
+      render();
+    }
+    
+    function setLogoPosition(pos) {
+      state.logoPosition = pos;
+      document.querySelectorAll('.pos-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.pos === pos);
+      });
+      render();
+    }
+    
+    function updateLogoSize() {
+      state.logoSize = parseInt(document.getElementById('logo-size').value);
+      document.getElementById('logo-size-value').textContent = state.logoSize + 'px';
+      render();
     }
     
     function drawText() {
