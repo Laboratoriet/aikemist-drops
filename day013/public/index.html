@@ -75,6 +75,21 @@
             font-size: 1.1rem;
         }
 
+        .page-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        @media (max-width: 640px) {
+            .page-title {
+                display: none;
+            }
+        }
+
         .header-actions {
             display: flex;
             align-items: center;
@@ -101,7 +116,7 @@
         /* Main Layout */
         main {
             display: grid;
-            grid-template-columns: 1fr 320px;
+            grid-template-columns: 1fr 340px;
             min-height: calc(100vh - 140px);
         }
 
@@ -120,7 +135,7 @@
             inset: 0;
             background-size: cover;
             background-position: center;
-            transition: background-image 0.3s;
+            transition: all 0.3s;
         }
 
         .preview-background.gradient {
@@ -143,40 +158,335 @@
             background: linear-gradient(135deg, #374151 0%, #1f2937 50%, #111827 100%);
         }
 
-        .glass-card {
-            position: relative;
-            z-index: 1;
-            width: 380px;
-            padding: 2rem;
-            border-radius: 16px;
-            transition: all 0.2s;
+        .preview-background.custom {
+            /* Set via JS */
         }
 
-        .glass-card h2 {
-            font-size: 1.5rem;
+        /* Glass Elements */
+        .glass-preview {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .glass-element {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .glass-element:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Card Preview */
+        .glass-card {
+            width: 380px;
+            padding: 2rem;
+        }
+
+        .glass-card .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .glass-card .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #60a5fa, #a855f7);
+        }
+
+        .glass-card .card-meta {
+            flex: 1;
+        }
+
+        .glass-card .card-title {
+            font-size: 1.1rem;
             font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .glass-card .card-subtitle {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .glass-card .card-body {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .glass-card .card-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .glass-card .btn {
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .glass-card .btn-primary {
+            background: rgba(255, 255, 255, 0.25);
+            color: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-card .btn-primary:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        .glass-card .btn-ghost {
+            background: transparent;
+            color: inherit;
+            opacity: 0.8;
+        }
+
+        .glass-card .btn-ghost:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Button Preview */
+        .glass-button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .glass-button {
+            padding: 1rem 2.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .glass-button svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .glass-button.large {
+            padding: 1.25rem 3rem;
+            font-size: 1.1rem;
+        }
+
+        .glass-button.small {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Modal Preview */
+        .glass-modal {
+            width: 420px;
+            padding: 2rem;
+        }
+
+        .glass-modal .modal-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(16, 185, 129, 0.3));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .glass-modal .modal-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: #22c55e;
+        }
+
+        .glass-modal h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
             margin-bottom: 0.75rem;
         }
 
-        .glass-card p {
-            opacity: 0.9;
-            margin-bottom: 1.5rem;
+        .glass-modal p {
+            text-align: center;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
         }
 
-        .glass-card button {
-            background: rgba(255, 255, 255, 0.2);
+        .glass-modal .modal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .glass-modal .modal-btn {
+            flex: 1;
+            padding: 0.875rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .glass-modal .modal-btn.confirm {
+            background: rgba(34, 197, 94, 0.3);
             color: inherit;
+            border: 1px solid rgba(34, 197, 94, 0.5);
+        }
+
+        .glass-modal .modal-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: inherit;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Nav Preview */
+        .glass-nav {
+            width: 500px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .glass-nav .nav-brand {
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .glass-nav .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .glass-nav .nav-link {
+            opacity: 0.8;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .glass-nav .nav-link:hover,
+        .glass-nav .nav-link.active {
+            opacity: 1;
+        }
+
+        .glass-nav .nav-cta {
+            padding: 0.5rem 1.25rem;
+            background: rgba(255, 255, 255, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        /* Input Preview */
+        .glass-input-group {
+            width: 360px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .glass-input {
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-family: inherit;
+            border: none;
+            color: inherit;
+            outline: none;
+        }
+
+        .glass-input::placeholder {
+            color: inherit;
+            opacity: 0.5;
+        }
+
+        .glass-search {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.25rem;
+        }
+
+        .glass-search svg {
+            width: 20px;
+            height: 20px;
+            opacity: 0.6;
+        }
+
+        .glass-search input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: inherit;
             font-family: inherit;
             font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.2s;
+            outline: none;
         }
 
-        .glass-card button:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .glass-search input::placeholder {
+            color: inherit;
+            opacity: 0.5;
+        }
+
+        /* Hide inactive previews */
+        .glass-element { display: none; }
+        .glass-element.active { display: flex; }
+        .glass-card.active, .glass-modal.active { display: block; }
+
+        /* Noise texture overlay */
+        .glass-element.has-noise::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.05;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        .glass-element {
+            position: relative;
         }
 
         /* Controls Panel */
@@ -185,19 +495,24 @@
             border-left: 1px solid var(--border);
             padding: 1.5rem;
             overflow-y: auto;
+            max-height: calc(100vh - 60px);
         }
 
         .controls h3 {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-muted);
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .control-section {
+            margin-bottom: 1.5rem;
         }
 
         .control-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .control-group label {
@@ -211,6 +526,7 @@
         .control-group label span {
             color: var(--text-muted);
             font-size: 0.85rem;
+            font-family: monospace;
         }
 
         .control-group input[type="range"] {
@@ -224,22 +540,148 @@
 
         .control-group input[type="range"]::-webkit-slider-thumb {
             appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background: var(--accent);
             cursor: pointer;
         }
 
+        /* Shape Selector */
+        .shape-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .shape-btn {
+            padding: 0.5rem 0.875rem;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .shape-btn svg {
+            width: 14px;
+            height: 14px;
+            opacity: 0.7;
+        }
+
+        .shape-btn:hover {
+            background: var(--border);
+        }
+
+        .shape-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .shape-btn.active svg {
+            opacity: 1;
+        }
+
+        /* Background Presets */
+        .bg-presets {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .bg-preset {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bg-preset:hover,
+        .bg-preset.active {
+            border-color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .bg-preset.gradient { background: linear-gradient(135deg, #667eea, #764ba2, #f97316); }
+        .bg-preset.ocean { background: linear-gradient(135deg, #0ea5e9, #14b8a6); }
+        .bg-preset.sunset { background: linear-gradient(135deg, #f59e0b, #ef4444, #ec4899); }
+        .bg-preset.forest { background: linear-gradient(135deg, #22c55e, #15803d); }
+        .bg-preset.mono { background: linear-gradient(135deg, #374151, #111827); }
+
         /* Color Input */
-        .color-input {
+        .color-row {
             display: flex;
             gap: 0.5rem;
             align-items: center;
         }
 
-        .color-input input[type="color"] {
-            width: 40px;
+        /* Image Upload */
+        .image-upload-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-top: 0.75rem;
+        }
+
+        .upload-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.875rem;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-btn:hover {
+            background: var(--border);
+        }
+
+        .upload-btn svg {
+            width: 14px;
+            height: 14px;
+            opacity: 0.7;
+        }
+
+        .clear-image-btn {
+            padding: 0.5rem 0.75rem;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 6px;
+            color: #ef4444;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .clear-image-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .color-input-wrap {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex: 1;
+        }
+
+        .color-input-wrap input[type="color"] {
+            width: 36px;
             height: 32px;
             border: none;
             border-radius: 6px;
@@ -247,7 +689,7 @@
             background: none;
         }
 
-        .color-input input[type="text"] {
+        .color-input-wrap input[type="text"] {
             flex: 1;
             padding: 0.5rem;
             background: var(--surface-2);
@@ -255,53 +697,25 @@
             border-radius: 6px;
             color: var(--text);
             font-family: monospace;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
-
-        /* Presets */
-        .presets {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .preset-btn {
-            aspect-ratio: 1;
-            border-radius: 8px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .preset-btn:hover,
-        .preset-btn.active {
-            border-color: var(--accent);
-            transform: scale(1.05);
-        }
-
-        .preset-btn.gradient { background: linear-gradient(135deg, #667eea, #764ba2, #f97316); }
-        .preset-btn.ocean { background: linear-gradient(135deg, #0ea5e9, #14b8a6); }
-        .preset-btn.sunset { background: linear-gradient(135deg, #f59e0b, #ef4444, #ec4899); }
-        .preset-btn.forest { background: linear-gradient(135deg, #22c55e, #15803d); }
-        .preset-btn.mono { background: linear-gradient(135deg, #374151, #111827); }
 
         /* Glass Presets */
         .glass-presets {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .glass-preset-btn {
-            padding: 0.5rem 0.75rem;
+            padding: 0.4rem 0.75rem;
             background: var(--surface-2);
             border: 1px solid var(--border);
             border-radius: 6px;
             color: var(--text);
             font-family: inherit;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -321,14 +735,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
         }
 
         .toggle {
-            width: 44px;
-            height: 24px;
+            width: 40px;
+            height: 22px;
             background: var(--surface-2);
-            border-radius: 12px;
+            border-radius: 11px;
             position: relative;
             cursor: pointer;
             transition: background 0.2s;
@@ -341,8 +756,8 @@
         .toggle::after {
             content: '';
             position: absolute;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             background: white;
             border-radius: 50%;
             top: 3px;
@@ -351,20 +766,21 @@
         }
 
         .toggle.active::after {
-            transform: translateX(20px);
+            transform: translateX(18px);
         }
 
         /* Output */
         .output-section {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
             border-top: 1px solid var(--border);
         }
 
-        .output-section h3 {
+        .output-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 0.75rem;
         }
 
         .copy-btn {
@@ -373,35 +789,36 @@
             border: none;
             padding: 0.4rem 0.75rem;
             border-radius: 6px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 500;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: all 0.2s;
         }
 
         .copy-btn:hover {
             opacity: 0.9;
         }
 
+        .copy-btn.copied {
+            background: #22c55e;
+        }
+
         .code-output {
             background: var(--surface-2);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 1rem;
+            padding: 0.875rem;
             font-family: 'SF Mono', Monaco, monospace;
-            font-size: 0.8rem;
-            line-height: 1.6;
+            font-size: 0.75rem;
+            line-height: 1.5;
             overflow-x: auto;
             white-space: pre-wrap;
             color: var(--text);
-            margin-top: 0.75rem;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
         /* Share */
-        .share-section {
-            margin-top: 1.5rem;
-        }
-
         .share-btn {
             width: 100%;
             background: var(--surface-2);
@@ -410,23 +827,29 @@
             padding: 0.75rem;
             border-radius: 8px;
             font-family: inherit;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            margin-top: 0.75rem;
         }
 
         .share-btn:hover {
             background: var(--border);
         }
 
+        .share-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
         /* Footer */
         footer {
             text-align: center;
-            padding: 1.5rem;
+            padding: 1.25rem;
             color: var(--text-muted);
             font-size: 0.85rem;
             border-top: 1px solid var(--border);
@@ -441,59 +864,6 @@
             text-decoration: underline;
         }
 
-        /* Pro Teaser */
-        .pro-teaser {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(168, 85, 247, 0.1));
-            border: 1px solid rgba(96, 165, 250, 0.3);
-            border-radius: 8px;
-        }
-
-        .pro-teaser h4 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .pro-teaser ul {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            padding-left: 1.2rem;
-        }
-
-        .pro-teaser li {
-            margin-bottom: 0.25rem;
-        }
-
-        /* Mobile */
-        @media (max-width: 768px) {
-            main {
-                grid-template-columns: 1fr;
-            }
-
-            .preview-area {
-                min-height: 350px;
-            }
-
-            .glass-card {
-                width: 90%;
-                max-width: 320px;
-            }
-
-            .controls {
-                border-left: none;
-                border-top: 1px solid var(--border);
-            }
-
-            header {
-                padding: 1rem;
-            }
-        }
-
         /* Toast */
         .toast {
             position: fixed;
@@ -505,6 +875,7 @@
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
             font-weight: 500;
+            font-size: 0.9rem;
             opacity: 0;
             transition: all 0.3s;
             z-index: 100;
@@ -513,6 +884,58 @@
         .toast.show {
             transform: translateX(-50%) translateY(0);
             opacity: 1;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-area {
+                min-height: 400px;
+                padding: 1.5rem;
+            }
+
+            .glass-card, .glass-modal {
+                width: 100%;
+                max-width: 340px;
+            }
+
+            .glass-nav {
+                width: 100%;
+                max-width: 360px;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .glass-nav .nav-links {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                gap: 1.5rem;
+            }
+
+            .glass-input-group {
+                width: 100%;
+                max-width: 320px;
+            }
+
+            .controls {
+                border-left: none;
+                border-top: 1px solid var(--border);
+                max-height: none;
+            }
+
+            header {
+                padding: 1rem;
+            }
+
+            .shape-selector {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 0.5rem;
+            }
         }
     </style>
 </head>
@@ -531,6 +954,7 @@
             </svg>
             <span>Alkemist</span>
         </a>
+        <h1 class="page-title">Glassmorphism Generator</h1>
         <div class="header-actions">
             <button class="theme-toggle" id="themeToggle" title="Toggle theme">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -544,107 +968,237 @@
     <main>
         <div class="preview-area">
             <div class="preview-background gradient" id="previewBg"></div>
-            <div class="glass-card" id="glassCard">
-                <h2>Frosted Glass</h2>
-                <p>Beautiful glassmorphism effect with customizable blur, transparency, and borders.</p>
-                <button>Learn More</button>
+            
+            <div class="glass-preview">
+                <!-- Card Preview -->
+                <div class="glass-element glass-card active" id="previewCard">
+                    <div class="card-header">
+                        <div class="avatar"></div>
+                        <div class="card-meta">
+                            <div class="card-title">Sarah Chen</div>
+                            <div class="card-subtitle">Product Designer</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        Just shipped our new glassmorphism design system. The frosted glass effects add such a beautiful depth to the interface. ✨
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-primary">Follow</button>
+                        <button class="btn btn-ghost">Message</button>
+                    </div>
+                </div>
+
+                <!-- Button Preview -->
+                <div class="glass-element glass-button-group" id="previewButton">
+                    <button class="glass-element glass-button large">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                        Get Started
+                    </button>
+                    <button class="glass-element glass-button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5 3 19 12 5 21 5 3"/>
+                        </svg>
+                        Watch Demo
+                    </button>
+                    <button class="glass-element glass-button small">Learn More</button>
+                </div>
+
+                <!-- Modal Preview -->
+                <div class="glass-element glass-modal" id="previewModal">
+                    <div class="modal-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 6L9 17l-5-5"/>
+                        </svg>
+                    </div>
+                    <h3>Payment Successful</h3>
+                    <p>Your transaction has been processed. A confirmation email is on its way.</p>
+                    <div class="modal-actions">
+                        <button class="modal-btn cancel">View Receipt</button>
+                        <button class="modal-btn confirm">Done</button>
+                    </div>
+                </div>
+
+                <!-- Nav Preview -->
+                <div class="glass-element glass-nav" id="previewNav">
+                    <div class="nav-brand">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                        Acme
+                    </div>
+                    <div class="nav-links">
+                        <span class="nav-link active">Home</span>
+                        <span class="nav-link">Features</span>
+                        <span class="nav-link">Pricing</span>
+                    </div>
+                    <button class="nav-cta">Sign Up</button>
+                </div>
+
+                <!-- Input Preview -->
+                <div class="glass-element glass-input-group" id="previewInput">
+                    <div class="glass-element glass-search">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="M21 21l-4.35-4.35"/>
+                        </svg>
+                        <input type="text" placeholder="Search anything...">
+                    </div>
+                    <input type="text" class="glass-element glass-input" placeholder="Enter your email">
+                    <input type="text" class="glass-element glass-input" placeholder="Your message here...">
+                </div>
             </div>
         </div>
 
         <div class="controls">
-            <h3>Background</h3>
-            <div class="presets">
-                <button class="preset-btn gradient active" data-bg="gradient" title="Gradient"></button>
-                <button class="preset-btn ocean" data-bg="ocean" title="Ocean"></button>
-                <button class="preset-btn sunset" data-bg="sunset" title="Sunset"></button>
-                <button class="preset-btn forest" data-bg="forest" title="Forest"></button>
-                <button class="preset-btn mono" data-bg="mono" title="Mono"></button>
-            </div>
-
-            <h3>Glass Presets</h3>
-            <div class="glass-presets">
-                <button class="glass-preset-btn active" data-preset="default">Default</button>
-                <button class="glass-preset-btn" data-preset="subtle">Subtle</button>
-                <button class="glass-preset-btn" data-preset="frosted">Frosted</button>
-                <button class="glass-preset-btn" data-preset="heavy">Heavy</button>
-                <button class="glass-preset-btn" data-preset="dark">Dark</button>
-                <button class="glass-preset-btn" data-preset="vibrant">Vibrant</button>
-            </div>
-
-            <h3>Glass Effect</h3>
-            
-            <div class="control-group">
-                <label>Blur <span id="blurValue">12px</span></label>
-                <input type="range" id="blur" min="0" max="40" value="12">
-            </div>
-
-            <div class="control-group">
-                <label>Opacity <span id="opacityValue">0.25</span></label>
-                <input type="range" id="opacity" min="0" max="100" value="25">
-            </div>
-
-            <div class="control-group">
-                <label>Saturation <span id="saturationValue">180%</span></label>
-                <input type="range" id="saturation" min="100" max="300" value="180">
-            </div>
-
-            <h3>Color Tint</h3>
-            <div class="control-group">
-                <div class="color-input">
-                    <input type="color" id="tintColor" value="#ffffff">
-                    <input type="text" id="tintHex" value="#ffffff">
+            <div class="control-section">
+                <h3>Preview Shape</h3>
+                <div class="shape-selector">
+                    <button class="shape-btn active" data-shape="card">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        </svg>
+                        Card
+                    </button>
+                    <button class="shape-btn" data-shape="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="8" width="18" height="8" rx="4"/>
+                        </svg>
+                        Button
+                    </button>
+                    <button class="shape-btn" data-shape="modal">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="4" width="20" height="16" rx="2"/>
+                            <path d="M8 2v4M16 2v4"/>
+                        </svg>
+                        Modal
+                    </button>
+                    <button class="shape-btn" data-shape="nav">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="6" width="20" height="4" rx="1"/>
+                        </svg>
+                        Nav
+                    </button>
+                    <button class="shape-btn" data-shape="input">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="8" width="18" height="8" rx="2"/>
+                            <path d="M7 12h4"/>
+                        </svg>
+                        Input
+                    </button>
                 </div>
             </div>
 
-            <h3>Border</h3>
-            
-            <div class="control-group">
-                <label>Width <span id="borderWidthValue">1px</span></label>
-                <input type="range" id="borderWidth" min="0" max="4" value="1">
+            <div class="control-section">
+                <h3>Background</h3>
+                <div class="bg-presets">
+                    <button class="bg-preset gradient active" data-bg="gradient" title="Gradient"></button>
+                    <button class="bg-preset ocean" data-bg="ocean" title="Ocean"></button>
+                    <button class="bg-preset sunset" data-bg="sunset" title="Sunset"></button>
+                    <button class="bg-preset forest" data-bg="forest" title="Forest"></button>
+                    <button class="bg-preset mono" data-bg="mono" title="Mono"></button>
+                </div>
+                <div class="color-row">
+                    <span style="font-size: 0.85rem;">Custom:</span>
+                    <div class="color-input-wrap">
+                        <input type="color" id="bgColor" value="#667eea">
+                        <input type="text" id="bgHex" value="#667eea" placeholder="#hex">
+                    </div>
+                </div>
+                <div class="image-upload-row">
+                    <label class="upload-btn" for="bgImage">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <path d="M21 15l-5-5L5 21"/>
+                        </svg>
+                        Upload Image
+                    </label>
+                    <input type="file" id="bgImage" accept="image/*" style="display: none;">
+                    <button class="clear-image-btn" id="clearImage" style="display: none;">✕</button>
+                </div>
             </div>
 
-            <div class="control-group">
-                <label>Opacity <span id="borderOpacityValue">0.30</span></label>
-                <input type="range" id="borderOpacity" min="0" max="100" value="30">
+            <div class="control-section">
+                <h3>Glass Presets</h3>
+                <div class="glass-presets">
+                    <button class="glass-preset-btn active" data-preset="default">Default</button>
+                    <button class="glass-preset-btn" data-preset="subtle">Subtle</button>
+                    <button class="glass-preset-btn" data-preset="frosted">Frosted</button>
+                    <button class="glass-preset-btn" data-preset="heavy">Heavy</button>
+                    <button class="glass-preset-btn" data-preset="dark">Dark</button>
+                    <button class="glass-preset-btn" data-preset="vibrant">Vibrant</button>
+                </div>
             </div>
 
-            <div class="control-group">
-                <label>Radius <span id="borderRadiusValue">16px</span></label>
-                <input type="range" id="borderRadius" min="0" max="50" value="16">
+            <div class="control-section">
+                <h3>Glass Effect</h3>
+                <div class="control-group">
+                    <label>Blur <span id="blurValue">12px</span></label>
+                    <input type="range" id="blur" min="0" max="40" value="12">
+                </div>
+                <div class="control-group">
+                    <label>Opacity <span id="opacityValue">0.25</span></label>
+                    <input type="range" id="opacity" min="0" max="100" value="25">
+                </div>
+                <div class="control-group">
+                    <label>Saturation <span id="saturationValue">180%</span></label>
+                    <input type="range" id="saturation" min="100" max="300" value="180">
+                </div>
             </div>
 
-            <h3>Extras</h3>
-            <div class="toggle-row">
-                <span>Shadow</span>
-                <div class="toggle active" id="shadowToggle"></div>
+            <div class="control-section">
+                <h3>Color Tint</h3>
+                <div class="color-row">
+                    <div class="color-input-wrap">
+                        <input type="color" id="tintColor" value="#ffffff">
+                        <input type="text" id="tintHex" value="#ffffff">
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>Border</h3>
+                <div class="control-group">
+                    <label>Width <span id="borderWidthValue">1px</span></label>
+                    <input type="range" id="borderWidth" min="0" max="4" value="1">
+                </div>
+                <div class="control-group">
+                    <label>Opacity <span id="borderOpacityValue">0.30</span></label>
+                    <input type="range" id="borderOpacity" min="0" max="100" value="30">
+                </div>
+                <div class="control-group">
+                    <label>Radius <span id="borderRadiusValue">16px</span></label>
+                    <input type="range" id="borderRadius" min="0" max="50" value="16">
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>Extras</h3>
+                <div class="toggle-row">
+                    <span>Shadow</span>
+                    <div class="toggle active" id="shadowToggle"></div>
+                </div>
+                <div class="toggle-row">
+                    <span>Noise Texture</span>
+                    <div class="toggle" id="noiseToggle"></div>
+                </div>
             </div>
 
             <div class="output-section">
-                <h3>
-                    CSS
+                <div class="output-header">
+                    <h3>CSS Output</h3>
                     <button class="copy-btn" id="copyBtn">Copy</button>
-                </h3>
+                </div>
                 <pre class="code-output" id="cssOutput"></pre>
-            </div>
-
-            <div class="share-section">
                 <button class="share-btn" id="shareBtn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
                         <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
                     </svg>
                     Copy Shareable Link
                 </button>
-            </div>
-
-            <div class="pro-teaser">
-                <h4>✨ Pro Features (Coming Soon)</h4>
-                <ul>
-                    <li>Animated glass effects</li>
-                    <li>Image upload for background</li>
-                    <li>Tailwind/SCSS export</li>
-                    <li>React/Vue components</li>
-                </ul>
             </div>
         </div>
     </main>
@@ -658,7 +1212,9 @@
     <script>
         // State
         const state = {
+            shape: 'card',
             bg: 'gradient',
+            customBg: '#667eea',
             blur: 12,
             opacity: 25,
             saturation: 180,
@@ -666,45 +1222,24 @@
             borderWidth: 1,
             borderOpacity: 30,
             borderRadius: 16,
-            shadow: true
+            shadow: true,
+            noise: false
         };
 
         // Elements
-        const glassCard = document.getElementById('glassCard');
         const previewBg = document.getElementById('previewBg');
         const cssOutput = document.getElementById('cssOutput');
         const toast = document.getElementById('toast');
 
-        // Parse URL params
-        function loadFromUrl() {
-            const params = new URLSearchParams(window.location.search);
-            if (params.has('blur')) state.blur = parseInt(params.get('blur'));
-            if (params.has('opacity')) state.opacity = parseInt(params.get('opacity'));
-            if (params.has('saturation')) state.saturation = parseInt(params.get('saturation'));
-            if (params.has('tint')) state.tint = '#' + params.get('tint');
-            if (params.has('bw')) state.borderWidth = parseInt(params.get('bw'));
-            if (params.has('bo')) state.borderOpacity = parseInt(params.get('bo'));
-            if (params.has('br')) state.borderRadius = parseInt(params.get('br'));
-            if (params.has('shadow')) state.shadow = params.get('shadow') === '1';
-            if (params.has('bg')) state.bg = params.get('bg');
-
-            // Update inputs
-            document.getElementById('blur').value = state.blur;
-            document.getElementById('opacity').value = state.opacity;
-            document.getElementById('saturation').value = state.saturation;
-            document.getElementById('tintColor').value = state.tint;
-            document.getElementById('tintHex').value = state.tint;
-            document.getElementById('borderWidth').value = state.borderWidth;
-            document.getElementById('borderOpacity').value = state.borderOpacity;
-            document.getElementById('borderRadius').value = state.borderRadius;
-            document.getElementById('shadowToggle').classList.toggle('active', state.shadow);
-
-            // Update background preset
-            document.querySelectorAll('.preset-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.bg === state.bg);
-            });
-            previewBg.className = 'preview-background ' + state.bg;
-        }
+        // Glass presets
+        const glassPresets = {
+            default: { blur: 12, opacity: 25, saturation: 180, tint: '#ffffff', borderWidth: 1, borderOpacity: 30, shadow: true },
+            subtle: { blur: 8, opacity: 15, saturation: 120, tint: '#ffffff', borderWidth: 1, borderOpacity: 20, shadow: false },
+            frosted: { blur: 20, opacity: 35, saturation: 150, tint: '#ffffff', borderWidth: 1, borderOpacity: 40, shadow: true },
+            heavy: { blur: 30, opacity: 50, saturation: 130, tint: '#ffffff', borderWidth: 2, borderOpacity: 50, shadow: true },
+            dark: { blur: 16, opacity: 40, saturation: 100, tint: '#000000', borderWidth: 1, borderOpacity: 30, shadow: true },
+            vibrant: { blur: 10, opacity: 20, saturation: 250, tint: '#ffffff', borderWidth: 1, borderOpacity: 25, shadow: true }
+        };
 
         // Hex to RGB
         function hexToRgb(hex) {
@@ -716,25 +1251,30 @@
             } : { r: 255, g: 255, b: 255 };
         }
 
+        // Get all glass elements
+        function getGlassElements() {
+            return document.querySelectorAll('.glass-element');
+        }
+
         // Update preview
         function updatePreview() {
             const rgb = hexToRgb(state.tint);
             const bgColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${state.opacity / 100})`;
             const borderColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${state.borderOpacity / 100})`;
 
-            let styles = `
-                background: ${bgColor};
-                backdrop-filter: blur(${state.blur}px) saturate(${state.saturation}%);
-                -webkit-backdrop-filter: blur(${state.blur}px) saturate(${state.saturation}%);
-                border: ${state.borderWidth}px solid ${borderColor};
-                border-radius: ${state.borderRadius}px;
-            `;
+            const styles = {
+                background: bgColor,
+                backdropFilter: `blur(${state.blur}px) saturate(${state.saturation}%)`,
+                webkitBackdropFilter: `blur(${state.blur}px) saturate(${state.saturation}%)`,
+                border: `${state.borderWidth}px solid ${borderColor}`,
+                borderRadius: `${state.borderRadius}px`,
+                boxShadow: state.shadow ? '0 8px 32px rgba(0, 0, 0, 0.2)' : 'none'
+            };
 
-            if (state.shadow) {
-                styles += `box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);`;
-            }
-
-            glassCard.style.cssText = styles;
+            // Apply to all glass elements
+            getGlassElements().forEach(el => {
+                Object.assign(el.style, styles);
+            });
 
             // Update value displays
             document.getElementById('blurValue').textContent = state.blur + 'px';
@@ -744,7 +1284,6 @@
             document.getElementById('borderOpacityValue').textContent = (state.borderOpacity / 100).toFixed(2);
             document.getElementById('borderRadiusValue').textContent = state.borderRadius + 'px';
 
-            // Update CSS output
             updateCssOutput();
         }
 
@@ -765,9 +1304,64 @@
             cssOutput.textContent = css;
         }
 
+        // Update active shape
+        function updateShape(shape) {
+            state.shape = shape;
+            
+            // Update buttons
+            document.querySelectorAll('.shape-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.shape === shape);
+            });
+
+            // Show/hide previews
+            const previews = {
+                card: document.getElementById('previewCard'),
+                button: document.getElementById('previewButton'),
+                modal: document.getElementById('previewModal'),
+                nav: document.getElementById('previewNav'),
+                input: document.getElementById('previewInput')
+            };
+
+            Object.entries(previews).forEach(([key, el]) => {
+                if (el) {
+                    el.classList.toggle('active', key === shape);
+                    // For button group, also toggle child buttons
+                    if (key === 'button') {
+                        el.querySelectorAll('.glass-button').forEach(btn => {
+                            btn.classList.toggle('active', key === shape);
+                        });
+                    }
+                    if (key === 'input') {
+                        el.querySelectorAll('.glass-search, .glass-input').forEach(input => {
+                            input.classList.toggle('active', key === shape);
+                        });
+                    }
+                }
+            });
+        }
+
+        // Update background
+        function updateBackground(bg, custom = null) {
+            state.bg = bg;
+            if (custom) {
+                state.customBg = custom;
+                previewBg.className = 'preview-background';
+                previewBg.style.background = custom;
+            } else {
+                previewBg.className = 'preview-background ' + bg;
+                previewBg.style.background = '';
+            }
+
+            // Update preset buttons
+            document.querySelectorAll('.bg-preset').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.bg === bg && !custom);
+            });
+        }
+
         // Generate share URL
         function generateShareUrl() {
             const params = new URLSearchParams();
+            params.set('shape', state.shape);
             params.set('blur', state.blur);
             params.set('opacity', state.opacity);
             params.set('saturation', state.saturation);
@@ -776,8 +1370,53 @@
             params.set('bo', state.borderOpacity);
             params.set('br', state.borderRadius);
             params.set('shadow', state.shadow ? '1' : '0');
+            params.set('noise', state.noise ? '1' : '0');
             params.set('bg', state.bg);
+            if (state.bg === 'custom') {
+                params.set('bgc', state.customBg.replace('#', ''));
+            }
             return window.location.origin + '?' + params.toString();
+        }
+
+        // Load from URL
+        function loadFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('shape')) state.shape = params.get('shape');
+            if (params.has('blur')) state.blur = parseInt(params.get('blur'));
+            if (params.has('opacity')) state.opacity = parseInt(params.get('opacity'));
+            if (params.has('saturation')) state.saturation = parseInt(params.get('saturation'));
+            if (params.has('tint')) state.tint = '#' + params.get('tint');
+            if (params.has('bw')) state.borderWidth = parseInt(params.get('bw'));
+            if (params.has('bo')) state.borderOpacity = parseInt(params.get('bo'));
+            if (params.has('br')) state.borderRadius = parseInt(params.get('br'));
+            if (params.has('shadow')) state.shadow = params.get('shadow') === '1';
+            if (params.has('noise')) state.noise = params.get('noise') === '1';
+            if (params.has('bg')) state.bg = params.get('bg');
+            if (params.has('bgc')) state.customBg = '#' + params.get('bgc');
+
+            // Update inputs
+            document.getElementById('blur').value = state.blur;
+            document.getElementById('opacity').value = state.opacity;
+            document.getElementById('saturation').value = state.saturation;
+            document.getElementById('tintColor').value = state.tint;
+            document.getElementById('tintHex').value = state.tint;
+            document.getElementById('borderWidth').value = state.borderWidth;
+            document.getElementById('borderOpacity').value = state.borderOpacity;
+            document.getElementById('borderRadius').value = state.borderRadius;
+            document.getElementById('shadowToggle').classList.toggle('active', state.shadow);
+            document.getElementById('noiseToggle').classList.toggle('active', state.noise);
+            document.getElementById('bgColor').value = state.customBg;
+            document.getElementById('bgHex').value = state.customBg;
+
+            // Update shape
+            updateShape(state.shape);
+
+            // Update background
+            if (state.bg === 'custom') {
+                updateBackground('custom', state.customBg);
+            } else {
+                updateBackground(state.bg);
+            }
         }
 
         // Show toast
@@ -787,7 +1426,81 @@
             setTimeout(() => toast.classList.remove('show'), 2000);
         }
 
-        // Event listeners
+        // Event listeners - Shape
+        document.querySelectorAll('.shape-btn').forEach(btn => {
+            btn.addEventListener('click', () => updateShape(btn.dataset.shape));
+        });
+
+        // Event listeners - Background presets
+        document.querySelectorAll('.bg-preset').forEach(btn => {
+            btn.addEventListener('click', () => updateBackground(btn.dataset.bg));
+        });
+
+        // Event listeners - Custom background
+        document.getElementById('bgColor').addEventListener('input', e => {
+            document.getElementById('bgHex').value = e.target.value;
+            updateBackground('custom', e.target.value);
+            clearImageUpload();
+        });
+
+        document.getElementById('bgHex').addEventListener('input', e => {
+            if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+                document.getElementById('bgColor').value = e.target.value;
+                updateBackground('custom', e.target.value);
+                clearImageUpload();
+            }
+        });
+
+        // Event listeners - Image upload
+        document.getElementById('bgImage').addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    previewBg.className = 'preview-background';
+                    previewBg.style.background = `url(${event.target.result}) center/cover`;
+                    state.bg = 'image';
+                    document.getElementById('clearImage').style.display = 'block';
+                    document.querySelectorAll('.bg-preset').forEach(btn => btn.classList.remove('active'));
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('clearImage').addEventListener('click', () => {
+            clearImageUpload();
+            updateBackground('gradient');
+        });
+
+        function clearImageUpload() {
+            document.getElementById('bgImage').value = '';
+            document.getElementById('clearImage').style.display = 'none';
+        }
+
+        // Event listeners - Glass presets
+        document.querySelectorAll('.glass-preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.glass-preset-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const preset = glassPresets[btn.dataset.preset];
+                Object.assign(state, preset);
+
+                // Update inputs
+                document.getElementById('blur').value = state.blur;
+                document.getElementById('opacity').value = state.opacity;
+                document.getElementById('saturation').value = state.saturation;
+                document.getElementById('tintColor').value = state.tint;
+                document.getElementById('tintHex').value = state.tint;
+                document.getElementById('borderWidth').value = state.borderWidth;
+                document.getElementById('borderOpacity').value = state.borderOpacity;
+                document.getElementById('shadowToggle').classList.toggle('active', state.shadow);
+
+                updatePreview();
+            });
+        });
+
+        // Event listeners - Sliders
         document.getElementById('blur').addEventListener('input', e => {
             state.blur = parseInt(e.target.value);
             updatePreview();
@@ -801,20 +1514,6 @@
         document.getElementById('saturation').addEventListener('input', e => {
             state.saturation = parseInt(e.target.value);
             updatePreview();
-        });
-
-        document.getElementById('tintColor').addEventListener('input', e => {
-            state.tint = e.target.value;
-            document.getElementById('tintHex').value = e.target.value;
-            updatePreview();
-        });
-
-        document.getElementById('tintHex').addEventListener('input', e => {
-            if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
-                state.tint = e.target.value;
-                document.getElementById('tintColor').value = e.target.value;
-                updatePreview();
-            }
         });
 
         document.getElementById('borderWidth').addEventListener('input', e => {
@@ -832,67 +1531,52 @@
             updatePreview();
         });
 
+        // Event listeners - Tint color
+        document.getElementById('tintColor').addEventListener('input', e => {
+            state.tint = e.target.value;
+            document.getElementById('tintHex').value = e.target.value;
+            updatePreview();
+        });
+
+        document.getElementById('tintHex').addEventListener('input', e => {
+            if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+                state.tint = e.target.value;
+                document.getElementById('tintColor').value = e.target.value;
+                updatePreview();
+            }
+        });
+
+        // Event listeners - Toggles
         document.getElementById('shadowToggle').addEventListener('click', e => {
             state.shadow = !state.shadow;
             e.target.classList.toggle('active', state.shadow);
             updatePreview();
         });
 
-        // Background presets
-        document.querySelectorAll('.preset-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                state.bg = btn.dataset.bg;
-                previewBg.className = 'preview-background ' + state.bg;
-            });
+        document.getElementById('noiseToggle').addEventListener('click', e => {
+            state.noise = !state.noise;
+            e.target.classList.toggle('active', state.noise);
+            updateNoiseEffect();
         });
 
-        // Glass presets
-        const glassPresets = {
-            default: { blur: 12, opacity: 25, saturation: 180, tint: '#ffffff', borderWidth: 1, borderOpacity: 30, shadow: true },
-            subtle: { blur: 8, opacity: 15, saturation: 120, tint: '#ffffff', borderWidth: 1, borderOpacity: 20, shadow: false },
-            frosted: { blur: 20, opacity: 35, saturation: 150, tint: '#ffffff', borderWidth: 1, borderOpacity: 40, shadow: true },
-            heavy: { blur: 30, opacity: 50, saturation: 130, tint: '#ffffff', borderWidth: 2, borderOpacity: 50, shadow: true },
-            dark: { blur: 16, opacity: 40, saturation: 100, tint: '#000000', borderWidth: 1, borderOpacity: 30, shadow: true },
-            vibrant: { blur: 10, opacity: 20, saturation: 250, tint: '#ffffff', borderWidth: 1, borderOpacity: 25, shadow: true }
-        };
-
-        document.querySelectorAll('.glass-preset-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.glass-preset-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                const preset = glassPresets[btn.dataset.preset];
-                state.blur = preset.blur;
-                state.opacity = preset.opacity;
-                state.saturation = preset.saturation;
-                state.tint = preset.tint;
-                state.borderWidth = preset.borderWidth;
-                state.borderOpacity = preset.borderOpacity;
-                state.shadow = preset.shadow;
-
-                // Update inputs
-                document.getElementById('blur').value = state.blur;
-                document.getElementById('opacity').value = state.opacity;
-                document.getElementById('saturation').value = state.saturation;
-                document.getElementById('tintColor').value = state.tint;
-                document.getElementById('tintHex').value = state.tint;
-                document.getElementById('borderWidth').value = state.borderWidth;
-                document.getElementById('borderOpacity').value = state.borderOpacity;
-                document.getElementById('shadowToggle').classList.toggle('active', state.shadow);
-
-                updatePreview();
+        function updateNoiseEffect() {
+            getGlassElements().forEach(el => {
+                el.classList.toggle('has-noise', state.noise);
             });
-        });
+        }
 
-        // Copy CSS
+        // Event listeners - Copy & Share
         document.getElementById('copyBtn').addEventListener('click', () => {
             navigator.clipboard.writeText(cssOutput.textContent);
-            showToast('CSS copied!');
+            const btn = document.getElementById('copyBtn');
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = 'Copy';
+                btn.classList.remove('copied');
+            }, 1500);
         });
 
-        // Share
         document.getElementById('shareBtn').addEventListener('click', () => {
             const url = generateShareUrl();
             navigator.clipboard.writeText(url);
@@ -916,6 +1600,7 @@
 
         loadFromUrl();
         updatePreview();
+        updateNoiseEffect();
     </script>
 </body>
 </html>
