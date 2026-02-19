@@ -121,7 +121,8 @@
     @media (max-width: 900px) {
       main {
         grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
+        grid-template-rows: 1fr auto;
+        height: calc(100vh - 60px);
       }
     }
 
@@ -138,10 +139,13 @@
 
     @media (max-width: 900px) {
       .sidebar {
+        order: 2;
         border-right: none;
-        border-bottom: 1px solid var(--border);
+        border-top: 1px solid var(--border);
         padding: 1rem;
-        max-height: 40vh;
+        max-height: none;
+        overflow-y: auto;
+        gap: 1rem;
       }
     }
 
@@ -526,6 +530,101 @@
       font-size: 0.8rem;
       color: var(--text-muted);
       line-height: 1.5;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 900px) {
+      header {
+        padding: 0.75rem 1rem;
+      }
+
+      .logo span {
+        font-size: 1rem;
+      }
+
+      .canvas-area {
+        order: 1;
+        padding: 1rem;
+        min-height: 40vh;
+      }
+
+      #preview-canvas {
+        max-height: 35vh;
+      }
+
+      .option-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .option-btn {
+        font-size: 1.25rem;
+        min-height: 44px;
+      }
+
+      .gradient-grid {
+        grid-template-columns: repeat(5, 1fr);
+      }
+
+      .gradient-btn {
+        min-height: 36px;
+      }
+
+      .control-group h3 {
+        font-size: 0.7rem;
+      }
+
+      .action-buttons {
+        flex-direction: row;
+        margin-top: 0.5rem;
+      }
+
+      .action-buttons .btn {
+        flex: 1;
+        padding: 0.6rem 0.75rem;
+        font-size: 0.85rem;
+      }
+
+      .pro-teaser {
+        display: none;
+      }
+
+      .slider-control {
+        gap: 0.25rem;
+      }
+
+      input[type="range"] {
+        height: 8px;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .option-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.4rem;
+      }
+
+      .gradient-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.4rem;
+      }
+
+      .upload-area {
+        padding: 1.5rem 1rem;
+      }
+
+      .upload-area svg {
+        width: 36px;
+        height: 36px;
+      }
+
+      .action-buttons .btn svg {
+        display: none;
+      }
     }
   </style>
 </head>

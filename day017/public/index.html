@@ -282,12 +282,6 @@
             font-size: 0.75rem;
         }
 
-        @media (max-width: 768px) {
-            .pro-banner {
-                display: none;
-            }
-        }
-
         footer {
             padding: 1.5rem 2rem;
             text-align: center;
@@ -305,38 +299,93 @@
             color: white;
         }
 
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .hero-text h1 {
-                font-size: 2.5rem;
-            }
-
-            .hero-text p {
-                font-size: 1rem;
-            }
-
-            .controls-panel {
-                bottom: 1rem;
-                padding: 1rem;
-                gap: 1rem;
-            }
-
-            input[type="range"] {
-                width: 80px;
+            .pro-banner {
+                display: none;
             }
 
             header {
                 padding: 1rem;
+                flex-wrap: wrap;
+                gap: 0.75rem;
             }
-        }
 
-        @media (max-width: 480px) {
+            .header-actions {
+                width: 100%;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+
+            .header-actions .btn {
+                flex: 1;
+                padding: 0.6rem 0.5rem;
+                font-size: 0.8rem;
+                text-align: center;
+            }
+
+            .hero-text {
+                padding: 0 1rem;
+            }
+
             .hero-text h1 {
                 font-size: 2rem;
             }
 
+            .hero-text p {
+                font-size: 0.95rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+                padding-bottom: 280px; /* Space for controls */
+            }
+
             .controls-panel {
-                flex-direction: column;
-                align-items: center;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                transform: none;
+                border-radius: 16px 16px 0 0;
+                padding: 1.25rem;
+                gap: 1rem;
+                max-width: 100%;
+                max-height: 50vh;
+                overflow-y: auto;
+            }
+
+            .control-group {
+                width: 100%;
+            }
+
+            .preset-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .preset-btn {
+                width: 44px;
+                height: 44px;
+            }
+
+            input[type="range"] {
+                width: 100%;
+            }
+
+            footer {
+                padding: 1rem;
+                padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+            }
+        }
+
+        @media (max-width: 380px) {
+            .header-actions .btn {
+                font-size: 0.7rem;
+                padding: 0.5rem 0.4rem;
+            }
+
+            .logo-text {
+                font-size: 1rem;
             }
         }
     </style>
