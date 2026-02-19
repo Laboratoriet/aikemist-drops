@@ -56,7 +56,6 @@
       flex-direction: column;
     }
 
-    /* Header */
     header {
       padding: 1rem 1.5rem;
       display: flex;
@@ -109,7 +108,6 @@
       border-color: var(--text-muted);
     }
 
-    /* Main Layout */
     main {
       flex: 1;
       display: grid;
@@ -126,7 +124,6 @@
       }
     }
 
-    /* Sidebar Controls */
     .sidebar {
       background: var(--surface);
       border-right: 1px solid var(--border);
@@ -163,7 +160,6 @@
       color: var(--text-muted);
     }
 
-    /* Upload Area */
     .upload-area {
       border: 2px dashed var(--border);
       border-radius: var(--radius);
@@ -225,7 +221,6 @@
       font-size: 0.8rem;
     }
 
-    /* Option Grid */
     .option-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -242,8 +237,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       color: var(--text);
+      min-height: 44px;
     }
 
     .option-btn:hover {
@@ -255,12 +251,6 @@
       background: rgba(99, 102, 241, 0.1);
     }
 
-    .option-btn svg {
-      width: 24px;
-      height: 24px;
-    }
-
-    /* Gradient Options */
     .gradient-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -273,6 +263,7 @@
       border-radius: var(--radius-sm);
       cursor: pointer;
       transition: all 0.2s;
+      min-height: 36px;
     }
 
     .gradient-btn:hover {
@@ -285,7 +276,6 @@
       box-shadow: 0 0 0 2px var(--accent);
     }
 
-    /* Sliders */
     .slider-control {
       display: flex;
       flex-direction: column;
@@ -320,8 +310,8 @@
 
     input[type="range"]::-webkit-slider-thumb {
       appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       background: var(--accent);
       cursor: pointer;
@@ -332,7 +322,6 @@
       transform: scale(1.2);
     }
 
-    /* Buttons */
     .btn {
       display: flex;
       align-items: center;
@@ -380,7 +369,6 @@
       margin-top: auto;
     }
 
-    /* Canvas Area */
     .canvas-area {
       display: flex;
       align-items: center;
@@ -388,6 +376,14 @@
       padding: 2rem;
       background: repeating-conic-gradient(var(--surface) 0% 25%, var(--bg) 0% 50%) 50% / 20px 20px;
       overflow: auto;
+    }
+
+    @media (max-width: 900px) {
+      .canvas-area {
+        order: 1;
+        padding: 1rem;
+        min-height: 40vh;
+      }
     }
 
     .canvas-wrapper {
@@ -404,7 +400,12 @@
       border-radius: var(--radius);
     }
 
-    /* Empty State */
+    @media (max-width: 900px) {
+      #preview-canvas {
+        max-height: 35vh;
+      }
+    }
+
     .empty-state {
       text-align: center;
       color: var(--text-muted);
@@ -428,7 +429,6 @@
       font-size: 0.9rem;
     }
 
-    /* Footer */
     footer {
       padding: 1rem;
       text-align: center;
@@ -446,12 +446,10 @@
       text-decoration: underline;
     }
 
-    /* Hidden */
     .hidden {
       display: none !important;
     }
 
-    /* Checkbox toggle */
     .toggle-row {
       display: flex;
       align-items: center;
@@ -507,7 +505,6 @@
       transform: translateX(20px);
     }
 
-    /* Pro teaser */
     .pro-teaser {
       background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
       border: 1px solid rgba(99, 102, 241, 0.3);
@@ -532,7 +529,34 @@
       line-height: 1.5;
     }
 
-    /* Mobile Responsive */
+    /* Aspect ratio buttons */
+    .aspect-grid {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .aspect-btn {
+      padding: 0.4rem 0.75rem;
+      border: 2px solid var(--border);
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-family: inherit;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+
+    .aspect-btn:hover {
+      border-color: var(--text-muted);
+    }
+
+    .aspect-btn.active {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.1);
+    }
+
     @media (max-width: 900px) {
       header {
         padding: 0.75rem 1rem;
@@ -542,31 +566,8 @@
         font-size: 1rem;
       }
 
-      .canvas-area {
-        order: 1;
-        padding: 1rem;
-        min-height: 40vh;
-      }
-
-      #preview-canvas {
-        max-height: 35vh;
-      }
-
-      .option-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-
       .option-btn {
         font-size: 1.25rem;
-        min-height: 44px;
-      }
-
-      .gradient-grid {
-        grid-template-columns: repeat(5, 1fr);
-      }
-
-      .gradient-btn {
-        min-height: 36px;
       }
 
       .control-group h3 {
@@ -604,12 +605,10 @@
 
     @media (max-width: 480px) {
       .option-grid {
-        grid-template-columns: repeat(4, 1fr);
         gap: 0.4rem;
       }
 
       .gradient-grid {
-        grid-template-columns: repeat(5, 1fr);
         gap: 0.4rem;
       }
 
@@ -653,7 +652,6 @@
 
   <main>
     <aside class="sidebar">
-      <!-- Upload -->
       <div class="control-group">
         <h3>Screenshot</h3>
         <div class="upload-area" id="upload-area">
@@ -672,7 +670,6 @@
         <input type="file" id="file-input" accept="image/*" class="hidden">
       </div>
 
-      <!-- Device Frame -->
       <div class="control-group">
         <h3>Device Frame</h3>
         <div class="option-grid">
@@ -687,40 +684,48 @@
         </div>
       </div>
 
-      <!-- Background -->
       <div class="control-group">
-        <h3>Background</h3>
-        <div class="gradient-grid" id="gradient-grid">
-          <!-- Filled by JS -->
+        <h3>Output Size</h3>
+        <div class="aspect-grid">
+          <button class="aspect-btn active" data-aspect="auto">Auto</button>
+          <button class="aspect-btn" data-aspect="1:1">1:1</button>
+          <button class="aspect-btn" data-aspect="4:3">4:3</button>
+          <button class="aspect-btn" data-aspect="16:9">16:9</button>
+          <button class="aspect-btn" data-aspect="9:16">9:16</button>
+          <button class="aspect-btn" data-aspect="og">OG (1200×630)</button>
         </div>
       </div>
 
-      <!-- Adjustments -->
+      <div class="control-group">
+        <h3>Background</h3>
+        <div class="gradient-grid" id="gradient-grid"></div>
+      </div>
+
       <div class="control-group">
         <h3>Adjustments</h3>
         
         <div class="slider-control">
           <div class="slider-header">
             <label>Padding</label>
-            <span id="padding-value">64px</span>
+            <span id="padding-value">80px</span>
           </div>
-          <input type="range" id="padding" min="16" max="128" value="64">
+          <input type="range" id="padding" min="0" max="300" value="80">
         </div>
 
         <div class="slider-control">
           <div class="slider-header">
             <label>Shadow</label>
-            <span id="shadow-value">50%</span>
+            <span id="shadow-value">60%</span>
           </div>
-          <input type="range" id="shadow" min="0" max="100" value="50">
+          <input type="range" id="shadow" min="0" max="100" value="60">
         </div>
 
         <div class="slider-control">
           <div class="slider-header">
             <label>Corner Radius</label>
-            <span id="radius-value">12px</span>
+            <span id="radius-value">16px</span>
           </div>
-          <input type="range" id="radius" min="0" max="32" value="12">
+          <input type="range" id="radius" min="0" max="64" value="16">
         </div>
 
         <div class="toggle-row">
@@ -732,7 +737,6 @@
         </div>
       </div>
 
-      <!-- Actions -->
       <div class="action-buttons">
         <button class="btn btn-primary" id="download-btn" disabled>
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -744,10 +748,9 @@
         </button>
       </div>
 
-      <!-- Pro Teaser -->
       <div class="pro-teaser">
         <h4>✨ Pro coming soon</h4>
-        <p>4K export, video/GIF backgrounds, custom branding, more device frames</p>
+        <p>4K export, video backgrounds, custom branding, batch processing</p>
       </div>
     </aside>
 
@@ -770,7 +773,6 @@
   </footer>
 
   <script>
-    // Gradients
     const gradients = [
       { name: 'Indigo', colors: ['#6366f1', '#8b5cf6'] },
       { name: 'Ocean', colors: ['#0ea5e9', '#6366f1'] },
@@ -784,18 +786,17 @@
       { name: 'Noir', colors: ['#27272a', '#18181b'] },
     ];
 
-    // State
     let state = {
       image: null,
       frame: 'none',
+      aspect: 'auto',
       gradient: 0,
-      padding: 64,
-      shadow: 50,
-      radius: 12,
+      padding: 80,
+      shadow: 60,
+      radius: 16,
       noise: false,
     };
 
-    // DOM Elements
     const uploadArea = document.getElementById('upload-area');
     const fileInput = document.getElementById('file-input');
     const previewThumb = document.getElementById('preview-thumb');
@@ -827,7 +828,6 @@
       localStorage.setItem('theme', next);
     }
 
-    // Init theme
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
     document.querySelector('.theme-icon').textContent = savedTheme === 'light' ? '☀️' : '🌙';
@@ -835,27 +835,15 @@
     // Upload handlers
     uploadArea.onclick = () => fileInput.click();
     fileInput.onchange = (e) => handleFile(e.target.files[0]);
-
-    uploadArea.ondragover = (e) => {
-      e.preventDefault();
-      uploadArea.classList.add('dragover');
-    };
+    uploadArea.ondragover = (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); };
     uploadArea.ondragleave = () => uploadArea.classList.remove('dragover');
-    uploadArea.ondrop = (e) => {
-      e.preventDefault();
-      uploadArea.classList.remove('dragover');
-      handleFile(e.dataTransfer.files[0]);
-    };
+    uploadArea.ondrop = (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); };
 
-    // Paste handler
     document.addEventListener('paste', (e) => {
       const items = e.clipboardData?.items;
       if (!items) return;
       for (const item of items) {
-        if (item.type.startsWith('image/')) {
-          handleFile(item.getAsFile());
-          break;
-        }
+        if (item.type.startsWith('image/')) { handleFile(item.getAsFile()); break; }
       }
     });
 
@@ -889,10 +877,17 @@
       };
     });
 
+    document.querySelectorAll('.aspect-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.aspect-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.aspect = btn.dataset.aspect;
+        render();
+      };
+    });
+
     function selectGradient(index) {
-      document.querySelectorAll('.gradient-btn').forEach((b, i) => {
-        b.classList.toggle('active', i === index);
-      });
+      document.querySelectorAll('.gradient-btn').forEach((b, i) => b.classList.toggle('active', i === index));
       state.gradient = index;
       render();
     }
@@ -929,48 +924,34 @@
       const radius = state.radius;
       const shadowIntensity = state.shadow / 100;
 
-      // Calculate frame dimensions
-      let frameTop = 0;
-      let frameLeft = 0;
-      let frameRight = 0;
-      let frameBottom = 0;
+      // Get frame config
+      const frameConfig = getFrameConfig(state.frame, img.width, img.height);
+      const contentWidth = frameConfig.width;
+      const contentHeight = frameConfig.height;
 
-      if (state.frame === 'browser' || state.frame === 'browser-dark') {
-        frameTop = 40;
-        frameLeft = 0;
-        frameRight = 0;
-        frameBottom = 0;
-      } else if (state.frame === 'macbook') {
-        frameTop = 24;
-        frameLeft = 32;
-        frameRight = 32;
-        frameBottom = 48;
-      } else if (state.frame === 'ipad') {
-        frameTop = 24;
-        frameLeft = 24;
-        frameRight = 24;
-        frameBottom = 24;
-      } else if (state.frame === 'iphone') {
-        frameTop = 48;
-        frameLeft = 16;
-        frameRight = 16;
-        frameBottom = 48;
-      } else if (state.frame === 'window') {
-        frameTop = 32;
-        frameLeft = 1;
-        frameRight = 1;
-        frameBottom = 1;
-      } else if (state.frame === 'polaroid') {
-        frameTop = 16;
-        frameLeft = 16;
-        frameRight = 16;
-        frameBottom = 64;
+      // Calculate canvas size based on aspect ratio
+      let totalWidth, totalHeight;
+      
+      if (state.aspect === 'auto') {
+        totalWidth = contentWidth + padding * 2;
+        totalHeight = contentHeight + padding * 2;
+      } else if (state.aspect === 'og') {
+        totalWidth = 1200;
+        totalHeight = 630;
+      } else {
+        const [w, h] = state.aspect.split(':').map(Number);
+        const minDim = Math.max(contentWidth + padding * 2, contentHeight + padding * 2);
+        if (w > h) {
+          totalWidth = Math.max(minDim, contentWidth + padding * 2);
+          totalHeight = totalWidth * (h / w);
+        } else {
+          totalHeight = Math.max(minDim, contentHeight + padding * 2);
+          totalWidth = totalHeight * (w / h);
+        }
+        // Ensure content fits
+        totalWidth = Math.max(totalWidth, contentWidth + padding * 2);
+        totalHeight = Math.max(totalHeight, contentHeight + padding * 2);
       }
-
-      const contentWidth = img.width + frameLeft + frameRight;
-      const contentHeight = img.height + frameTop + frameBottom;
-      const totalWidth = contentWidth + padding * 2;
-      const totalHeight = contentHeight + padding * 2;
 
       canvas.width = totalWidth;
       canvas.height = totalHeight;
@@ -985,329 +966,287 @@
 
       // Noise overlay
       if (state.noise) {
-        addNoise(ctx, totalWidth, totalHeight, 0.03);
+        addNoise(ctx, totalWidth, totalHeight, 0.04);
       }
+
+      // Center content
+      const x = (totalWidth - contentWidth) / 2;
+      const y = (totalHeight - contentHeight) / 2;
 
       // Shadow
       if (shadowIntensity > 0) {
         ctx.save();
-        ctx.shadowColor = `rgba(0, 0, 0, ${shadowIntensity * 0.5})`;
-        ctx.shadowBlur = 40 * shadowIntensity;
-        ctx.shadowOffsetY = 20 * shadowIntensity;
+        ctx.shadowColor = `rgba(0, 0, 0, ${shadowIntensity * 0.6})`;
+        ctx.shadowBlur = 60 * shadowIntensity;
+        ctx.shadowOffsetY = 30 * shadowIntensity;
+        ctx.shadowOffsetX = 0;
         
-        const frameRadius = getFrameRadius(state.frame, radius);
-        roundRect(ctx, padding, padding, contentWidth, contentHeight, frameRadius);
-        ctx.fillStyle = '#000';
+        const shadowRadius = frameConfig.radius || radius;
+        roundRect(ctx, x, y, contentWidth, contentHeight, shadowRadius);
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
         ctx.fill();
         ctx.restore();
       }
 
-      // Draw frame or image
-      const x = padding;
-      const y = padding;
-
-      if (state.frame === 'browser' || state.frame === 'browser-dark') {
-        drawBrowserFrame(ctx, x, y, contentWidth, contentHeight, img, radius, state.frame === 'browser-dark');
-      } else if (state.frame === 'macbook') {
-        drawMacBookFrame(ctx, x, y, contentWidth, contentHeight, img);
-      } else if (state.frame === 'ipad') {
-        drawIPadFrame(ctx, x, y, contentWidth, contentHeight, img);
-      } else if (state.frame === 'iphone') {
-        drawIPhoneFrame(ctx, x, y, contentWidth, contentHeight, img);
-      } else if (state.frame === 'window') {
-        drawWindowFrame(ctx, x, y, contentWidth, contentHeight, img, radius);
-      } else if (state.frame === 'polaroid') {
-        drawPolaroidFrame(ctx, x, y, contentWidth, contentHeight, img);
-      } else {
-        // No frame - just rounded image
-        ctx.save();
-        roundRect(ctx, x, y, img.width, img.height, radius);
-        ctx.clip();
-        ctx.drawImage(img, x, y);
-        ctx.restore();
-      }
+      // Draw frame
+      drawFrame(ctx, x, y, img, state.frame, radius);
     }
 
-    function getFrameRadius(frame, defaultRadius) {
+    function getFrameConfig(frame, imgW, imgH) {
       switch (frame) {
-        case 'macbook': return 12;
-        case 'ipad': return 20;
-        case 'iphone': return 40;
-        case 'polaroid': return 4;
-        default: return defaultRadius;
+        case 'browser':
+        case 'browser-dark':
+          return { width: imgW, height: imgH + 40, radius: 12 };
+        case 'macbook':
+          return { width: imgW + 48, height: imgH + 64, radius: 16 };
+        case 'ipad':
+          return { width: imgW + 40, height: imgH + 40, radius: 24 };
+        case 'iphone':
+          return { width: imgW + 24, height: imgH + 80, radius: 44 };
+        case 'window':
+          return { width: imgW, height: imgH + 36, radius: 10 };
+        case 'polaroid':
+          return { width: imgW + 24, height: imgH + 80, radius: 4 };
+        default:
+          return { width: imgW, height: imgH, radius: null };
       }
     }
 
-    function drawBrowserFrame(ctx, x, y, width, height, img, radius, dark) {
-      const barHeight = 40;
-      const bgColor = dark ? '#1e1e1e' : '#f5f5f5';
-      const dotColors = ['#ff5f56', '#ffbd2e', '#27c93f'];
+    function drawFrame(ctx, x, y, img, frame, radius) {
+      switch (frame) {
+        case 'browser':
+          drawBrowserFrame(ctx, x, y, img, false, radius);
+          break;
+        case 'browser-dark':
+          drawBrowserFrame(ctx, x, y, img, true, radius);
+          break;
+        case 'macbook':
+          drawMacBookFrame(ctx, x, y, img);
+          break;
+        case 'ipad':
+          drawIPadFrame(ctx, x, y, img);
+          break;
+        case 'iphone':
+          drawIPhoneFrame(ctx, x, y, img);
+          break;
+        case 'window':
+          drawWindowFrame(ctx, x, y, img, radius);
+          break;
+        case 'polaroid':
+          drawPolaroidFrame(ctx, x, y, img);
+          break;
+        default:
+          // No frame
+          ctx.save();
+          roundRect(ctx, x, y, img.width, img.height, radius);
+          ctx.clip();
+          ctx.drawImage(img, x, y);
+          ctx.restore();
+      }
+    }
 
-      // Frame background
+    function drawBrowserFrame(ctx, x, y, img, dark, radius) {
+      const barHeight = 40;
+      const w = img.width;
+      const h = img.height + barHeight;
+      const r = Math.min(radius, 16);
+
       ctx.save();
-      roundRect(ctx, x, y, width, height, radius);
+      roundRect(ctx, x, y, w, h, r);
       ctx.clip();
 
-      // Title bar
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(x, y, width, barHeight);
+      // Background
+      ctx.fillStyle = dark ? '#1e1e1e' : '#f5f5f5';
+      ctx.fillRect(x, y, w, h);
 
       // Traffic lights
-      const dotRadius = 6;
-      const dotY = y + barHeight / 2;
-      dotColors.forEach((color, i) => {
+      const dots = ['#ff5f56', '#ffbd2e', '#27c93f'];
+      dots.forEach((color, i) => {
         ctx.beginPath();
-        ctx.arc(x + 20 + i * 20, dotY, dotRadius, 0, Math.PI * 2);
+        ctx.arc(x + 20 + i * 20, y + barHeight / 2, 6, 0, Math.PI * 2);
         ctx.fillStyle = color;
         ctx.fill();
       });
 
       // URL bar
-      const urlBarWidth = Math.min(300, width - 120);
-      const urlBarHeight = 24;
-      const urlBarX = x + (width - urlBarWidth) / 2;
-      const urlBarY = y + (barHeight - urlBarHeight) / 2;
+      const urlW = Math.min(300, w - 140);
+      const urlH = 24;
       ctx.fillStyle = dark ? '#2d2d2d' : '#e5e5e5';
-      roundRect(ctx, urlBarX, urlBarY, urlBarWidth, urlBarHeight, urlBarHeight / 2);
+      roundRect(ctx, x + (w - urlW) / 2, y + (barHeight - urlH) / 2, urlW, urlH, urlH / 2);
       ctx.fill();
 
       // Screenshot
       ctx.drawImage(img, x, y + barHeight);
-
       ctx.restore();
     }
 
-    function drawMacBookFrame(ctx, x, y, width, height, img) {
-      const frameRadius = 12;
-      const bezelTop = 24;
-      const bezelSide = 32;
-      const bezelBottom = 48;
-      const screenRadius = 4;
+    function drawMacBookFrame(ctx, x, y, img) {
+      const bezel = 24;
+      const bottom = 40;
+      const w = img.width + bezel * 2;
+      const h = img.height + bezel + bottom;
 
-      // MacBook body (silver)
       ctx.save();
-      roundRect(ctx, x, y, width, height, frameRadius);
+      roundRect(ctx, x, y, w, h, 16);
       ctx.clip();
 
-      // Main body gradient
-      const bodyGrad = ctx.createLinearGradient(x, y, x, y + height);
-      bodyGrad.addColorStop(0, '#d4d4d8');
-      bodyGrad.addColorStop(0.5, '#e4e4e7');
+      // Body
+      const bodyGrad = ctx.createLinearGradient(x, y, x, y + h);
+      bodyGrad.addColorStop(0, '#e4e4e7');
       bodyGrad.addColorStop(1, '#a1a1aa');
       ctx.fillStyle = bodyGrad;
       ctx.fill();
 
-      // Screen bezel (black)
+      // Screen bezel
       ctx.fillStyle = '#18181b';
-      roundRect(ctx, x + 4, y + 4, width - 8, height - bezelBottom, screenRadius + 4);
-      ctx.fill();
-
-      // Camera notch
-      const notchWidth = 100;
-      const notchHeight = 20;
-      ctx.fillStyle = '#18181b';
-      roundRect(ctx, x + (width - notchWidth) / 2, y, notchWidth, notchHeight, 0);
-      ctx.fill();
-      roundRect(ctx, x + (width - notchWidth) / 2, y + notchHeight - 8, notchWidth, 8, 4);
-      ctx.fill();
-
-      // Camera dot
-      ctx.beginPath();
-      ctx.arc(x + width / 2, y + 10, 3, 0, Math.PI * 2);
-      ctx.fillStyle = '#27272a';
-      ctx.fill();
-
-      // Screenshot
-      ctx.drawImage(img, x + bezelSide, y + bezelTop);
-
-      // Hinge line
-      ctx.strokeStyle = '#71717a';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(x + 8, y + height - bezelBottom + 4);
-      ctx.lineTo(x + width - 8, y + height - bezelBottom + 4);
-      ctx.stroke();
-
-      // Bottom logo area
-      const logoSize = 16;
-      ctx.beginPath();
-      ctx.arc(x + width / 2, y + height - bezelBottom / 2 + 4, logoSize / 2, 0, Math.PI * 2);
-      ctx.fillStyle = '#a1a1aa';
-      ctx.fill();
-
-      ctx.restore();
-    }
-
-    function drawIPadFrame(ctx, x, y, width, height, img) {
-      const frameRadius = 20;
-      const bezel = 24;
-
-      // iPad body
-      ctx.save();
-      roundRect(ctx, x, y, width, height, frameRadius);
-      ctx.clip();
-
-      // Body gradient
-      const bodyGrad = ctx.createLinearGradient(x, y, x + width, y);
-      bodyGrad.addColorStop(0, '#27272a');
-      bodyGrad.addColorStop(0.5, '#3f3f46');
-      bodyGrad.addColorStop(1, '#27272a');
-      ctx.fillStyle = bodyGrad;
+      roundRect(ctx, x + 4, y + 4, w - 8, img.height + bezel - 4, 8);
       ctx.fill();
 
       // Camera
       ctx.beginPath();
-      ctx.arc(x + width / 2, y + 12, 4, 0, Math.PI * 2);
-      ctx.fillStyle = '#18181b';
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(x + width / 2, y + 12, 2, 0, Math.PI * 2);
-      ctx.fillStyle = '#1e3a5f';
+      ctx.arc(x + w / 2, y + 12, 3, 0, Math.PI * 2);
+      ctx.fillStyle = '#27272a';
       ctx.fill();
 
       // Screenshot
       ctx.drawImage(img, x + bezel, y + bezel);
 
+      // Hinge
+      ctx.strokeStyle = '#71717a';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x + 20, y + img.height + bezel + 6);
+      ctx.lineTo(x + w - 20, y + img.height + bezel + 6);
+      ctx.stroke();
+
       ctx.restore();
     }
 
-    function drawIPhoneFrame(ctx, x, y, width, height, img) {
-      const frameRadius = 40;
-      const bezelSide = 16;
-      const bezelTop = 48;
-      const bezelBottom = 48;
+    function drawIPadFrame(ctx, x, y, img) {
+      const bezel = 20;
+      const w = img.width + bezel * 2;
+      const h = img.height + bezel * 2;
 
-      // iPhone body
       ctx.save();
-      roundRect(ctx, x, y, width, height, frameRadius);
+      roundRect(ctx, x, y, w, h, 24);
       ctx.clip();
 
       // Body
-      ctx.fillStyle = '#18181b';
+      ctx.fillStyle = '#1a1a1a';
       ctx.fill();
 
-      // Side buttons (subtle)
+      // Camera
+      ctx.beginPath();
+      ctx.arc(x + w / 2, y + 10, 4, 0, Math.PI * 2);
       ctx.fillStyle = '#27272a';
-      ctx.fillRect(x - 2, y + 80, 4, 60); // volume up
-      ctx.fillRect(x - 2, y + 150, 4, 60); // volume down
-      ctx.fillRect(x + width - 2, y + 100, 4, 80); // power
-
-      // Dynamic Island
-      const islandWidth = 100;
-      const islandHeight = 28;
-      const islandX = x + (width - islandWidth) / 2;
-      const islandY = y + 14;
-      ctx.fillStyle = '#000';
-      roundRect(ctx, islandX, islandY, islandWidth, islandHeight, islandHeight / 2);
       ctx.fill();
 
       // Screenshot
-      const screenX = x + bezelSide;
-      const screenY = y + bezelTop;
-      roundRect(ctx, screenX, screenY, img.width, img.height, 4);
-      ctx.clip();
-      ctx.drawImage(img, screenX, screenY);
-
-      ctx.restore();
-
-      // Home indicator
-      ctx.save();
-      roundRect(ctx, x, y, width, height, frameRadius);
-      ctx.clip();
-      const indicatorWidth = 120;
-      const indicatorHeight = 5;
-      const indicatorX = x + (width - indicatorWidth) / 2;
-      const indicatorY = y + height - 20;
-      roundRect(ctx, indicatorX, indicatorY, indicatorWidth, indicatorHeight, indicatorHeight / 2);
-      ctx.fillStyle = '#fff';
-      ctx.fill();
+      ctx.drawImage(img, x + bezel, y + bezel);
       ctx.restore();
     }
 
-    function drawWindowFrame(ctx, x, y, width, height, img, radius) {
-      const barHeight = 32;
+    function drawIPhoneFrame(ctx, x, y, img) {
+      const bezelSide = 12;
+      const bezelTop = 40;
+      const bezelBottom = 40;
+      const w = img.width + bezelSide * 2;
+      const h = img.height + bezelTop + bezelBottom;
 
-      // Window background
       ctx.save();
-      roundRect(ctx, x, y, width, height, radius);
+      roundRect(ctx, x, y, w, h, 44);
       ctx.clip();
+
+      // Body
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fill();
+
+      // Dynamic Island
+      const islandW = 90;
+      const islandH = 26;
+      ctx.fillStyle = '#000';
+      roundRect(ctx, x + (w - islandW) / 2, y + 10, islandW, islandH, islandH / 2);
+      ctx.fill();
+
+      // Screenshot
+      roundRect(ctx, x + bezelSide, y + bezelTop, img.width, img.height, 4);
+      ctx.save();
+      ctx.clip();
+      ctx.drawImage(img, x + bezelSide, y + bezelTop);
+      ctx.restore();
+
+      // Home indicator
+      ctx.fillStyle = '#fff';
+      roundRect(ctx, x + (w - 100) / 2, y + h - 18, 100, 5, 3);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawWindowFrame(ctx, x, y, img, radius) {
+      const barHeight = 36;
+      const w = img.width;
+      const h = img.height + barHeight;
+      const r = Math.min(radius, 10);
+
+      ctx.save();
+      roundRect(ctx, x, y, w, h, r);
+      ctx.clip();
+
+      // Background
       ctx.fillStyle = '#1e1e1e';
       ctx.fill();
 
       // Title bar
-      const barGrad = ctx.createLinearGradient(x, y, x, y + barHeight);
-      barGrad.addColorStop(0, '#3f3f46');
-      barGrad.addColorStop(1, '#27272a');
-      ctx.fillStyle = barGrad;
-      ctx.fillRect(x, y, width, barHeight);
+      ctx.fillStyle = '#2d2d2d';
+      ctx.fillRect(x, y, w, barHeight);
 
-      // Window controls (right side, Windows style)
-      const btnWidth = 46;
-      const btnHeight = barHeight;
-      const btnY = y;
+      // Window controls (right side)
+      const btnW = 46;
+      ['#52525b', '#52525b', '#ef4444'].forEach((color, i) => {
+        ctx.fillStyle = color;
+        ctx.fillRect(x + w - btnW * (3 - i), y, btnW, barHeight);
+      });
 
-      // Minimize
-      ctx.fillStyle = '#52525b';
-      ctx.fillRect(x + width - btnWidth * 3, btnY, btnWidth, btnHeight);
-      ctx.strokeStyle = '#a1a1aa';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(x + width - btnWidth * 3 + 18, btnY + 16);
-      ctx.lineTo(x + width - btnWidth * 3 + 28, btnY + 16);
-      ctx.stroke();
-
-      // Maximize
-      ctx.fillStyle = '#52525b';
-      ctx.fillRect(x + width - btnWidth * 2, btnY, btnWidth, btnHeight);
-      ctx.strokeRect(x + width - btnWidth * 2 + 18, btnY + 11, 10, 10);
-
-      // Close (red)
-      ctx.fillStyle = '#ef4444';
-      ctx.fillRect(x + width - btnWidth, btnY, btnWidth, btnHeight);
+      // Close X
       ctx.strokeStyle = '#fff';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(x + width - btnWidth + 18, btnY + 11);
-      ctx.lineTo(x + width - btnWidth + 28, btnY + 21);
-      ctx.moveTo(x + width - btnWidth + 28, btnY + 11);
-      ctx.lineTo(x + width - btnWidth + 18, btnY + 21);
+      ctx.moveTo(x + w - btnW + 16, y + 12);
+      ctx.lineTo(x + w - btnW + 30, y + 24);
+      ctx.moveTo(x + w - btnW + 30, y + 12);
+      ctx.lineTo(x + w - btnW + 16, y + 24);
       ctx.stroke();
 
       // Screenshot
-      ctx.drawImage(img, x + 1, y + barHeight);
-
+      ctx.drawImage(img, x, y + barHeight);
       ctx.restore();
     }
 
-    function drawPolaroidFrame(ctx, x, y, width, height, img) {
-      const frameRadius = 4;
-      const borderTop = 16;
-      const borderSide = 16;
-      const borderBottom = 64;
+    function drawPolaroidFrame(ctx, x, y, img) {
+      const border = 12;
+      const bottom = 56;
+      const w = img.width + border * 2;
+      const h = img.height + border + bottom;
 
-      // Polaroid frame (white)
       ctx.save();
-      roundRect(ctx, x, y, width, height, frameRadius);
+      roundRect(ctx, x, y, w, h, 4);
       ctx.clip();
+
+      // White background
       ctx.fillStyle = '#fafafa';
       ctx.fill();
 
-      // Subtle shadow inside
+      // Subtle inner shadow
       ctx.shadowColor = 'rgba(0,0,0,0.1)';
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 8;
       ctx.shadowOffsetY = 2;
+      ctx.fillRect(x, y, w, h);
+
+      ctx.shadowColor = 'transparent';
 
       // Screenshot
-      ctx.drawImage(img, x + borderSide, y + borderTop);
-
-      ctx.restore();
-
-      // Optional: Polaroid text area hint
-      ctx.save();
-      ctx.font = '14px "Jost", sans-serif';
-      ctx.fillStyle = '#a1a1aa';
-      ctx.textAlign = 'center';
-      ctx.fillText('✨', x + width / 2, y + height - 24);
+      ctx.drawImage(img, x + border, y + border);
       ctx.restore();
     }
 
@@ -1337,7 +1276,6 @@
       ctx.putImageData(imageData, 0, 0);
     }
 
-    // Download
     downloadBtn.onclick = () => {
       const link = document.createElement('a');
       link.download = 'screenshot-beautified.png';
@@ -1345,13 +1283,10 @@
       link.click();
     };
 
-    // Copy to clipboard
     copyBtn.onclick = async () => {
       try {
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-        await navigator.clipboard.write([
-          new ClipboardItem({ 'image/png': blob })
-        ]);
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
         copyBtn.textContent = '✓ Copied!';
         setTimeout(() => {
           copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy to Clipboard`;
