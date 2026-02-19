@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Screenshot Beautifier — Make Your Screenshots Shine | Alkemist</title>
+  <meta name="description" content="Transform boring screenshots into stunning visuals. Add device frames, gradient backgrounds, and shadows. Free, instant, no signup.">
+  <meta property="og:title" content="Screenshot Beautifier — Make Your Screenshots Shine">
+  <meta property="og:description" content="Transform boring screenshots into stunning visuals. Add device frames, gradient backgrounds, and shadows.">
+  <meta property="og:image" content="https://day018.aikemist.com/og.png">
+  <meta property="og:url" content="https://day018.aikemist.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface-hover: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #ffffff;
+      --text-muted: #888888;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    [data-theme="light"] {
+      --bg: #f5f5f5;
+      --surface: #ffffff;
+      --surface-hover: #fafafa;
+      --border: #e5e5e5;
+      --text: #0a0a0a;
+      --text-muted: #666666;
+    }
+
+    html {
+      font-family: 'Jost', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .logo span {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .theme-toggle {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle:hover {
+      background: var(--surface-hover);
+      border-color: var(--text-muted);
+    }
+
+    /* Main Layout */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+    }
+
+    /* Sidebar Controls */
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 1rem;
+        max-height: 40vh;
+      }
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .control-group h3 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    /* Upload Area */
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--bg);
+    }
+
+    .upload-area:hover, .upload-area.dragover {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.05);
+    }
+
+    .upload-area.has-image {
+      padding: 1rem;
+    }
+
+    .upload-area svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .upload-area p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .upload-area .hint {
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      opacity: 0.7;
+    }
+
+    .upload-preview {
+      display: none;
+    }
+
+    .upload-area.has-image .upload-preview {
+      display: block;
+    }
+
+    .upload-area.has-image .upload-prompt {
+      display: none;
+    }
+
+    .upload-preview img {
+      max-width: 100%;
+      max-height: 120px;
+      border-radius: var(--radius-sm);
+      object-fit: contain;
+    }
+
+    .upload-preview p {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    /* Option Grid */
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+
+    .option-btn {
+      aspect-ratio: 1;
+      border: 2px solid var(--border);
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--text);
+    }
+
+    .option-btn:hover {
+      border-color: var(--text-muted);
+    }
+
+    .option-btn.active {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .option-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Gradient Options */
+    .gradient-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+    }
+
+    .gradient-btn {
+      aspect-ratio: 1;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .gradient-btn:hover {
+      border-color: var(--text-muted);
+      transform: scale(1.05);
+    }
+
+    .gradient-btn.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    /* Sliders */
+    .slider-control {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .slider-header label {
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+
+    .slider-header span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      appearance: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    /* Buttons */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-hover);
+      border-color: var(--text-muted);
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: auto;
+    }
+
+    /* Canvas Area */
+    .canvas-area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: repeating-conic-gradient(var(--surface) 0% 25%, var(--bg) 0% 50%) 50% / 20px 20px;
+      overflow: auto;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    }
+
+    #preview-canvas {
+      display: block;
+      max-width: 100%;
+      max-height: calc(100vh - 200px);
+      border-radius: var(--radius);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .empty-state svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .empty-state h2 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .empty-state p {
+      font-size: 0.9rem;
+    }
+
+    /* Footer */
+    footer {
+      padding: 1rem;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Hidden */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Checkbox toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+    }
+
+    .toggle-row label {
+      font-size: 0.85rem;
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--border);
+      border-radius: 24px;
+      transition: 0.2s;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: var(--text);
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background: var(--accent);
+    }
+
+    .toggle input:checked + .toggle-slider:before {
+      transform: translateX(20px);
+    }
+
+    /* Pro teaser */
+    .pro-teaser {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .pro-teaser h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .pro-teaser p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="https://aikemist.com" class="logo">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#6366f1"/>
+            <stop offset="100%" stop-color="#a855f7"/>
+          </linearGradient>
+        </defs>
+        <rect width="40" height="40" rx="8" fill="url(#logo-grad)"/>
+        <path d="M20 8L28 28H12L20 8Z" fill="white" fill-opacity="0.9"/>
+        <circle cx="20" cy="24" r="3" fill="white"/>
+      </svg>
+      <span>Screenshot Beautifier</span>
+    </a>
+    <div class="header-actions">
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <span class="theme-icon">🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <aside class="sidebar">
+      <!-- Upload -->
+      <div class="control-group">
+        <h3>Screenshot</h3>
+        <div class="upload-area" id="upload-area">
+          <div class="upload-prompt">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <p>Drop image or click to upload</p>
+            <p class="hint">Or paste from clipboard (Ctrl+V)</p>
+          </div>
+          <div class="upload-preview">
+            <img id="preview-thumb" src="" alt="Preview">
+            <p>Click to replace</p>
+          </div>
+        </div>
+        <input type="file" id="file-input" accept="image/*" class="hidden">
+      </div>
+
+      <!-- Device Frame -->
+      <div class="control-group">
+        <h3>Device Frame</h3>
+        <div class="option-grid">
+          <button class="option-btn active" data-frame="none" title="No frame">✨</button>
+          <button class="option-btn" data-frame="browser" title="Browser (Light)">🌐</button>
+          <button class="option-btn" data-frame="browser-dark" title="Browser (Dark)">🖥️</button>
+          <button class="option-btn" data-frame="macbook" title="MacBook">💻</button>
+          <button class="option-btn" data-frame="ipad" title="iPad">📱</button>
+          <button class="option-btn" data-frame="iphone" title="iPhone">📲</button>
+          <button class="option-btn" data-frame="window" title="Window">🪟</button>
+          <button class="option-btn" data-frame="polaroid" title="Polaroid">🖼️</button>
+        </div>
+      </div>
+
+      <!-- Background -->
+      <div class="control-group">
+        <h3>Background</h3>
+        <div class="gradient-grid" id="gradient-grid">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+
+      <!-- Adjustments -->
+      <div class="control-group">
+        <h3>Adjustments</h3>
+        
+        <div class="slider-control">
+          <div class="slider-header">
+            <label>Padding</label>
+            <span id="padding-value">64px</span>
+          </div>
+          <input type="range" id="padding" min="16" max="128" value="64">
+        </div>
+
+        <div class="slider-control">
+          <div class="slider-header">
+            <label>Shadow</label>
+            <span id="shadow-value">50%</span>
+          </div>
+          <input type="range" id="shadow" min="0" max="100" value="50">
+        </div>
+
+        <div class="slider-control">
+          <div class="slider-header">
+            <label>Corner Radius</label>
+            <span id="radius-value">12px</span>
+          </div>
+          <input type="range" id="radius" min="0" max="32" value="12">
+        </div>
+
+        <div class="toggle-row">
+          <label>Add noise texture</label>
+          <label class="toggle">
+            <input type="checkbox" id="noise-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="download-btn" disabled>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PNG
+        </button>
+        <button class="btn btn-secondary" id="copy-btn" disabled>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy to Clipboard
+        </button>
+      </div>
+
+      <!-- Pro Teaser -->
+      <div class="pro-teaser">
+        <h4>✨ Pro coming soon</h4>
+        <p>4K export, video/GIF backgrounds, custom branding, more device frames</p>
+      </div>
+    </aside>
+
+    <div class="canvas-area">
+      <div class="empty-state" id="empty-state">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <h2>Upload a screenshot</h2>
+        <p>Drag & drop, paste, or click to browse</p>
+      </div>
+      <div class="canvas-wrapper hidden" id="canvas-wrapper">
+        <canvas id="preview-canvas"></canvas>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+  </footer>
+
+  <script>
+    // Gradients
+    const gradients = [
+      { name: 'Indigo', colors: ['#6366f1', '#8b5cf6'] },
+      { name: 'Ocean', colors: ['#0ea5e9', '#6366f1'] },
+      { name: 'Sunset', colors: ['#f97316', '#ec4899'] },
+      { name: 'Mint', colors: ['#10b981', '#06b6d4'] },
+      { name: 'Fire', colors: ['#ef4444', '#f97316'] },
+      { name: 'Purple', colors: ['#8b5cf6', '#ec4899'] },
+      { name: 'Sky', colors: ['#38bdf8', '#818cf8'] },
+      { name: 'Peach', colors: ['#fb7185', '#fdba74'] },
+      { name: 'Forest', colors: ['#22c55e', '#16a34a'] },
+      { name: 'Noir', colors: ['#27272a', '#18181b'] },
+    ];
+
+    // State
+    let state = {
+      image: null,
+      frame: 'none',
+      gradient: 0,
+      padding: 64,
+      shadow: 50,
+      radius: 12,
+      noise: false,
+    };
+
+    // DOM Elements
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('file-input');
+    const previewThumb = document.getElementById('preview-thumb');
+    const canvas = document.getElementById('preview-canvas');
+    const ctx = canvas.getContext('2d');
+    const emptyState = document.getElementById('empty-state');
+    const canvasWrapper = document.getElementById('canvas-wrapper');
+    const downloadBtn = document.getElementById('download-btn');
+    const copyBtn = document.getElementById('copy-btn');
+    const gradientGrid = document.getElementById('gradient-grid');
+
+    // Initialize gradients
+    gradients.forEach((g, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'gradient-btn' + (i === 0 ? ' active' : '');
+      btn.style.background = `linear-gradient(135deg, ${g.colors[0]}, ${g.colors[1]})`;
+      btn.dataset.index = i;
+      btn.title = g.name;
+      btn.onclick = () => selectGradient(i);
+      gradientGrid.appendChild(btn);
+    });
+
+    // Theme
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      document.querySelector('.theme-icon').textContent = next === 'light' ? '☀️' : '🌙';
+      localStorage.setItem('theme', next);
+    }
+
+    // Init theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.querySelector('.theme-icon').textContent = savedTheme === 'light' ? '☀️' : '🌙';
+
+    // Upload handlers
+    uploadArea.onclick = () => fileInput.click();
+    fileInput.onchange = (e) => handleFile(e.target.files[0]);
+
+    uploadArea.ondragover = (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    };
+    uploadArea.ondragleave = () => uploadArea.classList.remove('dragover');
+    uploadArea.ondrop = (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      handleFile(e.dataTransfer.files[0]);
+    };
+
+    // Paste handler
+    document.addEventListener('paste', (e) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of items) {
+        if (item.type.startsWith('image/')) {
+          handleFile(item.getAsFile());
+          break;
+        }
+      }
+    });
+
+    function handleFile(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          state.image = img;
+          previewThumb.src = e.target.result;
+          uploadArea.classList.add('has-image');
+          emptyState.classList.add('hidden');
+          canvasWrapper.classList.remove('hidden');
+          downloadBtn.disabled = false;
+          copyBtn.disabled = false;
+          render();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Controls
+    document.querySelectorAll('.option-btn[data-frame]').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.option-btn[data-frame]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.frame = btn.dataset.frame;
+        render();
+      };
+    });
+
+    function selectGradient(index) {
+      document.querySelectorAll('.gradient-btn').forEach((b, i) => {
+        b.classList.toggle('active', i === index);
+      });
+      state.gradient = index;
+      render();
+    }
+
+    document.getElementById('padding').oninput = (e) => {
+      state.padding = parseInt(e.target.value);
+      document.getElementById('padding-value').textContent = state.padding + 'px';
+      render();
+    };
+
+    document.getElementById('shadow').oninput = (e) => {
+      state.shadow = parseInt(e.target.value);
+      document.getElementById('shadow-value').textContent = state.shadow + '%';
+      render();
+    };
+
+    document.getElementById('radius').oninput = (e) => {
+      state.radius = parseInt(e.target.value);
+      document.getElementById('radius-value').textContent = state.radius + 'px';
+      render();
+    };
+
+    document.getElementById('noise-toggle').onchange = (e) => {
+      state.noise = e.target.checked;
+      render();
+    };
+
+    // Render
+    function render() {
+      if (!state.image) return;
+
+      const img = state.image;
+      const padding = state.padding;
+      const radius = state.radius;
+      const shadowIntensity = state.shadow / 100;
+
+      // Calculate frame dimensions
+      let frameTop = 0;
+      let frameLeft = 0;
+      let frameRight = 0;
+      let frameBottom = 0;
+
+      if (state.frame === 'browser' || state.frame === 'browser-dark') {
+        frameTop = 40;
+        frameLeft = 0;
+        frameRight = 0;
+        frameBottom = 0;
+      } else if (state.frame === 'macbook') {
+        frameTop = 24;
+        frameLeft = 32;
+        frameRight = 32;
+        frameBottom = 48;
+      } else if (state.frame === 'ipad') {
+        frameTop = 24;
+        frameLeft = 24;
+        frameRight = 24;
+        frameBottom = 24;
+      } else if (state.frame === 'iphone') {
+        frameTop = 48;
+        frameLeft = 16;
+        frameRight = 16;
+        frameBottom = 48;
+      } else if (state.frame === 'window') {
+        frameTop = 32;
+        frameLeft = 1;
+        frameRight = 1;
+        frameBottom = 1;
+      } else if (state.frame === 'polaroid') {
+        frameTop = 16;
+        frameLeft = 16;
+        frameRight = 16;
+        frameBottom = 64;
+      }
+
+      const contentWidth = img.width + frameLeft + frameRight;
+      const contentHeight = img.height + frameTop + frameBottom;
+      const totalWidth = contentWidth + padding * 2;
+      const totalHeight = contentHeight + padding * 2;
+
+      canvas.width = totalWidth;
+      canvas.height = totalHeight;
+
+      // Background gradient
+      const grad = gradients[state.gradient];
+      const bgGrad = ctx.createLinearGradient(0, 0, totalWidth, totalHeight);
+      bgGrad.addColorStop(0, grad.colors[0]);
+      bgGrad.addColorStop(1, grad.colors[1]);
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, totalWidth, totalHeight);
+
+      // Noise overlay
+      if (state.noise) {
+        addNoise(ctx, totalWidth, totalHeight, 0.03);
+      }
+
+      // Shadow
+      if (shadowIntensity > 0) {
+        ctx.save();
+        ctx.shadowColor = `rgba(0, 0, 0, ${shadowIntensity * 0.5})`;
+        ctx.shadowBlur = 40 * shadowIntensity;
+        ctx.shadowOffsetY = 20 * shadowIntensity;
+        
+        const frameRadius = getFrameRadius(state.frame, radius);
+        roundRect(ctx, padding, padding, contentWidth, contentHeight, frameRadius);
+        ctx.fillStyle = '#000';
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Draw frame or image
+      const x = padding;
+      const y = padding;
+
+      if (state.frame === 'browser' || state.frame === 'browser-dark') {
+        drawBrowserFrame(ctx, x, y, contentWidth, contentHeight, img, radius, state.frame === 'browser-dark');
+      } else if (state.frame === 'macbook') {
+        drawMacBookFrame(ctx, x, y, contentWidth, contentHeight, img);
+      } else if (state.frame === 'ipad') {
+        drawIPadFrame(ctx, x, y, contentWidth, contentHeight, img);
+      } else if (state.frame === 'iphone') {
+        drawIPhoneFrame(ctx, x, y, contentWidth, contentHeight, img);
+      } else if (state.frame === 'window') {
+        drawWindowFrame(ctx, x, y, contentWidth, contentHeight, img, radius);
+      } else if (state.frame === 'polaroid') {
+        drawPolaroidFrame(ctx, x, y, contentWidth, contentHeight, img);
+      } else {
+        // No frame - just rounded image
+        ctx.save();
+        roundRect(ctx, x, y, img.width, img.height, radius);
+        ctx.clip();
+        ctx.drawImage(img, x, y);
+        ctx.restore();
+      }
+    }
+
+    function getFrameRadius(frame, defaultRadius) {
+      switch (frame) {
+        case 'macbook': return 12;
+        case 'ipad': return 20;
+        case 'iphone': return 40;
+        case 'polaroid': return 4;
+        default: return defaultRadius;
+      }
+    }
+
+    function drawBrowserFrame(ctx, x, y, width, height, img, radius, dark) {
+      const barHeight = 40;
+      const bgColor = dark ? '#1e1e1e' : '#f5f5f5';
+      const dotColors = ['#ff5f56', '#ffbd2e', '#27c93f'];
+
+      // Frame background
+      ctx.save();
+      roundRect(ctx, x, y, width, height, radius);
+      ctx.clip();
+
+      // Title bar
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(x, y, width, barHeight);
+
+      // Traffic lights
+      const dotRadius = 6;
+      const dotY = y + barHeight / 2;
+      dotColors.forEach((color, i) => {
+        ctx.beginPath();
+        ctx.arc(x + 20 + i * 20, dotY, dotRadius, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+      });
+
+      // URL bar
+      const urlBarWidth = Math.min(300, width - 120);
+      const urlBarHeight = 24;
+      const urlBarX = x + (width - urlBarWidth) / 2;
+      const urlBarY = y + (barHeight - urlBarHeight) / 2;
+      ctx.fillStyle = dark ? '#2d2d2d' : '#e5e5e5';
+      roundRect(ctx, urlBarX, urlBarY, urlBarWidth, urlBarHeight, urlBarHeight / 2);
+      ctx.fill();
+
+      // Screenshot
+      ctx.drawImage(img, x, y + barHeight);
+
+      ctx.restore();
+    }
+
+    function drawMacBookFrame(ctx, x, y, width, height, img) {
+      const frameRadius = 12;
+      const bezelTop = 24;
+      const bezelSide = 32;
+      const bezelBottom = 48;
+      const screenRadius = 4;
+
+      // MacBook body (silver)
+      ctx.save();
+      roundRect(ctx, x, y, width, height, frameRadius);
+      ctx.clip();
+
+      // Main body gradient
+      const bodyGrad = ctx.createLinearGradient(x, y, x, y + height);
+      bodyGrad.addColorStop(0, '#d4d4d8');
+      bodyGrad.addColorStop(0.5, '#e4e4e7');
+      bodyGrad.addColorStop(1, '#a1a1aa');
+      ctx.fillStyle = bodyGrad;
+      ctx.fill();
+
+      // Screen bezel (black)
+      ctx.fillStyle = '#18181b';
+      roundRect(ctx, x + 4, y + 4, width - 8, height - bezelBottom, screenRadius + 4);
+      ctx.fill();
+
+      // Camera notch
+      const notchWidth = 100;
+      const notchHeight = 20;
+      ctx.fillStyle = '#18181b';
+      roundRect(ctx, x + (width - notchWidth) / 2, y, notchWidth, notchHeight, 0);
+      ctx.fill();
+      roundRect(ctx, x + (width - notchWidth) / 2, y + notchHeight - 8, notchWidth, 8, 4);
+      ctx.fill();
+
+      // Camera dot
+      ctx.beginPath();
+      ctx.arc(x + width / 2, y + 10, 3, 0, Math.PI * 2);
+      ctx.fillStyle = '#27272a';
+      ctx.fill();
+
+      // Screenshot
+      ctx.drawImage(img, x + bezelSide, y + bezelTop);
+
+      // Hinge line
+      ctx.strokeStyle = '#71717a';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x + 8, y + height - bezelBottom + 4);
+      ctx.lineTo(x + width - 8, y + height - bezelBottom + 4);
+      ctx.stroke();
+
+      // Bottom logo area
+      const logoSize = 16;
+      ctx.beginPath();
+      ctx.arc(x + width / 2, y + height - bezelBottom / 2 + 4, logoSize / 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#a1a1aa';
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawIPadFrame(ctx, x, y, width, height, img) {
+      const frameRadius = 20;
+      const bezel = 24;
+
+      // iPad body
+      ctx.save();
+      roundRect(ctx, x, y, width, height, frameRadius);
+      ctx.clip();
+
+      // Body gradient
+      const bodyGrad = ctx.createLinearGradient(x, y, x + width, y);
+      bodyGrad.addColorStop(0, '#27272a');
+      bodyGrad.addColorStop(0.5, '#3f3f46');
+      bodyGrad.addColorStop(1, '#27272a');
+      ctx.fillStyle = bodyGrad;
+      ctx.fill();
+
+      // Camera
+      ctx.beginPath();
+      ctx.arc(x + width / 2, y + 12, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#18181b';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x + width / 2, y + 12, 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#1e3a5f';
+      ctx.fill();
+
+      // Screenshot
+      ctx.drawImage(img, x + bezel, y + bezel);
+
+      ctx.restore();
+    }
+
+    function drawIPhoneFrame(ctx, x, y, width, height, img) {
+      const frameRadius = 40;
+      const bezelSide = 16;
+      const bezelTop = 48;
+      const bezelBottom = 48;
+
+      // iPhone body
+      ctx.save();
+      roundRect(ctx, x, y, width, height, frameRadius);
+      ctx.clip();
+
+      // Body
+      ctx.fillStyle = '#18181b';
+      ctx.fill();
+
+      // Side buttons (subtle)
+      ctx.fillStyle = '#27272a';
+      ctx.fillRect(x - 2, y + 80, 4, 60); // volume up
+      ctx.fillRect(x - 2, y + 150, 4, 60); // volume down
+      ctx.fillRect(x + width - 2, y + 100, 4, 80); // power
+
+      // Dynamic Island
+      const islandWidth = 100;
+      const islandHeight = 28;
+      const islandX = x + (width - islandWidth) / 2;
+      const islandY = y + 14;
+      ctx.fillStyle = '#000';
+      roundRect(ctx, islandX, islandY, islandWidth, islandHeight, islandHeight / 2);
+      ctx.fill();
+
+      // Screenshot
+      const screenX = x + bezelSide;
+      const screenY = y + bezelTop;
+      roundRect(ctx, screenX, screenY, img.width, img.height, 4);
+      ctx.clip();
+      ctx.drawImage(img, screenX, screenY);
+
+      ctx.restore();
+
+      // Home indicator
+      ctx.save();
+      roundRect(ctx, x, y, width, height, frameRadius);
+      ctx.clip();
+      const indicatorWidth = 120;
+      const indicatorHeight = 5;
+      const indicatorX = x + (width - indicatorWidth) / 2;
+      const indicatorY = y + height - 20;
+      roundRect(ctx, indicatorX, indicatorY, indicatorWidth, indicatorHeight, indicatorHeight / 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawWindowFrame(ctx, x, y, width, height, img, radius) {
+      const barHeight = 32;
+
+      // Window background
+      ctx.save();
+      roundRect(ctx, x, y, width, height, radius);
+      ctx.clip();
+      ctx.fillStyle = '#1e1e1e';
+      ctx.fill();
+
+      // Title bar
+      const barGrad = ctx.createLinearGradient(x, y, x, y + barHeight);
+      barGrad.addColorStop(0, '#3f3f46');
+      barGrad.addColorStop(1, '#27272a');
+      ctx.fillStyle = barGrad;
+      ctx.fillRect(x, y, width, barHeight);
+
+      // Window controls (right side, Windows style)
+      const btnWidth = 46;
+      const btnHeight = barHeight;
+      const btnY = y;
+
+      // Minimize
+      ctx.fillStyle = '#52525b';
+      ctx.fillRect(x + width - btnWidth * 3, btnY, btnWidth, btnHeight);
+      ctx.strokeStyle = '#a1a1aa';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x + width - btnWidth * 3 + 18, btnY + 16);
+      ctx.lineTo(x + width - btnWidth * 3 + 28, btnY + 16);
+      ctx.stroke();
+
+      // Maximize
+      ctx.fillStyle = '#52525b';
+      ctx.fillRect(x + width - btnWidth * 2, btnY, btnWidth, btnHeight);
+      ctx.strokeRect(x + width - btnWidth * 2 + 18, btnY + 11, 10, 10);
+
+      // Close (red)
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(x + width - btnWidth, btnY, btnWidth, btnHeight);
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x + width - btnWidth + 18, btnY + 11);
+      ctx.lineTo(x + width - btnWidth + 28, btnY + 21);
+      ctx.moveTo(x + width - btnWidth + 28, btnY + 11);
+      ctx.lineTo(x + width - btnWidth + 18, btnY + 21);
+      ctx.stroke();
+
+      // Screenshot
+      ctx.drawImage(img, x + 1, y + barHeight);
+
+      ctx.restore();
+    }
+
+    function drawPolaroidFrame(ctx, x, y, width, height, img) {
+      const frameRadius = 4;
+      const borderTop = 16;
+      const borderSide = 16;
+      const borderBottom = 64;
+
+      // Polaroid frame (white)
+      ctx.save();
+      roundRect(ctx, x, y, width, height, frameRadius);
+      ctx.clip();
+      ctx.fillStyle = '#fafafa';
+      ctx.fill();
+
+      // Subtle shadow inside
+      ctx.shadowColor = 'rgba(0,0,0,0.1)';
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetY = 2;
+
+      // Screenshot
+      ctx.drawImage(img, x + borderSide, y + borderTop);
+
+      ctx.restore();
+
+      // Optional: Polaroid text area hint
+      ctx.save();
+      ctx.font = '14px "Jost", sans-serif';
+      ctx.fillStyle = '#a1a1aa';
+      ctx.textAlign = 'center';
+      ctx.fillText('✨', x + width / 2, y + height - 24);
+      ctx.restore();
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    function addNoise(ctx, width, height, opacity) {
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+      for (let i = 0; i < data.length; i += 4) {
+        const noise = (Math.random() - 0.5) * 255 * opacity;
+        data[i] += noise;
+        data[i + 1] += noise;
+        data[i + 2] += noise;
+      }
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    // Download
+    downloadBtn.onclick = () => {
+      const link = document.createElement('a');
+      link.download = 'screenshot-beautified.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    };
+
+    // Copy to clipboard
+    copyBtn.onclick = async () => {
+      try {
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+        copyBtn.textContent = '✓ Copied!';
+        setTimeout(() => {
+          copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy to Clipboard`;
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    };
+  </script>
+</body>
+</html>

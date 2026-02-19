@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regex Builder — Natural Language to Regex | Alkemist</title>
+    <meta name="description" content="Build regex patterns from natural language. Test, explain, and copy regular expressions instantly.">
+    <meta property="og:title" content="Regex Builder — Natural Language to Regex">
+    <meta property="og:description" content="Build regex patterns from natural language. Test, explain, and copy regular expressions instantly.">
+    <meta property="og:image" content="https://day016.aikemist.com/og.png">
+    <meta property="og:url" content="https://day016.aikemist.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔤</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #fafafa;
+            --bg-card: #ffffff;
+            --text: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e5e5e5;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --code-bg: #f3f4f6;
+            --match-bg: rgba(99, 102, 241, 0.2);
+            --match-border: rgba(99, 102, 241, 0.5);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --bg-card: #141414;
+            --text: #f5f5f5;
+            --text-muted: #a3a3a3;
+            --border: #262626;
+            --code-bg: #1f1f1f;
+            --match-bg: rgba(99, 102, 241, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Jost', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .logo-text {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quick-patterns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .pattern-btn {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.875rem;
+            cursor: pointer;
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .pattern-btn:hover {
+            border-color: var(--accent);
+            background: var(--match-bg);
+        }
+
+        .pattern-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            color: var(--text);
+            resize: vertical;
+            transition: all 0.2s;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--match-bg);
+        }
+
+        .regex-output {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.125rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            min-height: 60px;
+        }
+
+        .regex-pattern {
+            flex: 1;
+            word-break: break-all;
+            color: var(--accent);
+        }
+
+        .copy-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-family: 'Jost', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+        }
+
+        .flags {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .flag-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .flag-option input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+
+        .explanation {
+            background: var(--code-bg);
+            border-radius: 10px;
+            padding: 1rem;
+            font-size: 0.9375rem;
+        }
+
+        .explanation-part {
+            display: flex;
+            gap: 1rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .explanation-part:last-child {
+            border-bottom: none;
+        }
+
+        .explanation-regex {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            min-width: 80px;
+        }
+
+        .explanation-text {
+            color: var(--text-muted);
+        }
+
+        .test-area {
+            min-height: 120px;
+        }
+
+        .test-results {
+            margin-top: 1rem;
+        }
+
+        .match-count {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .match-count.has-matches {
+            color: var(--success);
+        }
+
+        .match-count.no-matches {
+            color: var(--error);
+        }
+
+        .highlighted-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9375rem;
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 1rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.8;
+        }
+
+        .match {
+            background: var(--match-bg);
+            border: 1px solid var(--match-border);
+            border-radius: 3px;
+            padding: 0 2px;
+        }
+
+        .builder-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .builder-item {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .builder-item:hover {
+            border-color: var(--accent);
+        }
+
+        .builder-item-pattern {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--accent);
+            margin-bottom: 0.25rem;
+        }
+
+        .builder-item-desc {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+
+        .pro-teaser {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .pro-teaser h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .pro-teaser p {
+            color: var(--text-muted);
+            font-size: 0.9375rem;
+            margin-bottom: 1rem;
+        }
+
+        .pro-features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .pro-feature {
+            background: var(--bg-card);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+
+        .pro-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-family: 'Jost', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pro-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .share-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.875rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .share-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .regex-output {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .copy-btn {
+                text-align: center;
+            }
+
+            .flags {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="https://aikemist.com" class="logo">
+                <div class="logo-icon">🔤</div>
+                <span class="logo-text">Regex Builder</span>
+            </a>
+            <div class="header-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+            </div>
+        </header>
+
+        <main>
+            <h1>Regex Builder</h1>
+            <p class="subtitle">Build powerful regular expressions with natural language. No cryptic syntax required.</p>
+
+            <div class="card">
+                <div class="card-title">⚡ Quick Patterns</div>
+                <div class="quick-patterns">
+                    <button class="pattern-btn" data-pattern="email">Email</button>
+                    <button class="pattern-btn" data-pattern="url">URL</button>
+                    <button class="pattern-btn" data-pattern="phone">Phone</button>
+                    <button class="pattern-btn" data-pattern="date">Date</button>
+                    <button class="pattern-btn" data-pattern="time">Time</button>
+                    <button class="pattern-btn" data-pattern="ip">IP Address</button>
+                    <button class="pattern-btn" data-pattern="hex">Hex Color</button>
+                    <button class="pattern-btn" data-pattern="username">Username</button>
+                    <button class="pattern-btn" data-pattern="password">Password</button>
+                    <button class="pattern-btn" data-pattern="creditcard">Credit Card</button>
+                    <button class="pattern-btn" data-pattern="zipcode">Zip Code</button>
+                    <button class="pattern-btn" data-pattern="slug">URL Slug</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📝 Your Regex</div>
+                <div class="regex-output">
+                    <span class="regex-pattern" id="regexOutput">/^[\w.-]+@[\w.-]+\.\w{2,}$/</span>
+                    <button class="share-btn" onclick="sharePattern()">Share</button>
+                    <button class="copy-btn" onclick="copyRegex()">Copy</button>
+                </div>
+                <div class="flags">
+                    <label class="flag-option">
+                        <input type="checkbox" id="flagG" onchange="updateFlags()">
+                        <span>Global (g)</span>
+                    </label>
+                    <label class="flag-option">
+                        <input type="checkbox" id="flagI" onchange="updateFlags()">
+                        <span>Case insensitive (i)</span>
+                    </label>
+                    <label class="flag-option">
+                        <input type="checkbox" id="flagM" onchange="updateFlags()">
+                        <span>Multiline (m)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">💡 Explanation</div>
+                <div class="explanation" id="explanation">
+                    <div class="explanation-part">
+                        <span class="explanation-regex">^</span>
+                        <span class="explanation-text">Start of string</span>
+                    </div>
+                    <div class="explanation-part">
+                        <span class="explanation-regex">[\w.-]+</span>
+                        <span class="explanation-text">One or more word characters, dots, or hyphens (local part)</span>
+                    </div>
+                    <div class="explanation-part">
+                        <span class="explanation-regex">@</span>
+                        <span class="explanation-text">Literal @ symbol</span>
+                    </div>
+                    <div class="explanation-part">
+                        <span class="explanation-regex">[\w.-]+</span>
+                        <span class="explanation-text">One or more word characters, dots, or hyphens (domain)</span>
+                    </div>
+                    <div class="explanation-part">
+                        <span class="explanation-regex">\.</span>
+                        <span class="explanation-text">Literal dot</span>
+                    </div>
+                    <div class="explanation-part">
+                        <span class="explanation-regex">\w{2,}</span>
+                        <span class="explanation-text">Two or more word characters (TLD)</span>
+                    </div>
+                    <div class="explanation-part">
+                        <span class="explanation-regex">$</span>
+                        <span class="explanation-text">End of string</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🧪 Test Your Regex</div>
+                <div class="input-group">
+                    <textarea id="testInput" class="test-area" placeholder="Paste text here to test matches...">hello@example.com
+invalid-email
+test.user@domain.co.uk
+not an email
+another@test.org</textarea>
+                </div>
+                <div class="test-results">
+                    <div class="match-count has-matches" id="matchCount">3 matches found</div>
+                    <div class="highlighted-text" id="highlightedText"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🧱 Build Your Own</div>
+                <div class="input-group" style="margin-bottom: 1rem;">
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="text" id="customRegex" placeholder="Click blocks below to build, or type your own regex..." style="flex: 1;">
+                        <button class="pattern-btn" onclick="useCustomRegex()" style="white-space: nowrap;">Use This</button>
+                        <button class="pattern-btn" onclick="clearCustomRegex()" style="background: transparent;">Clear</button>
+                    </div>
+                </div>
+                <div class="builder-section">
+                    <div class="builder-item" onclick="insertPattern('.')">
+                        <div class="builder-item-pattern">.</div>
+                        <div class="builder-item-desc">Any character</div>
+                    </div>
+                    <div class="builder-item" onclick="insertPattern('\\d')">
+                        <div class="builder-item-pattern">\d</div>
+                        <div class="builder-item-desc">Any digit (0-9)</div>
+                    </div>
+                    <div class="builder-item" onclick="insertPattern('\\w')">
+                        <div class="builder-item-pattern">\w</div>
+                        <div class="builder-item-desc">Word character</div>
+                    </div>
+                    <div class="builder-item" onclick="insertPattern('\\s')">
+                        <div class="builder-item-pattern">\s</div>
+                        <div class="builder-item-desc">Whitespace</div>
+                    </div>
+                    <div class="builder-item" onclick="insertPattern('[a-z]')">
+                        <div class="builder-item-pattern">[a-z]</div>
+                        <div class="builder-item-desc">Lowercase letter</div>
+                    </div>
+                    <div class="builder-item" onclick="insertPattern('[A-Z]')">
+                        <div class="builder-item-pattern">[A-Z]</div>
+                        <div class="builder-item-desc">Uppercase letter</div>
+                    </div>
+                    <div class="builder-item" onclick="insertPattern('+')">
+                        <div class="builder-item-pattern">+</div>
+                        <div class="builder-item-desc">One or more</div>
+                    </div>
+                    <div class="builder-item" onclick="insertPattern('*')">
+                        <div class="builder-item-pattern">*</div>
+                        <div class="builder-item-desc">Zero or more</div>
+                    </div>
+                    <div class="builder-item" onclick="insertPattern('?')">
+                        <div class="builder-item-pattern">?</div>
+                        <div class="builder-item-desc">Optional</div>
+                    </div>
+                    <div class="builder-item" onclick="insertPattern('^')">
+                        <div class="builder-item-pattern">^</div>
+                        <div class="builder-item-desc">Start of line</div>
+                    </div>
+                    <div class="builder-item" onclick="insertPattern('$')">
+                        <div class="builder-item-pattern">$</div>
+                        <div class="builder-item-desc">End of line</div>
+                    </div>
+                    <div class="builder-item" onclick="insertPattern('()')">
+                        <div class="builder-item-pattern">()</div>
+                        <div class="builder-item-desc">Capture group</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pro-teaser">
+                <h3>🚀 Regex Builder Pro</h3>
+                <p>Take your regex skills to the next level</p>
+                <div class="pro-features">
+                    <span class="pro-feature">Custom pattern library</span>
+                    <span class="pro-feature">API access</span>
+                    <span class="pro-feature">Team sharing</span>
+                    <span class="pro-feature">Pattern history</span>
+                    <span class="pro-feature">VS Code extension</span>
+                </div>
+                <button class="pro-btn" onclick="alert('Pro coming soon! Join the waitlist.')">Join Waitlist</button>
+            </div>
+        </main>
+
+        <footer>
+            <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+        </footer>
+    </div>
+
+    <script>
+        const patterns = {
+            email: {
+                regex: '^[\\w.-]+@[\\w.-]+\\.\\w{2,}$',
+                explanation: [
+                    { part: '^', desc: 'Start of string' },
+                    { part: '[\\w.-]+', desc: 'One or more word characters, dots, or hyphens (local part)' },
+                    { part: '@', desc: 'Literal @ symbol' },
+                    { part: '[\\w.-]+', desc: 'One or more word characters, dots, or hyphens (domain)' },
+                    { part: '\\.', desc: 'Literal dot' },
+                    { part: '\\w{2,}', desc: 'Two or more word characters (TLD)' },
+                    { part: '$', desc: 'End of string' }
+                ],
+                testText: 'hello@example.com\ninvalid-email\ntest.user@domain.co.uk\nnot an email\nanother@test.org'
+            },
+            url: {
+                regex: 'https?://[\\w.-]+(?:\\.[\\w.-]+)+[\\w.,@?^=%&:/~+#-]*',
+                explanation: [
+                    { part: 'https?', desc: 'http or https (s is optional)' },
+                    { part: '://', desc: 'Literal ://' },
+                    { part: '[\\w.-]+', desc: 'Domain name characters' },
+                    { part: '(?:\\.[\\w.-]+)+', desc: 'One or more domain parts' },
+                    { part: '[\\w.,@?^=%&:/~+#-]*', desc: 'Optional path and query string' }
+                ],
+                testText: 'Visit https://example.com for more\nCheck http://sub.domain.org/path?query=1\nNot a url here\nhttps://alkemist.no'
+            },
+            phone: {
+                regex: '\\+?\\d{1,3}[-.\\s]?\\(?\\d{1,4}\\)?[-.\\s]?\\d{1,4}[-.\\s]?\\d{1,9}',
+                explanation: [
+                    { part: '\\+?', desc: 'Optional + sign' },
+                    { part: '\\d{1,3}', desc: 'Country code (1-3 digits)' },
+                    { part: '[-.\\s]?', desc: 'Optional separator' },
+                    { part: '\\(?\\d{1,4}\\)?', desc: 'Optional area code with parentheses' },
+                    { part: '[-.\\s]?\\d{1,4}', desc: 'First part of number' },
+                    { part: '[-.\\s]?\\d{1,9}', desc: 'Rest of number' }
+                ],
+                testText: '+1 (555) 123-4567\n+47 123 45 678\n555-1234\nnot a phone\n(800) 555-0199'
+            },
+            date: {
+                regex: '\\d{4}[-/]\\d{2}[-/]\\d{2}|\\d{2}[-/]\\d{2}[-/]\\d{4}',
+                explanation: [
+                    { part: '\\d{4}[-/]\\d{2}[-/]\\d{2}', desc: 'YYYY-MM-DD or YYYY/MM/DD' },
+                    { part: '|', desc: 'OR' },
+                    { part: '\\d{2}[-/]\\d{2}[-/]\\d{4}', desc: 'DD-MM-YYYY or MM/DD/YYYY' }
+                ],
+                testText: '2024-01-15\n15/01/2024\n01-15-2024\nnot a date\n2024/12/31'
+            },
+            time: {
+                regex: '(?:[01]?\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d)?(?:\\s?[AP]M)?',
+                explanation: [
+                    { part: '(?:[01]?\\d|2[0-3])', desc: 'Hours (0-23 or 00-23)' },
+                    { part: ':', desc: 'Colon separator' },
+                    { part: '[0-5]\\d', desc: 'Minutes (00-59)' },
+                    { part: '(?::[0-5]\\d)?', desc: 'Optional seconds' },
+                    { part: '(?:\\s?[AP]M)?', desc: 'Optional AM/PM' }
+                ],
+                testText: '14:30\n2:30 PM\n09:15:00\n25:00 invalid\n11:59 AM'
+            },
+            ip: {
+                regex: '\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b',
+                explanation: [
+                    { part: '\\b', desc: 'Word boundary' },
+                    { part: '(?:\\d{1,3}\\.){3}', desc: 'Three groups of 1-3 digits followed by dot' },
+                    { part: '\\d{1,3}', desc: 'Final group of 1-3 digits' },
+                    { part: '\\b', desc: 'Word boundary' }
+                ],
+                testText: '192.168.1.1\n10.0.0.1\n255.255.255.0\nnot an ip\n8.8.8.8'
+            },
+            hex: {
+                regex: '#(?:[0-9a-fA-F]{3}){1,2}\\b',
+                explanation: [
+                    { part: '#', desc: 'Hash symbol' },
+                    { part: '(?:[0-9a-fA-F]{3}){1,2}', desc: '3 or 6 hex characters' },
+                    { part: '\\b', desc: 'Word boundary' }
+                ],
+                testText: '#fff\n#FF5733\n#123abc\n#GGGGGG invalid\n#000000'
+            },
+            username: {
+                regex: '^[a-zA-Z][a-zA-Z0-9_-]{2,15}$',
+                explanation: [
+                    { part: '^', desc: 'Start of string' },
+                    { part: '[a-zA-Z]', desc: 'Must start with a letter' },
+                    { part: '[a-zA-Z0-9_-]{2,15}', desc: '2-15 more alphanumeric, underscore, or hyphen' },
+                    { part: '$', desc: 'End of string' }
+                ],
+                testText: 'john_doe\nuser123\n_invalid\nab\nvalid-user-name'
+            },
+            password: {
+                regex: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$',
+                explanation: [
+                    { part: '^', desc: 'Start of string' },
+                    { part: '(?=.*[a-z])', desc: 'At least one lowercase' },
+                    { part: '(?=.*[A-Z])', desc: 'At least one uppercase' },
+                    { part: '(?=.*\\d)', desc: 'At least one digit' },
+                    { part: '(?=.*[@$!%*?&])', desc: 'At least one special char' },
+                    { part: '[A-Za-z\\d@$!%*?&]{8,}', desc: '8+ valid characters' },
+                    { part: '$', desc: 'End of string' }
+                ],
+                testText: 'Password1!\nweak\nNoSpecial1\nValid@Pass1\nshort1!'
+            },
+            creditcard: {
+                regex: '\\b(?:\\d{4}[- ]?){3}\\d{4}\\b',
+                explanation: [
+                    { part: '\\b', desc: 'Word boundary' },
+                    { part: '(?:\\d{4}[- ]?){3}', desc: 'Three groups of 4 digits with optional separator' },
+                    { part: '\\d{4}', desc: 'Final 4 digits' },
+                    { part: '\\b', desc: 'Word boundary' }
+                ],
+                testText: '4111-1111-1111-1111\n4111111111111111\n4111 1111 1111 1111\n123-456\n5500-0000-0000-0004'
+            },
+            zipcode: {
+                regex: '\\b\\d{5}(?:-\\d{4})?\\b',
+                explanation: [
+                    { part: '\\b', desc: 'Word boundary' },
+                    { part: '\\d{5}', desc: '5 digits' },
+                    { part: '(?:-\\d{4})?', desc: 'Optional +4 extension' },
+                    { part: '\\b', desc: 'Word boundary' }
+                ],
+                testText: '12345\n12345-6789\n1234 too short\n90210\n10001-0001'
+            },
+            slug: {
+                regex: '^[a-z0-9]+(?:-[a-z0-9]+)*$',
+                explanation: [
+                    { part: '^', desc: 'Start of string' },
+                    { part: '[a-z0-9]+', desc: 'One or more lowercase alphanumeric' },
+                    { part: '(?:-[a-z0-9]+)*', desc: 'Optional hyphen-separated parts' },
+                    { part: '$', desc: 'End of string' }
+                ],
+                testText: 'my-url-slug\nvalid123\nInvalid_slug\nsome-good-slug\n--invalid'
+            }
+        };
+
+        let currentPattern = 'email';
+        let currentRegex = patterns.email.regex;
+        let flags = { g: false, i: false, m: false };
+
+        function init() {
+            // Load theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon();
+
+            // Set up pattern buttons
+            document.querySelectorAll('.pattern-btn').forEach(btn => {
+                btn.addEventListener('click', () => selectPattern(btn.dataset.pattern));
+            });
+
+            // Set up test input
+            document.getElementById('testInput').addEventListener('input', updateTest);
+
+            // Check URL params first, else default to email
+            loadFromURL();
+            if (!window.location.search) {
+                selectPattern('email');
+            }
+        }
+
+        function selectPattern(name) {
+            currentPattern = name;
+            const pattern = patterns[name];
+            currentRegex = pattern.regex;
+
+            // Update active button
+            document.querySelectorAll('.pattern-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.pattern === name);
+            });
+
+            // Update display
+            updateRegexDisplay();
+            updateExplanation(pattern.explanation);
+            document.getElementById('testInput').value = pattern.testText;
+            updateTest();
+        }
+
+        function updateRegexDisplay() {
+            let flagStr = '';
+            if (flags.g) flagStr += 'g';
+            if (flags.i) flagStr += 'i';
+            if (flags.m) flagStr += 'm';
+            document.getElementById('regexOutput').textContent = `/${currentRegex}/${flagStr}`;
+        }
+
+        function updateExplanation(parts) {
+            const container = document.getElementById('explanation');
+            container.innerHTML = parts.map(p => `
+                <div class="explanation-part">
+                    <span class="explanation-regex">${escapeHtml(p.part)}</span>
+                    <span class="explanation-text">${p.desc}</span>
+                </div>
+            `).join('');
+        }
+
+        function updateFlags() {
+            flags.g = document.getElementById('flagG').checked;
+            flags.i = document.getElementById('flagI').checked;
+            flags.m = document.getElementById('flagM').checked;
+            updateRegexDisplay();
+            updateTest();
+        }
+
+        function updateTest() {
+            const text = document.getElementById('testInput').value;
+            let flagStr = '';
+            if (flags.g) flagStr += 'g';
+            if (flags.i) flagStr += 'i';
+            if (flags.m) flagStr += 'm';
+
+            try {
+                const regex = new RegExp(currentRegex, flagStr || 'g');
+                const matches = text.match(regex) || [];
+                
+                const countEl = document.getElementById('matchCount');
+                countEl.textContent = `${matches.length} match${matches.length !== 1 ? 'es' : ''} found`;
+                countEl.className = 'match-count ' + (matches.length > 0 ? 'has-matches' : 'no-matches');
+
+                // Highlight matches
+                const highlighted = text.replace(new RegExp(currentRegex, 'g'), match => 
+                    `<span class="match">${escapeHtml(match)}</span>`
+                );
+                document.getElementById('highlightedText').innerHTML = highlighted || escapeHtml(text);
+            } catch (e) {
+                document.getElementById('matchCount').textContent = 'Invalid regex';
+                document.getElementById('matchCount').className = 'match-count no-matches';
+                document.getElementById('highlightedText').textContent = text;
+            }
+        }
+
+        function copyRegex() {
+            let flagStr = '';
+            if (flags.g) flagStr += 'g';
+            if (flags.i) flagStr += 'i';
+            if (flags.m) flagStr += 'm';
+            const fullRegex = `/${currentRegex}/${flagStr}`;
+            
+            navigator.clipboard.writeText(fullRegex).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function sharePattern() {
+            const params = new URLSearchParams();
+            params.set('p', currentPattern);
+            if (flags.g) params.set('g', '1');
+            if (flags.i) params.set('i', '1');
+            if (flags.m) params.set('m', '1');
+            
+            const url = `${window.location.origin}?${params.toString()}`;
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = document.querySelector('.share-btn');
+                btn.textContent = 'Link copied!';
+                setTimeout(() => {
+                    btn.textContent = 'Share';
+                }, 2000);
+            });
+        }
+
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const pattern = params.get('p');
+            if (pattern && patterns[pattern]) {
+                if (params.get('g')) document.getElementById('flagG').checked = true;
+                if (params.get('i')) document.getElementById('flagI').checked = true;
+                if (params.get('m')) document.getElementById('flagM').checked = true;
+                updateFlags();
+                selectPattern(pattern);
+            }
+        }
+
+        function insertPattern(pattern) {
+            const input = document.getElementById('customRegex');
+            input.value += pattern;
+            input.focus();
+        }
+
+        function useCustomRegex() {
+            const input = document.getElementById('customRegex');
+            const customRegex = input.value.trim();
+            if (!customRegex) return;
+            
+            currentRegex = customRegex;
+            currentPattern = 'custom';
+            
+            // Clear active state from quick patterns
+            document.querySelectorAll('.pattern-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            updateRegexDisplay();
+            
+            // Generate simple explanation
+            const explanation = generateExplanation(customRegex);
+            updateExplanation(explanation);
+            updateTest();
+        }
+
+        function clearCustomRegex() {
+            document.getElementById('customRegex').value = '';
+        }
+
+        function generateExplanation(regex) {
+            const parts = [];
+            const tokens = {
+                '^': 'Start of string',
+                '$': 'End of string',
+                '.': 'Any character',
+                '*': 'Zero or more of previous',
+                '+': 'One or more of previous',
+                '?': 'Optional (zero or one)',
+                '\\d': 'Any digit (0-9)',
+                '\\D': 'Any non-digit',
+                '\\w': 'Word character (a-z, A-Z, 0-9, _)',
+                '\\W': 'Non-word character',
+                '\\s': 'Whitespace',
+                '\\S': 'Non-whitespace',
+                '\\b': 'Word boundary',
+                '\\n': 'Newline',
+                '\\t': 'Tab'
+            };
+            
+            // Simple tokenization for explanation
+            let i = 0;
+            while (i < regex.length) {
+                let matched = false;
+                
+                // Check for escape sequences first
+                if (regex[i] === '\\' && i + 1 < regex.length) {
+                    const twoChar = regex.slice(i, i + 2);
+                    if (tokens[twoChar]) {
+                        parts.push({ part: twoChar, desc: tokens[twoChar] });
+                        i += 2;
+                        matched = true;
+                    }
+                }
+                
+                // Check for character classes
+                if (!matched && regex[i] === '[') {
+                    const end = regex.indexOf(']', i);
+                    if (end !== -1) {
+                        const charClass = regex.slice(i, end + 1);
+                        parts.push({ part: charClass, desc: 'Character class: one of these characters' });
+                        i = end + 1;
+                        matched = true;
+                    }
+                }
+                
+                // Check for groups
+                if (!matched && regex[i] === '(') {
+                    const end = findMatchingParen(regex, i);
+                    if (end !== -1) {
+                        const group = regex.slice(i, end + 1);
+                        const isNonCapture = group.startsWith('(?:');
+                        parts.push({ part: group, desc: isNonCapture ? 'Non-capturing group' : 'Capture group' });
+                        i = end + 1;
+                        matched = true;
+                    }
+                }
+                
+                // Check for quantifiers
+                if (!matched && regex[i] === '{') {
+                    const end = regex.indexOf('}', i);
+                    if (end !== -1) {
+                        const quant = regex.slice(i, end + 1);
+                        parts.push({ part: quant, desc: 'Repeat count' });
+                        i = end + 1;
+                        matched = true;
+                    }
+                }
+                
+                // Single char tokens
+                if (!matched && tokens[regex[i]]) {
+                    parts.push({ part: regex[i], desc: tokens[regex[i]] });
+                    i++;
+                    matched = true;
+                }
+                
+                // Literal character
+                if (!matched) {
+                    parts.push({ part: regex[i], desc: `Literal "${regex[i]}"` });
+                    i++;
+                }
+            }
+            
+            return parts.length > 0 ? parts : [{ part: regex, desc: 'Custom pattern' }];
+        }
+
+        function findMatchingParen(str, start) {
+            let depth = 1;
+            for (let i = start + 1; i < str.length; i++) {
+                if (str[i] === '(' && str[i-1] !== '\\') depth++;
+                if (str[i] === ')' && str[i-1] !== '\\') depth--;
+                if (depth === 0) return i;
+            }
+            return -1;
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const theme = document.documentElement.getAttribute('data-theme');
+            document.querySelector('.theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        init();
+    </script>
+</body>
+</html>

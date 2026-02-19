@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Favicon Generator — Instant Icons for Your Site</title>
-  <meta name="description" content="Generate beautiful favicons from text, emoji, or your own image. Preview in a real browser tab, download all sizes. Free tool by Alkemist.">
-  <meta property="og:title" content="Favicon Generator — Free Tool">
-  <meta property="og:description" content="Generate beautiful favicons from text, emoji, or images. Preview and download all sizes.">
+  <title>App Icon Generator — Favicons, iOS, Android, PWA</title>
+  <meta name="description" content="Generate complete icon sets for websites, iOS, Android, and PWA. Support for light/dark mode variants. Free tool by Alkemist.">
+  <meta property="og:title" content="App Icon Generator — Complete Icon Toolkit">
+  <meta property="og:description" content="Generate favicons, iOS icons, Android icons, PWA manifest icons. Light/dark mode support.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://day007.aikemist.com">
-  <link rel="icon" id="dynamicFavicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366f1'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white'>F</text></svg>">
+  <link rel="icon" id="dynamicFavicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366f1'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white'>A</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #fafafa;
@@ -45,13 +45,9 @@
     }
     
     .container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 1.5rem;
-    }
-    
-    @media (max-width: 600px) {
-      .container { padding: 1rem; }
     }
     
     header {
@@ -65,6 +61,8 @@
       display: flex;
       align-items: center;
       gap: 0.6rem;
+      text-decoration: none;
+      color: var(--text);
     }
     
     .logo-icon {
@@ -77,7 +75,6 @@
       justify-content: center;
       color: white;
       font-weight: 700;
-      font-size: 1rem;
     }
     
     .logo h1 {
@@ -86,6 +83,11 @@
     }
     
     .logo h1 span { color: var(--text-muted); font-weight: 400; }
+    
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
     
     .theme-btn {
       background: var(--bg-alt);
@@ -101,123 +103,18 @@
     
     .main-grid {
       display: grid;
-      grid-template-columns: 1fr 340px;
+      grid-template-columns: 360px 1fr;
       gap: 1.5rem;
       align-items: start;
     }
     
-    @media (max-width: 800px) {
+    @media (max-width: 900px) {
       .main-grid { 
         grid-template-columns: 1fr; 
       }
-      .controls { order: -1; }
     }
     
-    .preview-section {
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-    
-    .browser-mockup {
-      background: var(--bg-alt);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    
-    .browser-toolbar {
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      padding: 0.6rem 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-    
-    .browser-dots {
-      display: flex;
-      gap: 5px;
-    }
-    
-    .browser-dots span {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--border);
-    }
-    
-    .browser-tabs {
-      display: flex;
-      align-items: center;
-      flex: 1;
-    }
-    
-    .browser-tab {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--bg-alt);
-      padding: 0.4rem 0.75rem;
-      border-radius: 6px 6px 0 0;
-      font-size: 0.75rem;
-      color: var(--text);
-      max-width: 180px;
-    }
-    
-    .browser-tab .tab-favicon {
-      width: 14px;
-      height: 14px;
-      border-radius: 2px;
-      flex-shrink: 0;
-    }
-    
-    .browser-tab .tab-title {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .browser-content {
-      padding: 2.5rem 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 220px;
-      gap: 1rem;
-    }
-    
-    .preview-favicon {
-      width: 96px;
-      height: 96px;
-      border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-    }
-    
-    .preview-sizes {
-      display: flex;
-      gap: 1rem;
-      align-items: flex-end;
-    }
-    
-    .preview-size {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    
-    .preview-size canvas {
-      border-radius: 3px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    
-    .preview-size span {
-      font-size: 0.6rem;
-      color: var(--text-muted);
-    }
-    
+    /* Controls Panel */
     .controls {
       background: var(--bg-alt);
       border: 1px solid var(--border);
@@ -225,31 +122,31 @@
       padding: 1.25rem;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 1.25rem;
     }
     
     .control-group h3 {
-      font-size: 0.6rem;
+      font-size: 0.65rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: var(--text-muted);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.6rem;
     }
     
+    /* Mode Tabs */
     .mode-tabs {
       display: flex;
       gap: 0.3rem;
-      margin-bottom: 0.75rem;
     }
     
     .mode-tab {
       flex: 1;
-      padding: 0.5rem;
-      font-size: 0.75rem;
+      padding: 0.6rem;
+      font-size: 0.8rem;
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       color: var(--text-muted);
       font-family: 'Jost', sans-serif;
@@ -263,25 +160,20 @@
       border-color: var(--accent);
     }
     
-    .mode-content {
-      display: none;
-    }
+    .mode-content { display: none; }
+    .mode-content.active { display: block; }
     
-    .mode-content.active {
-      display: block;
-    }
-    
+    /* Text Input */
     .text-input {
       width: 100%;
-      padding: 0.6rem 0.75rem;
-      font-size: 1.75rem;
+      padding: 0.75rem;
+      font-size: 2rem;
       text-align: center;
       border: 2px solid var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
       background: var(--bg);
       color: var(--text);
       font-family: 'Jost', sans-serif;
-      transition: border-color 0.2s;
     }
     
     .text-input:focus {
@@ -292,16 +184,16 @@
     .quick-picks {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.3rem;
-      margin-top: 0.5rem;
+      gap: 0.35rem;
+      margin-top: 0.75rem;
     }
     
     .quick-pick {
-      padding: 0.4rem 0.6rem;
+      padding: 0.5rem 0.65rem;
       font-size: 1.1rem;
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s;
     }
@@ -311,36 +203,31 @@
       transform: scale(1.1);
     }
     
-    .pick-tabs {
+    /* Upload Zones */
+    .upload-section {
       display: flex;
-      gap: 0.25rem;
+      flex-direction: column;
+      gap: 0.75rem;
     }
     
-    .pick-tab {
-      padding: 0.3rem 0.6rem;
-      font-size: 0.7rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      cursor: pointer;
-      color: var(--text-muted);
-      font-family: 'Jost', sans-serif;
-    }
-    
-    .pick-tab.active {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
+    .upload-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
     }
     
     .upload-zone {
       border: 2px dashed var(--border);
       border-radius: 10px;
-      padding: 1.5rem 1rem;
+      padding: 1rem;
       text-align: center;
       cursor: pointer;
       transition: all 0.2s;
       position: relative;
+    }
+    
+    .upload-zone.single {
+      grid-column: 1 / -1;
     }
     
     .upload-zone:hover, .upload-zone.dragover {
@@ -356,79 +243,71 @@
     }
     
     .upload-zone-icon {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
     }
     
-    .upload-zone-text {
-      font-size: 0.8rem;
+    .upload-zone-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.15rem;
+    }
+    
+    .upload-zone-hint {
+      font-size: 0.6rem;
       color: var(--text-muted);
     }
     
-    .upload-zone-text strong {
-      color: var(--accent);
+    .upload-zone.has-image {
+      padding: 0.5rem;
+      border-style: solid;
     }
     
-    .uploaded-preview {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.75rem;
-    }
+    .upload-zone.has-image .upload-placeholder { display: none; }
+    .upload-zone:not(.has-image) .upload-preview-wrap { display: none; }
     
-    .uploaded-preview.show {
-      display: flex;
-    }
-    
-    .uploaded-image-wrap {
+    .upload-preview-wrap {
       position: relative;
+      display: inline-block;
     }
     
-    .uploaded-image {
-      width: 80px;
-      height: 80px;
+    .upload-preview-img {
+      width: 60px;
+      height: 60px;
       object-fit: cover;
       border-radius: 10px;
-      border: 2px solid var(--border);
     }
     
-    .remove-image {
+    .remove-btn {
       position: absolute;
-      top: -8px;
-      right: -8px;
-      width: 22px;
-      height: 22px;
+      top: -6px;
+      right: -6px;
+      width: 18px;
+      height: 18px;
       background: #ef4444;
       color: white;
       border: none;
       border-radius: 50%;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
     }
     
-    .uploaded-name {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    
+    /* Colors */
     .color-row {
       display: flex;
       gap: 0.5rem;
       align-items: center;
+      margin-bottom: 0.5rem;
     }
     
     .color-row label {
       font-size: 0.7rem;
       color: var(--text-muted);
-      width: 30px;
+      width: 35px;
     }
     
     .color-grid {
@@ -447,47 +326,41 @@
       transition: all 0.15s;
     }
     
-    .color-swatch:hover {
-      transform: scale(1.2);
-      z-index: 1;
-    }
+    .color-swatch:hover { transform: scale(1.15); }
+    .color-swatch.active { border-color: var(--text); }
     
-    .color-swatch.active {
-      border-color: var(--text);
-    }
-    
-    .custom-color-row {
+    .custom-color-wrap {
       display: flex;
       gap: 0.4rem;
-      margin-top: 0.4rem;
+      margin-top: 0.5rem;
     }
     
-    .custom-color-row input[type="color"] {
-      width: 32px;
-      height: 32px;
+    .custom-color-wrap input[type="color"] {
+      width: 36px;
+      height: 36px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       background: none;
+      padding: 0;
     }
     
-    .custom-color-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-    .custom-color-row input[type="color"]::-webkit-color-swatch {
-      border: 2px solid var(--border);
-      border-radius: 4px;
-    }
+    .custom-color-wrap input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+    .custom-color-wrap input[type="color"]::-webkit-color-swatch { border: none; border-radius: 6px; }
     
-    .custom-color-row input[type="text"] {
+    .custom-color-wrap input[type="text"] {
       flex: 1;
-      padding: 0.4rem;
-      font-family: 'SF Mono', monospace;
-      font-size: 0.7rem;
+      padding: 0.5rem;
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: 0.75rem;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
       background: var(--bg);
       color: var(--text);
+      text-transform: uppercase;
     }
     
+    /* Shape Options */
     .shape-options {
       display: flex;
       gap: 0.4rem;
@@ -495,14 +368,15 @@
     
     .shape-btn {
       flex: 1;
-      padding: 0.5rem;
+      padding: 0.55rem;
       background: var(--bg);
       border: 2px solid var(--border);
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       color: var(--text);
       font-family: 'Jost', sans-serif;
       font-size: 0.75rem;
+      font-weight: 500;
       transition: all 0.2s;
     }
     
@@ -512,25 +386,20 @@
       color: white;
     }
     
-    .download-section {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
-    
+    /* Download */
     .btn {
-      padding: 0.65rem 0.9rem;
+      padding: 0.75rem 1rem;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-family: 'Jost', sans-serif;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.4rem;
+      gap: 0.5rem;
     }
     
     .btn-primary {
@@ -554,35 +423,336 @@
     .btn-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.4rem;
+      gap: 0.5rem;
     }
     
-    .format-note {
+    .download-info {
       font-size: 0.65rem;
       color: var(--text-muted);
       text-align: center;
+      margin-top: 0.25rem;
     }
     
-    .pro-teaser {
-      background: linear-gradient(135deg, var(--accent)08, var(--accent)15);
-      border: 1px dashed var(--accent);
+    /* Preview Section */
+    .preview-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .preview-title {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    
+    .preview-context-toggle {
+      display: flex;
+      gap: 0.25rem;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 0.75rem;
-      text-align: center;
+      padding: 0.25rem;
     }
     
-    .pro-teaser h4 {
+    .context-btn {
+      padding: 0.35rem 0.65rem;
       font-size: 0.7rem;
-      font-weight: 600;
-      color: var(--accent);
-      margin-bottom: 0.25rem;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-family: 'Jost', sans-serif;
+      transition: all 0.2s;
     }
     
-    .pro-teaser p {
+    .context-btn.active {
+      background: var(--accent);
+      color: white;
+    }
+    
+    /* Preview Cards Grid */
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    
+    .preview-card {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .preview-card-header {
+      padding: 0.6rem 0.85rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .preview-card-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .preview-card-badge {
       font-size: 0.6rem;
+      padding: 0.2rem 0.5rem;
+      background: var(--border);
+      border-radius: 4px;
       color: var(--text-muted);
     }
     
+    .preview-card-body {
+      padding: 1.25rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 140px;
+    }
+    
+    .preview-card-body.light-bg {
+      background: #f5f5f7;
+    }
+    
+    .preview-card-body.dark-bg {
+      background: #1c1c1e;
+    }
+    
+    /* Browser Preview */
+    .browser-preview {
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 260px;
+    }
+    
+    .browser-toolbar {
+      padding: 0.5rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .browser-dots {
+      display: flex;
+      gap: 4px;
+    }
+    
+    .browser-dots span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+    
+    .browser-tab {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--bg-alt);
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.65rem;
+    }
+    
+    .browser-tab canvas {
+      border-radius: 2px;
+    }
+    
+    .browser-content {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .browser-content canvas {
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .browser-sizes {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-end;
+    }
+    
+    .browser-size {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    
+    .browser-size span {
+      font-size: 0.55rem;
+      color: var(--text-muted);
+    }
+    
+    .browser-size canvas {
+      border-radius: 3px;
+    }
+    
+    /* iOS Preview */
+    .ios-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .ios-icon-wrap {
+      position: relative;
+    }
+    
+    .ios-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 13px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .ios-label {
+      font-size: 0.65rem;
+      color: #333;
+      text-align: center;
+      max-width: 70px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .dark-bg .ios-label {
+      color: #fff;
+    }
+    
+    .ios-sizes {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+    
+    .ios-size {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    
+    .ios-size span {
+      font-size: 0.5rem;
+      color: var(--text-muted);
+    }
+    
+    /* Android Preview */
+    .android-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .android-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .android-label {
+      font-size: 0.6rem;
+      color: #333;
+    }
+    
+    .dark-bg .android-label {
+      color: #fff;
+    }
+    
+    .android-sizes {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+    
+    .android-size {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    
+    .android-size span {
+      font-size: 0.5rem;
+      color: var(--text-muted);
+    }
+    
+    /* Code Preview */
+    .code-preview {
+      background: #1e1e1e;
+      border-radius: 8px;
+      overflow: hidden;
+      width: 100%;
+    }
+    
+    .code-header {
+      background: #2d2d2d;
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .code-title {
+      font-size: 0.65rem;
+      color: #888;
+    }
+    
+    .code-copy {
+      background: transparent;
+      border: none;
+      color: #888;
+      font-size: 0.65rem;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'Jost', sans-serif;
+    }
+    
+    .code-copy:hover {
+      background: #3d3d3d;
+      color: #fff;
+    }
+    
+    .code-body {
+      padding: 0.75rem;
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: 0.6rem;
+      line-height: 1.6;
+      color: #d4d4d4;
+      overflow-x: auto;
+      max-height: 180px;
+    }
+    
+    .code-body .tag { color: #569cd6; }
+    .code-body .attr { color: #9cdcfe; }
+    .code-body .val { color: #ce9178; }
+    .code-body .cmt { color: #6a9955; }
+    
+    /* Footer */
     footer {
       text-align: center;
       padding: 1.5rem;
@@ -597,6 +767,7 @@
     
     footer a:hover { text-decoration: underline; }
     
+    /* Toast */
     .toast {
       position: fixed;
       bottom: 1.5rem;
@@ -604,9 +775,9 @@
       transform: translateX(-50%) translateY(100px);
       background: var(--text);
       color: var(--bg);
-      padding: 0.65rem 1.25rem;
-      border-radius: 8px;
-      font-size: 0.8rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
       opacity: 0;
       transition: all 0.3s;
       z-index: 1000;
@@ -616,133 +787,108 @@
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
-    
-    .image-colors {
-      display: none;
-    }
-    
-    .image-colors.show {
-      display: block;
-    }
   </style>
 </head>
 <body data-theme="dark">
   <div class="container">
     <header>
-      <div class="logo">
-        <div class="logo-icon">F</div>
-        <h1>Favicon <span>Generator</span></h1>
+      <a href="https://aikemist.com" class="logo">
+        <div class="logo-icon">A</div>
+        <h1>App Icon <span>Generator</span></h1>
+      </a>
+      <div class="header-actions">
+        <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="themeIcon">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
+        </button>
       </div>
-      <button class="theme-btn" onclick="toggleTheme()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="themeIcon">
-          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
-        </svg>
-      </button>
     </header>
     
     <main class="main-grid">
-      <div class="preview-section">
-        <div class="browser-mockup">
-          <div class="browser-toolbar">
-            <div class="browser-dots">
-              <span></span><span></span><span></span>
-            </div>
-            <div class="browser-tabs">
-              <div class="browser-tab">
-                <canvas class="tab-favicon" id="tabFavicon" width="14" height="14"></canvas>
-                <span class="tab-title">Your Website</span>
-              </div>
-            </div>
-          </div>
-          <div class="browser-content">
-            <canvas class="preview-favicon" id="previewLarge" width="96" height="96"></canvas>
-            <div class="preview-sizes">
-              <div class="preview-size">
-                <canvas id="preview16" width="16" height="16"></canvas>
-                <span>16px</span>
-              </div>
-              <div class="preview-size">
-                <canvas id="preview32" width="32" height="32"></canvas>
-                <span>32px</span>
-              </div>
-              <div class="preview-size">
-                <canvas id="preview48" width="48" height="48"></canvas>
-                <span>48px</span>
-              </div>
-              <div class="preview-size">
-                <canvas id="preview64" width="64" height="64"></canvas>
-                <span>64px</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
       <div class="controls">
+        <!-- Source Mode -->
         <div class="control-group">
           <h3>Source</h3>
           <div class="mode-tabs">
-            <button class="mode-tab active" onclick="setMode('text')">✏️ Text</button>
-            <button class="mode-tab" onclick="setMode('image')">🖼️ Image</button>
+            <button class="mode-tab active" onclick="setSourceMode('text')">✏️ Text</button>
+            <button class="mode-tab" onclick="setSourceMode('image')">🖼️ Image</button>
           </div>
           
           <div class="mode-content active" id="textMode">
             <input type="text" class="text-input" id="iconText" placeholder="A" maxlength="2" value="A">
-            <div class="pick-tabs" style="margin-top: 0.75rem;">
-              <button class="pick-tab active" onclick="showPicks('emoji')">Emoji</button>
-              <button class="pick-tab" onclick="showPicks('letters')">Letters</button>
-            </div>
             <div class="quick-picks" id="quickPicks"></div>
           </div>
           
           <div class="mode-content" id="imageMode">
-            <div class="upload-zone" id="uploadZone">
-              <input type="file" accept="image/*" id="imageInput" onchange="handleImageUpload(event)">
-              <div class="upload-zone-icon">📁</div>
-              <div class="upload-zone-text">
-                <strong>Click to upload</strong> or drag & drop<br>
-                PNG, JPG, SVG, WebP
+            <div class="upload-section">
+              <div class="upload-zone single" id="singleUpload">
+                <input type="file" accept="image/*" onchange="handleUpload(event, 'single')">
+                <div class="upload-placeholder">
+                  <div class="upload-zone-icon">📁</div>
+                  <div class="upload-zone-label">Upload Icon</div>
+                  <div class="upload-zone-hint">PNG, SVG, JPG • Auto-generates all sizes</div>
+                </div>
+                <div class="upload-preview-wrap">
+                  <img class="upload-preview-img" id="singlePreview" src="">
+                  <button class="remove-btn" onclick="removeUpload(event, 'single')">×</button>
+                </div>
               </div>
-            </div>
-            <div class="uploaded-preview" id="uploadedPreview">
-              <div class="uploaded-image-wrap">
-                <img class="uploaded-image" id="uploadedImage" src="" alt="Uploaded">
-                <button class="remove-image" onclick="removeImage()">×</button>
+              
+              <div class="upload-row" id="dualUploadRow" style="display: none;">
+                <div class="upload-zone" id="lightUpload">
+                  <input type="file" accept="image/*" onchange="handleUpload(event, 'light')">
+                  <div class="upload-placeholder">
+                    <div class="upload-zone-icon">☀️</div>
+                    <div class="upload-zone-label">Light Mode</div>
+                    <div class="upload-zone-hint">For light backgrounds</div>
+                  </div>
+                  <div class="upload-preview-wrap">
+                    <img class="upload-preview-img" id="lightPreview" src="">
+                    <button class="remove-btn" onclick="removeUpload(event, 'light')">×</button>
+                  </div>
+                </div>
+                
+                <div class="upload-zone" id="darkUpload">
+                  <input type="file" accept="image/*" onchange="handleUpload(event, 'dark')">
+                  <div class="upload-placeholder">
+                    <div class="upload-zone-icon">🌙</div>
+                    <div class="upload-zone-label">Dark Mode</div>
+                    <div class="upload-zone-hint">For dark backgrounds</div>
+                  </div>
+                  <div class="upload-preview-wrap">
+                    <img class="upload-preview-img" id="darkPreview" src="">
+                    <button class="remove-btn" onclick="removeUpload(event, 'dark')">×</button>
+                  </div>
+                </div>
               </div>
-              <div class="uploaded-name" id="uploadedName"></div>
+              
+              <button class="btn btn-secondary" onclick="toggleDualMode()" id="dualModeBtn" style="font-size: 0.75rem;">
+                🌗 Add Dark Mode Variant
+              </button>
             </div>
           </div>
         </div>
         
-        <div class="control-group" id="textColors">
+        <!-- Colors (text mode only) -->
+        <div class="control-group" id="colorControls">
           <h3>Colors</h3>
           <div class="color-row">
             <label>BG</label>
             <div class="color-grid" id="bgColors"></div>
           </div>
-          <div class="color-row" style="margin-top: 0.5rem">
-            <label>Text</label>
+          <div class="color-row">
+            <label>Icon</label>
             <div class="color-grid" id="fgColors"></div>
           </div>
-          <div class="custom-color-row">
-            <input type="color" id="customBgColor" value="#6366f1" onchange="setBgColor(this.value)">
-            <input type="text" id="bgHex" value="#6366f1" onchange="setBgColor(this.value)" placeholder="Background">
-            <input type="color" id="customTextColor" value="#ffffff" onchange="setTextColor(this.value)">
+          <div class="custom-color-wrap">
+            <input type="color" id="customBg" value="#6366f1" onchange="setColor('bg', this.value)">
+            <input type="text" id="bgHex" value="#6366F1" onchange="setColor('bg', this.value)">
+            <input type="color" id="customFg" value="#ffffff" onchange="setColor('fg', this.value)">
           </div>
         </div>
         
-        <div class="control-group image-colors" id="imageColors">
-          <h3>Background</h3>
-          <div class="color-row">
-            <label>BG</label>
-            <div class="color-grid" id="imgBgColors"></div>
-          </div>
-          <div class="custom-color-row">
-            <input type="color" id="customImgBgColor" value="#6366f1" onchange="setBgColor(this.value)">
-            <input type="text" id="imgBgHex" value="#6366f1" onchange="setBgColor(this.value)" placeholder="Background">
-          </div>
-        </div>
-        
+        <!-- Shape -->
         <div class="control-group">
           <h3>Shape</h3>
           <div class="shape-options">
@@ -752,24 +898,119 @@
           </div>
         </div>
         
-        <div class="control-group download-section">
-          <h3>Download</h3>
+        <!-- Download -->
+        <div class="control-group">
+          <h3>Export</h3>
           <button class="btn btn-primary" onclick="downloadAll()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
             </svg>
-            Download ZIP
+            Download Complete Pack
           </button>
+          <div class="download-info">
+            Favicon (16–512) + iOS + Android + PWA manifest + HTML snippet
+          </div>
           <div class="btn-row">
             <button class="btn btn-secondary" onclick="downloadSVG()">SVG</button>
             <button class="btn btn-secondary" onclick="copyDataURL()">Copy URL</button>
           </div>
-          <p class="format-note">16, 32, 48, 180, 192, 512px + .ico + .svg</p>
+        </div>
+      </div>
+      
+      <!-- Preview Section -->
+      <div class="preview-section">
+        <div class="preview-header">
+          <span class="preview-title">Live Preview</span>
+          <div class="preview-context-toggle">
+            <button class="context-btn active" onclick="setPreviewContext('light')">☀️ Light</button>
+            <button class="context-btn" onclick="setPreviewContext('dark')">🌙 Dark</button>
+          </div>
         </div>
         
-        <div class="pro-teaser">
-          <h4>✨ Pro Features Coming</h4>
-          <p>Animated favicons, icon library, bulk generation</p>
+        <div class="preview-grid">
+          <!-- Browser Preview -->
+          <div class="preview-card">
+            <div class="preview-card-header">
+              <span class="preview-card-title">🌐 Browser / Favicon</span>
+              <span class="preview-card-badge">16–512px</span>
+            </div>
+            <div class="preview-card-body" id="browserPreviewBody">
+              <div class="browser-preview">
+                <div class="browser-toolbar">
+                  <div class="browser-dots"><span></span><span></span><span></span></div>
+                  <div class="browser-tab">
+                    <canvas id="tabFavicon" width="14" height="14"></canvas>
+                    <span>Your Site</span>
+                  </div>
+                </div>
+                <div class="browser-content">
+                  <canvas id="mainPreview" width="64" height="64"></canvas>
+                  <div class="browser-sizes">
+                    <div class="browser-size"><canvas id="p16" width="16" height="16"></canvas><span>16</span></div>
+                    <div class="browser-size"><canvas id="p32" width="32" height="32"></canvas><span>32</span></div>
+                    <div class="browser-size"><canvas id="p48" width="48" height="48"></canvas><span>48</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- iOS Preview -->
+          <div class="preview-card">
+            <div class="preview-card-header">
+              <span class="preview-card-title"> iOS / Safari</span>
+              <span class="preview-card-badge">180px</span>
+            </div>
+            <div class="preview-card-body light-bg" id="iosPreviewBody">
+              <div class="ios-preview">
+                <div class="ios-icon-wrap">
+                  <canvas class="ios-icon" id="iosMain" width="60" height="60"></canvas>
+                </div>
+                <div class="ios-label">Your App</div>
+                <div class="ios-sizes">
+                  <div class="ios-size"><canvas width="29" height="29" id="ios29"></canvas><span>29pt</span></div>
+                  <div class="ios-size"><canvas width="40" height="40" id="ios40"></canvas><span>40pt</span></div>
+                  <div class="ios-size"><canvas width="60" height="60" id="ios60"></canvas><span>60pt</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Android Preview -->
+          <div class="preview-card">
+            <div class="preview-card-header">
+              <span class="preview-card-title">🤖 Android / PWA</span>
+              <span class="preview-card-badge">192 & 512px</span>
+            </div>
+            <div class="preview-card-body light-bg" id="androidPreviewBody">
+              <div class="android-preview">
+                <canvas class="android-icon" id="androidMain" width="48" height="48"></canvas>
+                <div class="android-label">Your App</div>
+                <div class="android-sizes">
+                  <div class="android-size"><canvas width="36" height="36" id="and36"></canvas><span>36</span></div>
+                  <div class="android-size"><canvas width="48" height="48" id="and48"></canvas><span>48</span></div>
+                  <div class="android-size"><canvas width="72" height="72" id="and72" style="border-radius:50%"></canvas><span>72</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Code Preview -->
+          <div class="preview-card">
+            <div class="preview-card-header">
+              <span class="preview-card-title">📄 HTML Code</span>
+              <span class="preview-card-badge">Copy & Paste</span>
+            </div>
+            <div class="preview-card-body" style="padding: 0;">
+              <div class="code-preview">
+                <div class="code-header">
+                  <span class="code-title">index.html</span>
+                  <button class="code-copy" onclick="copyHTMLSnippet()">📋 Copy</button>
+                </div>
+                <div class="code-body" id="codeBody"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>
@@ -783,329 +1024,495 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script>
-    const bgColorPalette = [
-      '#ef4444', '#f97316', '#eab308', '#22c55e', '#10b981', '#06b6d4',
-      '#3b82f6', '#6366f1', '#8b5cf6', '#ec4899', '#1f2937', '#000000',
-    ];
+    // State
+    let state = {
+      sourceMode: 'text',
+      text: 'A',
+      bgColor: '#6366f1',
+      fgColor: '#ffffff',
+      shape: 'rounded',
+      previewContext: 'light',
+      dualMode: false,
+      images: {
+        single: null,
+        light: null,
+        dark: null
+      }
+    };
     
-    const textColorPalette = [
-      '#ffffff', '#fafafa', '#f5f5f5', '#000000', '#1f2937', '#fef08a',
-    ];
+    const bgPalette = ['#ef4444','#f97316','#eab308','#22c55e','#10b981','#06b6d4','#3b82f6','#6366f1','#8b5cf6','#ec4899','#1f2937','#000000'];
+    const fgPalette = ['#ffffff','#fafafa','#f5f5f5','#000000','#1f2937','#fef08a'];
+    const emojis = ['🚀','⚡','🎨','💡','🔥','✨','🌟','💎','🎯','🔮','📦','🛠️','💻','🌈','🎪','❤️','🎵','🎮'];
     
-    const emojiPicks = ['🚀', '⚡', '🎨', '💡', '🔥', '✨', '🌟', '💎', '🎯', '🔮', '📦', '🛠️', '💻', '🌈', '🎪'];
-    const letterPicks = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'M', 'N', 'S', 'T', 'W', 'X', 'Z'];
-    
-    let currentMode = 'text';
-    let currentText = 'A';
-    let currentBgColor = '#6366f1';
-    let currentTextColor = '#ffffff';
-    let currentShape = 'rounded';
-    let currentPickTab = 'emoji';
-    let uploadedImage = null;
-    
+    // Initialize
     function init() {
-      renderBgColors();
-      renderTextColors();
-      renderImgBgColors();
-      showPicks('emoji');
-      renderFavicon();
-      setupDragDrop();
-      
+      renderColorPalettes();
+      renderQuickPicks();
+      renderAllPreviews();
+      updateCodePreview();
+      setupListeners();
+    }
+    
+    function setupListeners() {
       document.getElementById('iconText').addEventListener('input', (e) => {
-        currentText = e.target.value || 'A';
-        renderFavicon();
+        state.text = e.target.value || 'A';
+        renderAllPreviews();
         updatePageFavicon();
       });
     }
     
-    function setMode(mode) {
-      currentMode = mode;
-      document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.textContent.includes(mode === 'text' ? 'Text' : 'Image')));
+    // Source Mode
+    function setSourceMode(mode) {
+      state.sourceMode = mode;
+      document.querySelectorAll('.mode-tab').forEach(t => {
+        t.classList.toggle('active', t.textContent.includes(mode === 'text' ? 'Text' : 'Image'));
+      });
       document.getElementById('textMode').classList.toggle('active', mode === 'text');
       document.getElementById('imageMode').classList.toggle('active', mode === 'image');
-      document.getElementById('textColors').style.display = mode === 'text' ? 'block' : 'none';
-      document.getElementById('imageColors').classList.toggle('show', mode === 'image');
-      renderFavicon();
-      updatePageFavicon();
+      document.getElementById('colorControls').style.display = mode === 'text' ? 'block' : 'none';
+      renderAllPreviews();
+      updateCodePreview();
     }
     
-    function setupDragDrop() {
-      const zone = document.getElementById('uploadZone');
-      
-      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
-        zone.addEventListener(event, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        });
-      });
-      
-      ['dragenter', 'dragover'].forEach(event => {
-        zone.addEventListener(event, () => zone.classList.add('dragover'));
-      });
-      
-      ['dragleave', 'drop'].forEach(event => {
-        zone.addEventListener(event, () => zone.classList.remove('dragover'));
-      });
-      
-      zone.addEventListener('drop', (e) => {
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) {
-          processImageFile(file);
-        }
-      });
+    // Dual Mode (light/dark variants)
+    function toggleDualMode() {
+      state.dualMode = !state.dualMode;
+      document.getElementById('singleUpload').style.display = state.dualMode ? 'none' : 'block';
+      document.getElementById('dualUploadRow').style.display = state.dualMode ? 'grid' : 'none';
+      document.getElementById('dualModeBtn').innerHTML = state.dualMode 
+        ? '📁 Use Single Icon' 
+        : '🌗 Add Dark Mode Variant';
+      updateCodePreview();
     }
     
-    function handleImageUpload(event) {
+    // Upload handling
+    function handleUpload(event, type) {
       const file = event.target.files[0];
-      if (file) {
-        processImageFile(file);
-      }
-    }
-    
-    function processImageFile(file) {
+      if (!file) return;
+      
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          uploadedImage = img;
-          document.getElementById('uploadZone').style.display = 'none';
-          document.getElementById('uploadedPreview').classList.add('show');
-          document.getElementById('uploadedImage').src = e.target.result;
-          document.getElementById('uploadedName').textContent = file.name;
-          renderFavicon();
+          state.images[type] = img;
+          
+          const zone = document.getElementById(type + 'Upload');
+          const preview = document.getElementById(type + 'Preview');
+          
+          zone.classList.add('has-image');
+          preview.src = e.target.result;
+          
+          renderAllPreviews();
           updatePageFavicon();
+          updateCodePreview();
         };
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }
     
-    function removeImage() {
-      uploadedImage = null;
-      document.getElementById('uploadZone').style.display = 'block';
-      document.getElementById('uploadedPreview').classList.remove('show');
-      document.getElementById('imageInput').value = '';
-      renderFavicon();
+    function removeUpload(event, type) {
+      event.stopPropagation();
+      state.images[type] = null;
+      
+      const zone = document.getElementById(type + 'Upload');
+      zone.classList.remove('has-image');
+      zone.querySelector('input').value = '';
+      
+      renderAllPreviews();
+      updateCodePreview();
+    }
+    
+    // Colors
+    function renderColorPalettes() {
+      document.getElementById('bgColors').innerHTML = bgPalette.map(c => 
+        `<div class="color-swatch ${c === state.bgColor ? 'active' : ''}" style="background:${c}" onclick="setColor('bg','${c}')"></div>`
+      ).join('');
+      
+      document.getElementById('fgColors').innerHTML = fgPalette.map(c => 
+        `<div class="color-swatch ${c === state.fgColor ? 'active' : ''}" style="background:${c};${c.match(/#f[5af]/) ? 'border:1px solid var(--border)' : ''}" onclick="setColor('fg','${c}')"></div>`
+      ).join('');
+    }
+    
+    function setColor(type, color) {
+      if (!/^#[0-9a-fA-F]{6}$/.test(color)) return;
+      
+      if (type === 'bg') {
+        state.bgColor = color;
+        document.getElementById('customBg').value = color;
+        document.getElementById('bgHex').value = color.toUpperCase();
+      } else {
+        state.fgColor = color;
+        document.getElementById('customFg').value = color;
+      }
+      
+      renderColorPalettes();
+      renderAllPreviews();
       updatePageFavicon();
     }
     
-    function renderBgColors() {
-      document.getElementById('bgColors').innerHTML = bgColorPalette.map(c => `
-        <div class="color-swatch ${c === currentBgColor ? 'active' : ''}" 
-             style="background: ${c}" onclick="setBgColor('${c}')"></div>
-      `).join('');
-    }
-    
-    function renderImgBgColors() {
-      document.getElementById('imgBgColors').innerHTML = bgColorPalette.map(c => `
-        <div class="color-swatch ${c === currentBgColor ? 'active' : ''}" 
-             style="background: ${c}" onclick="setBgColor('${c}')"></div>
-      `).join('');
-    }
-    
-    function renderTextColors() {
-      document.getElementById('fgColors').innerHTML = textColorPalette.map(c => `
-        <div class="color-swatch ${c === currentTextColor ? 'active' : ''}" 
-             style="background: ${c}; ${c === '#ffffff' || c === '#fafafa' || c === '#f5f5f5' ? 'border: 1px solid var(--border);' : ''}" 
-             onclick="setTextColor('${c}')"></div>
-      `).join('');
-    }
-    
-    function showPicks(tab) {
-      currentPickTab = tab;
-      document.querySelectorAll('.pick-tab').forEach(t => t.classList.toggle('active', t.textContent.toLowerCase() === tab));
-      
-      const picks = tab === 'emoji' ? emojiPicks : letterPicks;
-      document.getElementById('quickPicks').innerHTML = picks.map(p => `
-        <button class="quick-pick" onclick="setIcon('${p}')">${p}</button>
-      `).join('');
+    // Quick picks
+    function renderQuickPicks() {
+      document.getElementById('quickPicks').innerHTML = emojis.map(e => 
+        `<button class="quick-pick" onclick="setIcon('${e}')">${e}</button>`
+      ).join('');
     }
     
     function setIcon(text) {
-      currentText = text;
+      state.text = text;
       document.getElementById('iconText').value = text;
-      renderFavicon();
+      renderAllPreviews();
       updatePageFavicon();
     }
     
-    function setBgColor(color) {
-      currentBgColor = color;
-      document.getElementById('customBgColor').value = color;
-      document.getElementById('bgHex').value = color;
-      document.getElementById('customImgBgColor').value = color;
-      document.getElementById('imgBgHex').value = color;
-      renderBgColors();
-      renderImgBgColors();
-      renderFavicon();
-      updatePageFavicon();
-    }
-    
-    function setTextColor(color) {
-      currentTextColor = color;
-      document.getElementById('customTextColor').value = color;
-      renderTextColors();
-      renderFavicon();
-      updatePageFavicon();
-    }
-    
+    // Shape
     function setShape(shape) {
-      currentShape = shape;
-      document.querySelectorAll('.shape-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.shape === shape);
-      });
-      renderFavicon();
+      state.shape = shape;
+      document.querySelectorAll('.shape-btn').forEach(b => b.classList.toggle('active', b.dataset.shape === shape));
+      renderAllPreviews();
       updatePageFavicon();
     }
     
-    function renderFavicon() {
-      [14, 16, 32, 48, 64, 96].forEach(size => {
-        let canvas;
-        if (size === 96) canvas = document.getElementById('previewLarge');
-        else if (size === 14) canvas = document.getElementById('tabFavicon');
-        else canvas = document.getElementById(`preview${size}`);
-        if (canvas) renderToCanvas(canvas, size);
-      });
+    // Preview context
+    function setPreviewContext(ctx) {
+      state.previewContext = ctx;
+      document.querySelectorAll('.context-btn').forEach(b => b.classList.toggle('active', b.textContent.includes(ctx === 'light' ? 'Light' : 'Dark')));
+      
+      const isLight = ctx === 'light';
+      document.getElementById('iosPreviewBody').classList.toggle('light-bg', isLight);
+      document.getElementById('iosPreviewBody').classList.toggle('dark-bg', !isLight);
+      document.getElementById('androidPreviewBody').classList.toggle('light-bg', isLight);
+      document.getElementById('androidPreviewBody').classList.toggle('dark-bg', !isLight);
+      
+      renderAllPreviews();
     }
     
-    function renderToCanvas(canvas, size) {
+    // Rendering
+    function renderAllPreviews() {
+      const isDark = state.previewContext === 'dark';
+      
+      // Determine which image to use
+      let img = null;
+      if (state.sourceMode === 'image') {
+        if (state.dualMode) {
+          img = isDark ? state.images.dark : state.images.light;
+          if (!img) img = state.images.light || state.images.dark;
+        } else {
+          img = state.images.single;
+        }
+      }
+      
+      // Browser previews
+      renderToCanvas('tabFavicon', 14, img);
+      renderToCanvas('mainPreview', 64, img);
+      renderToCanvas('p16', 16, img);
+      renderToCanvas('p32', 32, img);
+      renderToCanvas('p48', 48, img);
+      
+      // iOS previews
+      renderToCanvas('iosMain', 60, img, 'ios');
+      renderToCanvas('ios29', 29, img, 'ios');
+      renderToCanvas('ios40', 40, img, 'ios');
+      renderToCanvas('ios60', 60, img, 'ios');
+      
+      // Android previews
+      renderToCanvas('androidMain', 48, img, 'android');
+      renderToCanvas('and36', 36, img, 'android');
+      renderToCanvas('and48', 48, img, 'android');
+      renderToCanvas('and72', 72, img, 'android');
+    }
+    
+    function renderToCanvas(id, size, img, platform = 'web') {
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, size, size);
       
-      // Background shape
-      const radius = currentShape === 'circle' ? size / 2 : 
-                     currentShape === 'rounded' ? size * 0.2 : 0;
+      // Determine border radius based on shape and platform
+      let radius;
+      if (platform === 'ios') {
+        radius = size * 0.22; // iOS uses ~22% radius
+      } else if (platform === 'android') {
+        radius = size / 2; // Android adaptive icons are circular
+      } else {
+        radius = state.shape === 'circle' ? size / 2 : state.shape === 'rounded' ? size * 0.2 : 0;
+      }
       
-      ctx.fillStyle = currentBgColor;
-      
-      if (currentShape === 'circle') {
+      // Draw background
+      ctx.fillStyle = state.bgColor;
+      if (state.shape === 'circle' || platform === 'android') {
         ctx.beginPath();
-        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+        ctx.arc(size/2, size/2, size/2, 0, Math.PI*2);
         ctx.fill();
       } else {
         roundRect(ctx, 0, 0, size, size, radius);
         ctx.fill();
       }
       
-      // Content: image or text
-      if (currentMode === 'image' && uploadedImage) {
-        // Clip to shape
+      // Draw content
+      if (img) {
         ctx.save();
-        if (currentShape === 'circle') {
+        if (state.shape === 'circle' || platform === 'android') {
           ctx.beginPath();
-          ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+          ctx.arc(size/2, size/2, size/2, 0, Math.PI*2);
           ctx.clip();
-        } else if (currentShape === 'rounded') {
+        } else {
           ctx.beginPath();
           roundRect(ctx, 0, 0, size, size, radius);
           ctx.clip();
         }
         
-        // Draw image centered and covering
-        const imgAspect = uploadedImage.width / uploadedImage.height;
-        let drawW, drawH, drawX, drawY;
-        
-        if (imgAspect > 1) {
-          drawH = size;
-          drawW = size * imgAspect;
-          drawX = (size - drawW) / 2;
-          drawY = 0;
+        // Cover fit
+        const imgRatio = img.width / img.height;
+        let dw, dh, dx, dy;
+        if (imgRatio > 1) {
+          dh = size; dw = size * imgRatio;
+          dx = (size - dw) / 2; dy = 0;
         } else {
-          drawW = size;
-          drawH = size / imgAspect;
-          drawX = 0;
-          drawY = (size - drawH) / 2;
+          dw = size; dh = size / imgRatio;
+          dx = 0; dy = (size - dh) / 2;
         }
-        
-        ctx.drawImage(uploadedImage, drawX, drawY, drawW, drawH);
+        ctx.drawImage(img, dx, dy, dw, dh);
         ctx.restore();
       } else {
         // Text mode
-        const isEmoji = /\p{Emoji}/u.test(currentText);
-        const fontSize = size * (isEmoji ? 0.6 : 0.55);
+        const isEmoji = /\p{Emoji}/u.test(state.text);
+        const fontSize = size * (isEmoji ? 0.55 : 0.5);
         ctx.font = `700 ${fontSize}px "Jost", "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = isEmoji ? '' : currentTextColor;
-        ctx.fillText(isEmoji ? currentText : currentText.toUpperCase(), size / 2, size / 2 + size * 0.04);
+        ctx.fillStyle = isEmoji ? '' : state.fgColor;
+        ctx.fillText(isEmoji ? state.text : state.text.toUpperCase(), size/2, size/2 + size*0.03);
       }
     }
     
     function roundRect(ctx, x, y, w, h, r) {
       ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.lineTo(x + w - r, y);
-      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-      ctx.lineTo(x + w, y + h - r);
-      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-      ctx.lineTo(x + r, y + h);
-      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-      ctx.lineTo(x, y + r);
-      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.moveTo(x+r, y);
+      ctx.lineTo(x+w-r, y);
+      ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+      ctx.lineTo(x+w, y+h-r);
+      ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+      ctx.lineTo(x+r, y+h);
+      ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+      ctx.lineTo(x, y+r);
+      ctx.quadraticCurveTo(x, y, x+r, y);
       ctx.closePath();
     }
     
-    function generateCanvas(size) {
+    function generateCanvas(size, img, platform = 'web') {
       const canvas = document.createElement('canvas');
       canvas.width = size;
       canvas.height = size;
-      renderToCanvas(canvas, size);
+      canvas.id = '_gen';
+      renderToCanvas('_gen', size, img, platform);
+      // Since we can't use ID, render directly
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, size, size);
+      
+      let radius;
+      if (platform === 'ios') {
+        radius = size * 0.22;
+      } else if (platform === 'android') {
+        radius = size / 2;
+      } else {
+        radius = state.shape === 'circle' ? size / 2 : state.shape === 'rounded' ? size * 0.2 : 0;
+      }
+      
+      ctx.fillStyle = state.bgColor;
+      if (state.shape === 'circle' || platform === 'android') {
+        ctx.beginPath();
+        ctx.arc(size/2, size/2, size/2, 0, Math.PI*2);
+        ctx.fill();
+      } else {
+        roundRect(ctx, 0, 0, size, size, radius);
+        ctx.fill();
+      }
+      
+      if (img) {
+        ctx.save();
+        if (state.shape === 'circle' || platform === 'android') {
+          ctx.beginPath();
+          ctx.arc(size/2, size/2, size/2, 0, Math.PI*2);
+          ctx.clip();
+        } else {
+          ctx.beginPath();
+          roundRect(ctx, 0, 0, size, size, radius);
+          ctx.clip();
+        }
+        const imgRatio = img.width / img.height;
+        let dw, dh, dx, dy;
+        if (imgRatio > 1) { dh = size; dw = size * imgRatio; dx = (size-dw)/2; dy = 0; }
+        else { dw = size; dh = size / imgRatio; dx = 0; dy = (size-dh)/2; }
+        ctx.drawImage(img, dx, dy, dw, dh);
+        ctx.restore();
+      } else {
+        const isEmoji = /\p{Emoji}/u.test(state.text);
+        const fontSize = size * (isEmoji ? 0.55 : 0.5);
+        ctx.font = `700 ${fontSize}px "Jost", "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = isEmoji ? '' : state.fgColor;
+        ctx.fillText(isEmoji ? state.text : state.text.toUpperCase(), size/2, size/2 + size*0.03);
+      }
+      
       return canvas;
     }
     
-    function updatePageFavicon() {
-      const canvas = generateCanvas(32);
-      document.getElementById('dynamicFavicon').href = canvas.toDataURL('image/png');
+    // Code preview
+    function updateCodePreview() {
+      const hasDarkVariant = state.dualMode && state.images.dark;
+      
+      let code = `<span class="cmt">&lt;!-- Favicon --&gt;</span>\n`;
+      code += `<span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"icon"</span> <span class="attr">type</span>=<span class="val">"image/png"</span> <span class="attr">sizes</span>=<span class="val">"32x32"</span> <span class="attr">href</span>=<span class="val">"/favicon-32x32.png"</span><span class="tag">&gt;</span>\n`;
+      code += `<span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"icon"</span> <span class="attr">type</span>=<span class="val">"image/png"</span> <span class="attr">sizes</span>=<span class="val">"16x16"</span> <span class="attr">href</span>=<span class="val">"/favicon-16x16.png"</span><span class="tag">&gt;</span>\n\n`;
+      
+      if (hasDarkVariant) {
+        code += `<span class="cmt">&lt;!-- Dark mode favicon --&gt;</span>\n`;
+        code += `<span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"icon"</span> <span class="attr">href</span>=<span class="val">"/favicon-dark.png"</span> <span class="attr">media</span>=<span class="val">"(prefers-color-scheme: dark)"</span><span class="tag">&gt;</span>\n\n`;
+      }
+      
+      code += `<span class="cmt">&lt;!-- iOS --&gt;</span>\n`;
+      code += `<span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"apple-touch-icon"</span> <span class="attr">sizes</span>=<span class="val">"180x180"</span> <span class="attr">href</span>=<span class="val">"/apple-touch-icon.png"</span><span class="tag">&gt;</span>\n\n`;
+      
+      code += `<span class="cmt">&lt;!-- PWA Manifest --&gt;</span>\n`;
+      code += `<span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="val">"manifest"</span> <span class="attr">href</span>=<span class="val">"/manifest.json"</span><span class="tag">&gt;</span>`;
+      
+      document.getElementById('codeBody').innerHTML = code;
     }
     
+    function copyHTMLSnippet() {
+      const hasDarkVariant = state.dualMode && state.images.dark;
+      
+      let code = `<!-- Favicon -->\n`;
+      code += `<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">\n`;
+      code += `<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">\n`;
+      
+      if (hasDarkVariant) {
+        code += `\n<!-- Dark mode favicon -->\n`;
+        code += `<link rel="icon" href="/favicon-dark.png" media="(prefers-color-scheme: dark)">\n`;
+      }
+      
+      code += `\n<!-- iOS -->\n`;
+      code += `<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">\n`;
+      code += `\n<!-- PWA Manifest -->\n`;
+      code += `<link rel="manifest" href="/manifest.json">`;
+      
+      navigator.clipboard.writeText(code);
+      showToast('✓ HTML copied!');
+    }
+    
+    // Downloads
     async function downloadAll() {
       const zip = new JSZip();
-      const sizes = [16, 32, 48, 180, 192, 512];
       
+      const img = state.sourceMode === 'image' ? (state.images.single || state.images.light) : null;
+      const darkImg = state.dualMode ? state.images.dark : null;
+      
+      // Favicons
+      const sizes = [16, 32, 48, 64, 96, 128, 256, 512];
       for (const size of sizes) {
-        const canvas = generateCanvas(size);
-        const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+        const canvas = generateCanvas(size, img);
+        const blob = await canvasToBlob(canvas);
         zip.file(`favicon-${size}x${size}.png`, blob);
       }
       
-      const ico32 = generateCanvas(32);
-      const icoBlob = await new Promise(r => ico32.toBlob(r, 'image/png'));
-      zip.file('favicon.ico', icoBlob);
+      // ICO (32px as PNG, browsers accept this)
+      const ico = generateCanvas(32, img);
+      zip.file('favicon.ico', await canvasToBlob(ico));
       
-      if (currentMode === 'text') {
+      // Dark mode variant
+      if (darkImg) {
+        const darkCanvas = generateCanvas(32, darkImg);
+        zip.file('favicon-dark.png', await canvasToBlob(darkCanvas));
+      }
+      
+      // iOS icons
+      const iosSizes = [57, 60, 72, 76, 114, 120, 144, 152, 167, 180];
+      for (const size of iosSizes) {
+        const canvas = generateCanvas(size, img, 'ios');
+        zip.file(`apple-touch-icon-${size}x${size}.png`, await canvasToBlob(canvas));
+      }
+      zip.file('apple-touch-icon.png', await canvasToBlob(generateCanvas(180, img, 'ios')));
+      
+      // Android / PWA
+      const androidSizes = [36, 48, 72, 96, 144, 192, 512];
+      for (const size of androidSizes) {
+        const canvas = generateCanvas(size, img, 'android');
+        zip.file(`android-icon-${size}x${size}.png`, await canvasToBlob(canvas));
+      }
+      
+      // Maskable icon (with padding)
+      const maskable = generateCanvas(512, img, 'android');
+      zip.file('maskable-icon-512x512.png', await canvasToBlob(maskable));
+      
+      // manifest.json
+      const manifest = {
+        name: "Your App",
+        short_name: "App",
+        icons: [
+          { src: "/android-icon-192x192.png", sizes: "192x192", type: "image/png" },
+          { src: "/android-icon-512x512.png", sizes: "512x512", type: "image/png" },
+          { src: "/maskable-icon-512x512.png", sizes: "512x512", type: "image/png", purpose: "maskable" }
+        ],
+        theme_color: state.bgColor,
+        background_color: state.bgColor,
+        display: "standalone"
+      };
+      zip.file('manifest.json', JSON.stringify(manifest, null, 2));
+      
+      // HTML snippet
+      let html = `<!-- Generated by day007.aikemist.com -->\n\n`;
+      html += `<!-- Favicon -->\n`;
+      html += `<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">\n`;
+      html += `<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">\n`;
+      
+      if (darkImg) {
+        html += `\n<!-- Dark mode favicon -->\n`;
+        html += `<link rel="icon" href="/favicon-dark.png" media="(prefers-color-scheme: dark)">\n`;
+      }
+      
+      html += `\n<!-- iOS -->\n`;
+      html += `<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">\n`;
+      html += `\n<!-- PWA -->\n`;
+      html += `<link rel="manifest" href="/manifest.json">\n`;
+      html += `<meta name="theme-color" content="${state.bgColor}">`;
+      
+      zip.file('html-snippet.txt', html);
+      
+      // SVG (text mode only)
+      if (state.sourceMode === 'text') {
         zip.file('favicon.svg', generateSVG());
       }
       
-      const html = `<!-- Favicon - Generated at day007.aikemist.com -->
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">`;
-      zip.file('html-snippet.txt', html);
-      
+      // Download
       const content = await zip.generateAsync({ type: 'blob' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(content);
-      link.download = 'favicon-pack.zip';
+      link.download = 'app-icons.zip';
       link.click();
       
-      showToast('✓ Downloaded!');
+      showToast('✓ Downloaded complete icon pack!');
+    }
+    
+    function canvasToBlob(canvas) {
+      return new Promise(r => canvas.toBlob(r, 'image/png'));
     }
     
     function generateSVG() {
-      const isEmoji = /\p{Emoji}/u.test(currentText);
-      const r = currentShape === 'circle' ? 50 : currentShape === 'rounded' ? 18 : 0;
-      
-      const shape = currentShape === 'circle' 
-        ? `<circle cx="50" cy="50" r="50" fill="${currentBgColor}"/>`
-        : `<rect width="100" height="100" rx="${r}" fill="${currentBgColor}"/>`;
-      
-      const text = `<text x="50" y="54" font-size="55" font-weight="700" font-family="system-ui, sans-serif" text-anchor="middle" dominant-baseline="middle" fill="${isEmoji ? 'transparent' : currentTextColor}">${isEmoji ? currentText : currentText.toUpperCase()}</text>`;
-      
+      const isEmoji = /\p{Emoji}/u.test(state.text);
+      const r = state.shape === 'circle' ? 50 : state.shape === 'rounded' ? 18 : 0;
+      const shape = state.shape === 'circle'
+        ? `<circle cx="50" cy="50" r="50" fill="${state.bgColor}"/>`
+        : `<rect width="100" height="100" rx="${r}" fill="${state.bgColor}"/>`;
+      const text = `<text x="50" y="54" font-size="50" font-weight="700" font-family="system-ui,sans-serif" text-anchor="middle" dominant-baseline="middle" fill="${isEmoji ? 'transparent' : state.fgColor}">${isEmoji ? state.text : state.text.toUpperCase()}</text>`;
       return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${shape}${text}</svg>`;
     }
     
     function downloadSVG() {
-      if (currentMode === 'image') {
-        showToast('SVG not available for image mode');
+      if (state.sourceMode === 'image') {
+        showToast('SVG not available for images');
         return;
       }
       const blob = new Blob([generateSVG()], { type: 'image/svg+xml' });
@@ -1117,18 +1524,22 @@
     }
     
     function copyDataURL() {
-      const canvas = generateCanvas(32);
+      const canvas = generateCanvas(32, state.sourceMode === 'image' ? state.images.single : null);
       navigator.clipboard.writeText(canvas.toDataURL('image/png'));
       showToast('✓ Data URL copied!');
     }
     
+    function updatePageFavicon() {
+      const canvas = generateCanvas(32, state.sourceMode === 'image' ? state.images.single : null);
+      document.getElementById('dynamicFavicon').href = canvas.toDataURL('image/png');
+    }
+    
+    // Theme
     function toggleTheme() {
-      const body = document.body;
-      const isDark = body.dataset.theme === 'dark';
-      body.dataset.theme = isDark ? 'light' : 'dark';
-      localStorage.setItem('theme', body.dataset.theme);
-      
-      document.getElementById('themeIcon').innerHTML = isDark 
+      const isDark = document.body.dataset.theme === 'dark';
+      document.body.dataset.theme = isDark ? 'light' : 'dark';
+      localStorage.setItem('theme', document.body.dataset.theme);
+      document.getElementById('themeIcon').innerHTML = isDark
         ? '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>'
         : '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
     }
@@ -1137,9 +1548,10 @@
       const toast = document.getElementById('toast');
       toast.textContent = msg;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
+      setTimeout(() => toast.classList.remove('show'), 2500);
     }
     
+    // Load theme
     if (localStorage.getItem('theme')) {
       document.body.dataset.theme = localStorage.getItem('theme');
     }

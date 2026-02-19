@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wave Divider Generator — Alkemist</title>
+  <meta name="description" content="Create beautiful SVG wave section dividers for your landing pages. Export SVG or CSS with one click.">
+  <meta property="og:title" content="Wave Divider Generator — Alkemist">
+  <meta property="og:description" content="Create beautiful SVG wave section dividers for your landing pages.">
+  <!-- TODO: Add og:image -->
+  <meta property="og:url" content="https://day015.aikemist.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --text: #1a1a2e;
+      --text-secondary: #6b7280;
+      --border: #e5e7eb;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0a0a0f;
+      --bg-secondary: #12121a;
+      --text: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --border: #1e293b;
+      --accent: #818cf8;
+      --accent-hover: #a5b4fc;
+    }
+
+    body {
+      font-family: 'Jost', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+    }
+
+    .logo-text {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .theme-toggle {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--accent);
+    }
+
+    /* Main Layout */
+    .main {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: calc(100vh - 60px);
+    }
+
+    @media (max-width: 900px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Controls Panel */
+    .controls {
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    @media (max-width: 900px) {
+      .controls {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+    }
+
+    .control-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .control-group h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    /* Presets */
+    .presets {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .preset-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-family: inherit;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+
+    .preset-btn.active {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+
+    /* Wave Type Buttons */
+    .wave-types {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+
+    .wave-type-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--text);
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .wave-type-btn svg {
+      width: 60px;
+      height: 24px;
+    }
+
+    .wave-type-btn span {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+
+    .wave-type-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .wave-type-btn.active {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+
+    .wave-type-btn.active span {
+      color: rgba(255,255,255,0.8);
+    }
+
+    .wave-type-btn.active svg path {
+      stroke: white;
+    }
+
+    /* Sliders */
+    .slider-row {
+      margin-bottom: 1rem;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .slider-value {
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      appearance: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+    }
+
+    /* Color Picker */
+    .color-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .color-input-wrap {
+      position: relative;
+      width: 40px;
+      height: 40px;
+    }
+
+    .color-input-wrap input[type="color"] {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .color-input-wrap input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    .color-input-wrap input[type="color"]::-webkit-color-swatch {
+      border: 2px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .hex-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: 0.85rem;
+      color: var(--text);
+      text-transform: uppercase;
+    }
+
+    .hex-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    /* Color Presets */
+    .color-presets {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .color-preset {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .color-preset:hover {
+      transform: scale(1.1);
+    }
+
+    .color-preset.active {
+      border-color: var(--accent);
+    }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .toggle-label {
+      font-size: 0.85rem;
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: var(--border);
+      border-radius: 24px;
+      transition: 0.3s;
+    }
+
+    .toggle-slider::before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background: var(--accent);
+    }
+
+    .toggle input:checked + .toggle-slider::before {
+      transform: translateX(20px);
+    }
+
+    /* Layers */
+    .layers-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .layer-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .layer-item.active {
+      border-color: var(--accent);
+    }
+
+    .layer-color {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .layer-name {
+      flex: 1;
+      font-size: 0.85rem;
+    }
+
+    .layer-actions {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .layer-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+
+    .layer-btn:hover {
+      opacity: 1;
+    }
+
+    .add-layer-btn {
+      width: 100%;
+      background: var(--bg);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .add-layer-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Preview */
+    .preview-area {
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .preview-title {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .preview-bg-buttons {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .preview-bg-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preview-bg-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .preview-bg-btn.active {
+      border-color: var(--accent);
+    }
+
+    .preview-bg-btn.light { background: #f8f9fa; }
+    .preview-bg-btn.dark { background: #1a1a2e; }
+    .preview-bg-btn.gradient { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+    .preview-bg-btn.checker {
+      background-image: 
+        linear-gradient(45deg, #ccc 25%, transparent 25%),
+        linear-gradient(-45deg, #ccc 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #ccc 75%),
+        linear-gradient(-45deg, transparent 75%, #ccc 75%);
+      background-size: 8px 8px;
+      background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+    }
+
+    .preview-container {
+      flex: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 400px;
+    }
+
+    .preview-container.light { background: #f8f9fa; }
+    .preview-container.dark { background: #1a1a2e; }
+    .preview-container.gradient { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+    .preview-container.checker {
+      background-color: #fff;
+      background-image: 
+        linear-gradient(45deg, #e0e0e0 25%, transparent 25%),
+        linear-gradient(-45deg, #e0e0e0 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #e0e0e0 75%),
+        linear-gradient(-45deg, transparent 75%, #e0e0e0 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    }
+
+    .preview-top {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+
+    .preview-wave {
+      width: 100%;
+      display: block;
+    }
+
+    .preview-bottom {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+
+    /* Export */
+    .export-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .export-btn {
+      flex: 1;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .export-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .export-btn.secondary {
+      background: var(--bg-secondary);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .export-btn.secondary:hover {
+      border-color: var(--accent);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Copied Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Pro Teaser */
+    .pro-teaser {
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      border-radius: 8px;
+      padding: 1rem;
+      color: white;
+      margin-top: 1.5rem;
+    }
+
+    .pro-teaser h4 {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .pro-teaser ul {
+      font-size: 0.8rem;
+      list-style: none;
+      opacity: 0.9;
+    }
+
+    .pro-teaser li {
+      margin-bottom: 0.25rem;
+    }
+
+    .pro-teaser li::before {
+      content: "✦ ";
+    }
+  </style>
+</head>
+<body data-theme="light">
+  <header class="header">
+    <a href="https://aikemist.com" class="logo">
+      <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
+        <defs>
+          <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#6366f1"/>
+            <stop offset="100%" style="stop-color:#8b5cf6"/>
+          </linearGradient>
+        </defs>
+        <rect width="32" height="32" rx="8" fill="url(#logoGrad)"/>
+        <path d="M10 22L16 10L22 22" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="16" cy="18" r="2" fill="white"/>
+      </svg>
+      <span class="logo-text">Alkemist</span>
+    </a>
+    <div class="header-actions">
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <aside class="controls">
+      <div class="control-group">
+        <h3>Presets</h3>
+        <div class="presets">
+          <button class="preset-btn" data-preset="smooth">Smooth</button>
+          <button class="preset-btn active" data-preset="waves">Waves</button>
+          <button class="preset-btn" data-preset="peaks">Peaks</button>
+          <button class="preset-btn" data-preset="layered">Layered</button>
+          <button class="preset-btn" data-preset="minimal">Minimal</button>
+          <button class="preset-btn" data-preset="dramatic">Dramatic</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <h3>Wave Type</h3>
+        <div class="wave-types">
+          <button class="wave-type-btn active" data-type="sine">
+            <svg viewBox="0 0 60 24"><path d="M0 12 Q15 0 30 12 T60 12" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <span>Sine</span>
+          </button>
+          <button class="wave-type-btn" data-type="curve">
+            <svg viewBox="0 0 60 24"><path d="M0 20 Q30 -10 60 20" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <span>Curve</span>
+          </button>
+          <button class="wave-type-btn" data-type="steps">
+            <svg viewBox="0 0 60 24"><path d="M0 20 L15 20 L15 10 L30 10 L30 15 L45 15 L45 5 L60 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <span>Steps</span>
+          </button>
+          <button class="wave-type-btn" data-type="peaks">
+            <svg viewBox="0 0 60 24"><path d="M0 20 L10 5 L20 20 L30 8 L40 20 L50 3 L60 20" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <span>Peaks</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <h3>Settings</h3>
+        
+        <div class="slider-row">
+          <div class="slider-label">
+            <span>Height</span>
+            <span class="slider-value" id="heightValue">100px</span>
+          </div>
+          <input type="range" id="height" min="30" max="300" value="100">
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-label">
+            <span>Amplitude</span>
+            <span class="slider-value" id="amplitudeValue">50%</span>
+          </div>
+          <input type="range" id="amplitude" min="10" max="100" value="50">
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-label">
+            <span>Frequency</span>
+            <span class="slider-value" id="frequencyValue">2</span>
+          </div>
+          <input type="range" id="frequency" min="1" max="6" value="2">
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-label">
+            <span>Complexity</span>
+            <span class="slider-value" id="complexityValue">3</span>
+          </div>
+          <input type="range" id="complexity" min="1" max="8" value="3">
+        </div>
+
+        <div class="toggle-row">
+          <span class="toggle-label">Flip Vertically</span>
+          <label class="toggle">
+            <input type="checkbox" id="flipVertical">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <h3>Color</h3>
+        <div class="color-row">
+          <div class="color-input-wrap">
+            <input type="color" id="waveColor" value="#6366f1">
+          </div>
+          <input type="text" class="hex-input" id="colorHex" value="#6366F1">
+        </div>
+        <div class="color-presets">
+          <button class="color-preset active" style="background: #6366f1" data-color="#6366f1"></button>
+          <button class="color-preset" style="background: #8b5cf6" data-color="#8b5cf6"></button>
+          <button class="color-preset" style="background: #ec4899" data-color="#ec4899"></button>
+          <button class="color-preset" style="background: #f59e0b" data-color="#f59e0b"></button>
+          <button class="color-preset" style="background: #10b981" data-color="#10b981"></button>
+          <button class="color-preset" style="background: #06b6d4" data-color="#06b6d4"></button>
+          <button class="color-preset" style="background: #1a1a2e" data-color="#1a1a2e"></button>
+          <button class="color-preset" style="background: #f8f9fa" data-color="#f8f9fa"></button>
+        </div>
+      </div>
+
+      <div class="pro-teaser">
+        <h4>✨ Pro (Coming Soon)</h4>
+        <ul>
+          <li>Multi-layer waves with depth</li>
+          <li>Animated waves (CSS/Lottie)</li>
+          <li>Gradient fills</li>
+          <li>React/Vue/Tailwind export</li>
+        </ul>
+      </div>
+    </aside>
+
+    <section class="preview-area">
+      <div class="preview-header">
+        <span class="preview-title">Preview</span>
+        <div class="preview-bg-buttons">
+          <button class="preview-bg-btn light active" data-bg="light" title="Light background"></button>
+          <button class="preview-bg-btn dark" data-bg="dark" title="Dark background"></button>
+          <button class="preview-bg-btn gradient" data-bg="gradient" title="Gradient background"></button>
+          <button class="preview-bg-btn checker" data-bg="checker" title="Transparent"></button>
+        </div>
+      </div>
+
+      <div class="preview-container light" id="previewContainer">
+        <div class="preview-top">Section Above</div>
+        <svg class="preview-wave" id="previewWave" viewBox="0 0 1200 100" preserveAspectRatio="none">
+          <path id="wavePath" fill="#6366f1"/>
+        </svg>
+        <div class="preview-bottom" id="previewBottom">Section Below</div>
+      </div>
+
+      <div class="export-buttons">
+        <button class="export-btn" id="downloadSvg">
+          <span>⬇</span> Download SVG
+        </button>
+        <button class="export-btn secondary" id="copyCss">
+          <span>📋</span> Copy CSS
+        </button>
+        <button class="export-btn secondary" id="shareUrl">
+          <span>🔗</span> Share
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+  </footer>
+
+  <div class="toast" id="toast">Copied!</div>
+
+  <script>
+    // State
+    let state = {
+      type: 'sine',
+      height: 100,
+      amplitude: 50,
+      frequency: 2,
+      complexity: 3,
+      flip: false,
+      color: '#6366f1',
+      previewBg: 'light'
+    };
+
+    // Presets
+    const presets = {
+      smooth: { type: 'curve', height: 80, amplitude: 40, frequency: 1, complexity: 2 },
+      waves: { type: 'sine', height: 100, amplitude: 50, frequency: 2, complexity: 3 },
+      peaks: { type: 'peaks', height: 120, amplitude: 70, frequency: 3, complexity: 4 },
+      layered: { type: 'sine', height: 150, amplitude: 60, frequency: 2, complexity: 5 },
+      minimal: { type: 'curve', height: 50, amplitude: 30, frequency: 1, complexity: 1 },
+      dramatic: { type: 'peaks', height: 200, amplitude: 90, frequency: 4, complexity: 6 }
+    };
+
+    // DOM Elements
+    const heightSlider = document.getElementById('height');
+    const amplitudeSlider = document.getElementById('amplitude');
+    const frequencySlider = document.getElementById('frequency');
+    const complexitySlider = document.getElementById('complexity');
+    const flipToggle = document.getElementById('flipVertical');
+    const colorPicker = document.getElementById('waveColor');
+    const colorHex = document.getElementById('colorHex');
+    const previewWave = document.getElementById('previewWave');
+    const wavePath = document.getElementById('wavePath');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewBottom = document.getElementById('previewBottom');
+    const toast = document.getElementById('toast');
+
+    // Generate wave path
+    function generateWavePath() {
+      const width = 1200;
+      const height = state.height;
+      const amp = (state.amplitude / 100) * (height * 0.8);
+      const freq = state.frequency;
+      const complexity = state.complexity;
+      
+      let path = '';
+      
+      if (state.type === 'sine') {
+        path = generateSinePath(width, height, amp, freq, complexity);
+      } else if (state.type === 'curve') {
+        path = generateCurvePath(width, height, amp);
+      } else if (state.type === 'steps') {
+        path = generateStepsPath(width, height, amp, complexity);
+      } else if (state.type === 'peaks') {
+        path = generatePeaksPath(width, height, amp, complexity);
+      }
+      
+      return path;
+    }
+
+    function generateSinePath(width, height, amp, freq, complexity) {
+      const segments = Math.max(50, complexity * 20);
+      const points = [];
+      
+      for (let i = 0; i <= segments; i++) {
+        const x = (i / segments) * width;
+        let y = height / 2;
+        
+        // Add multiple sine waves for complexity
+        for (let j = 1; j <= complexity; j++) {
+          y += (amp / j) * Math.sin((i / segments) * Math.PI * 2 * freq * j + j);
+        }
+        
+        points.push({ x, y: Math.max(0, Math.min(height, y)) });
+      }
+      
+      let d = `M0 ${state.flip ? 0 : height}`;
+      d += ` L${points[0].x} ${points[0].y}`;
+      
+      // Smooth curve through points
+      for (let i = 1; i < points.length - 1; i++) {
+        const cp1x = points[i].x;
+        const cp1y = points[i].y;
+        const cp2x = (points[i].x + points[i + 1].x) / 2;
+        const cp2y = (points[i].y + points[i + 1].y) / 2;
+        d += ` Q${cp1x} ${cp1y} ${cp2x} ${cp2y}`;
+      }
+      
+      d += ` L${width} ${points[points.length - 1].y}`;
+      d += ` L${width} ${state.flip ? 0 : height}`;
+      d += ' Z';
+      
+      return d;
+    }
+
+    function generateCurvePath(width, height, amp) {
+      const midY = height / 2 - amp / 2;
+      const endY = state.flip ? 0 : height;
+      
+      return `M0 ${endY} L0 ${height - amp * 0.2} Q${width / 2} ${midY - amp} ${width} ${height - amp * 0.2} L${width} ${endY} Z`;
+    }
+
+    // Seeded random for consistent results
+    function seededRandom(seed) {
+      const x = Math.sin(seed) * 10000;
+      return x - Math.floor(x);
+    }
+
+    function generateStepsPath(width, height, amp, complexity) {
+      const steps = complexity + 2;
+      const stepWidth = width / steps;
+      
+      let d = `M0 ${state.flip ? 0 : height}`;
+      let currentY = height / 2;
+      
+      for (let i = 0; i <= steps; i++) {
+        const x = i * stepWidth;
+        const seed = i * 7 + complexity * 13; // deterministic seed
+        const y = height / 2 + (seededRandom(seed) - 0.5) * amp * 2;
+        
+        if (i === 0) {
+          d += ` L${x} ${y}`;
+        } else {
+          d += ` L${x} ${currentY} L${x} ${y}`;
+        }
+        currentY = y;
+      }
+      
+      d += ` L${width} ${state.flip ? 0 : height} Z`;
+      return d;
+    }
+
+    function generatePeaksPath(width, height, amp, complexity) {
+      const peaks = complexity + 2;
+      const peakWidth = width / peaks;
+      
+      let d = `M0 ${state.flip ? 0 : height}`;
+      
+      for (let i = 0; i <= peaks; i++) {
+        const x = i * peakWidth;
+        const seed = i * 11 + complexity * 17; // deterministic seed
+        const peakY = height / 2 - amp * (0.5 + seededRandom(seed) * 0.5);
+        const valleyY = height / 2 + amp * 0.3;
+        
+        if (i === 0) {
+          d += ` L${x} ${valleyY}`;
+        } else {
+          const prevX = (i - 1) * peakWidth;
+          const midX = (prevX + x) / 2;
+          d += ` L${midX} ${peakY} L${x} ${valleyY}`;
+        }
+      }
+      
+      d += ` L${width} ${state.flip ? 0 : height} Z`;
+      return d;
+    }
+
+    // Update preview
+    function updatePreview() {
+      const path = generateWavePath();
+      
+      previewWave.setAttribute('viewBox', `0 0 1200 ${state.height}`);
+      wavePath.setAttribute('d', path);
+      wavePath.setAttribute('fill', state.color);
+      
+      // Update bottom section color to match wave
+      previewBottom.style.backgroundColor = state.color;
+      previewBottom.style.color = isLightColor(state.color) ? '#1a1a2e' : '#f8f9fa';
+      
+      // Update slider values
+      document.getElementById('heightValue').textContent = `${state.height}px`;
+      document.getElementById('amplitudeValue').textContent = `${state.amplitude}%`;
+      document.getElementById('frequencyValue').textContent = state.frequency;
+      document.getElementById('complexityValue').textContent = state.complexity;
+    }
+
+    function isLightColor(hex) {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return (r * 299 + g * 587 + b * 114) / 1000 > 128;
+    }
+
+    // Event listeners
+    heightSlider.addEventListener('input', (e) => {
+      state.height = parseInt(e.target.value);
+      updatePreview();
+    });
+
+    amplitudeSlider.addEventListener('input', (e) => {
+      state.amplitude = parseInt(e.target.value);
+      updatePreview();
+    });
+
+    frequencySlider.addEventListener('input', (e) => {
+      state.frequency = parseInt(e.target.value);
+      updatePreview();
+    });
+
+    complexitySlider.addEventListener('input', (e) => {
+      state.complexity = parseInt(e.target.value);
+      updatePreview();
+    });
+
+    flipToggle.addEventListener('change', (e) => {
+      state.flip = e.target.checked;
+      updatePreview();
+    });
+
+    colorPicker.addEventListener('input', (e) => {
+      state.color = e.target.value;
+      colorHex.value = e.target.value.toUpperCase();
+      updatePreview();
+      updateColorPresets();
+    });
+
+    colorHex.addEventListener('input', (e) => {
+      const val = e.target.value;
+      if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+        state.color = val;
+        colorPicker.value = val;
+        updatePreview();
+        updateColorPresets();
+      }
+    });
+
+    // Presets
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const preset = presets[btn.dataset.preset];
+        if (preset) {
+          Object.assign(state, preset);
+          heightSlider.value = state.height;
+          amplitudeSlider.value = state.amplitude;
+          frequencySlider.value = state.frequency;
+          complexitySlider.value = state.complexity;
+          
+          document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          
+          document.querySelectorAll('.wave-type-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.type === state.type);
+          });
+          
+          updatePreview();
+        }
+      });
+    });
+
+    // Wave types
+    document.querySelectorAll('.wave-type-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.type = btn.dataset.type;
+        document.querySelectorAll('.wave-type-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        updatePreview();
+      });
+    });
+
+    // Color presets
+    function updateColorPresets() {
+      document.querySelectorAll('.color-preset').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.color === state.color);
+      });
+    }
+
+    document.querySelectorAll('.color-preset').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.color = btn.dataset.color;
+        colorPicker.value = state.color;
+        colorHex.value = state.color.toUpperCase();
+        updatePreview();
+        updateColorPresets();
+      });
+    });
+
+    // Preview background
+    document.querySelectorAll('.preview-bg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.previewBg = btn.dataset.bg;
+        previewContainer.className = `preview-container ${state.previewBg}`;
+        document.querySelectorAll('.preview-bg-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.body.dataset.theme === 'dark';
+      document.body.dataset.theme = isDark ? 'light' : 'dark';
+      themeToggle.textContent = isDark ? '🌙' : '☀️';
+    });
+
+    // Show toast
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // Download SVG
+    document.getElementById('downloadSvg').addEventListener('click', () => {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 ${state.height}" preserveAspectRatio="none">
+  <path d="${wavePath.getAttribute('d')}" fill="${state.color}"/>
+</svg>`;
+      
+      const blob = new Blob([svg], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'wave-divider.svg';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Copy CSS
+    document.getElementById('copyCss').addEventListener('click', () => {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 ${state.height}" preserveAspectRatio="none"><path d="${wavePath.getAttribute('d')}" fill="${state.color}"/></svg>`;
+      const encoded = encodeURIComponent(svg);
+      
+      const css = `.wave-divider {
+  width: 100%;
+  height: ${state.height}px;
+  background-image: url("data:image/svg+xml,${encoded}");
+  background-size: cover;
+  background-repeat: no-repeat;
+}`;
+      
+      navigator.clipboard.writeText(css);
+      showToast('CSS copied!');
+    });
+
+    // Share URL
+    document.getElementById('shareUrl').addEventListener('click', () => {
+      const params = new URLSearchParams({
+        t: state.type,
+        h: state.height,
+        a: state.amplitude,
+        f: state.frequency,
+        c: state.complexity,
+        fl: state.flip ? '1' : '0',
+        col: state.color.slice(1)
+      });
+      
+      const url = `${window.location.origin}${window.location.pathname}?${params}`;
+      navigator.clipboard.writeText(url);
+      showToast('URL copied!');
+    });
+
+    // Load from URL
+    function loadFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      
+      if (params.has('t')) state.type = params.get('t');
+      if (params.has('h')) state.height = parseInt(params.get('h'));
+      if (params.has('a')) state.amplitude = parseInt(params.get('a'));
+      if (params.has('f')) state.frequency = parseInt(params.get('f'));
+      if (params.has('c')) state.complexity = parseInt(params.get('c'));
+      if (params.has('fl')) state.flip = params.get('fl') === '1';
+      if (params.has('col')) state.color = '#' + params.get('col');
+      
+      // Update controls
+      heightSlider.value = state.height;
+      amplitudeSlider.value = state.amplitude;
+      frequencySlider.value = state.frequency;
+      complexitySlider.value = state.complexity;
+      flipToggle.checked = state.flip;
+      colorPicker.value = state.color;
+      colorHex.value = state.color.toUpperCase();
+      
+      document.querySelectorAll('.wave-type-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.type === state.type);
+      });
+      
+      updateColorPresets();
+    }
+
+    // Init
+    loadFromUrl();
+    updatePreview();
+  </script>
+</body>
+</html>
