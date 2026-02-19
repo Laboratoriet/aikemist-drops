@@ -939,18 +939,27 @@
         totalWidth = 1200;
         totalHeight = 630;
       } else {
-        const [w, h] = state.aspect.split(':').map(Number);
-        const minDim = Math.max(contentWidth + padding * 2, contentHeight + padding * 2);
-        if (w > h) {
-          totalWidth = Math.max(minDim, contentWidth + padding * 2);
-          totalHeight = totalWidth * (h / w);
-        } else {
-          totalHeight = Math.max(minDim, contentHeight + padding * 2);
-          totalWidth = totalHeight * (w / h);
+        // Parse aspect ratio (e.g., "16:9" -> 16/9)
+        const [aw, ah] = state.aspect.split(':').map(Number);
+        const aspectRatio = aw / ah;
+        
+        // Start with minimum size that fits content
+        const minWidth = contentWidth + padding * 2;
+        const minHeight = contentHeight + padding * 2;
+        
+        // Calculate dimensions maintaining aspect ratio
+        // Try fitting by width first
+        let tryWidth = minWidth;
+        let tryHeight = tryWidth / aspectRatio;
+        
+        // If height is too small, fit by height instead
+        if (tryHeight < minHeight) {
+          tryHeight = minHeight;
+          tryWidth = tryHeight * aspectRatio;
         }
-        // Ensure content fits
-        totalWidth = Math.max(totalWidth, contentWidth + padding * 2);
-        totalHeight = Math.max(totalHeight, contentHeight + padding * 2);
+        
+        totalWidth = Math.round(tryWidth);
+        totalHeight = Math.round(tryHeight);
       }
 
       canvas.width = totalWidth;
