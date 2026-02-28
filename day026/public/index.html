@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typography Scale Calculator — Alkemist</title>
+  <meta name="description" content="Generate harmonious typography scales for your design system. CSS custom properties, Tailwind, SCSS exports.">
+  <meta property="og:title" content="Typography Scale Calculator — Alkemist">
+  <meta property="og:description" content="Generate harmonious typography scales for your design system.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://day026.aikemist.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --surface-hover: #f5f5f5;
+      --border: #e5e5e5;
+      --text: #171717;
+      --text-muted: #737373;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --surface: #171717;
+      --surface-hover: #262626;
+      --border: #262626;
+      --text: #fafafa;
+      --text-muted: #a3a3a3;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+    
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--gradient);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+      font-size: 14px;
+    }
+    
+    .logo-text {
+      font-weight: 600;
+      font-size: 1.125rem;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    
+    .theme-toggle {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, background 0.2s ease;
+      overflow: hidden;
+    }
+    
+    [data-theme="dark"] .theme-toggle {
+      background: rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    [data-theme="dark"] .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:active {
+      transform: scale(0.95);
+    }
+    
+    .theme-toggle-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .theme-toggle-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .theme-toggle-icon .sun-icon {
+      color: #facc15;
+    }
+    
+    .theme-toggle-icon .moon-icon {
+      color: #64748b;
+    }
+    
+    [data-theme="dark"] .theme-toggle-icon {
+      transform: rotate(180deg);
+    }
+    
+    /* Main Layout */
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .hero {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    
+    .hero p {
+      color: var(--text-muted);
+      font-size: 1.125rem;
+    }
+    
+    .layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 2rem;
+    }
+    
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .preview-panel {
+        order: -1;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .header {
+        padding: 1rem;
+      }
+      .main {
+        padding: 1rem;
+      }
+      .preview-panel, .controls-panel {
+        padding: 1rem;
+      }
+      .presets-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+      }
+      .controls-section {
+        padding: 1rem;
+      }
+      .scale-preview {
+        padding: 1rem;
+      }
+      .scale-step {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
+      .scale-step-label {
+        min-width: auto;
+      }
+      .export-tabs {
+        flex-wrap: wrap;
+      }
+      .export-tab {
+        flex: 1;
+        min-width: 70px;
+      }
+      .footer {
+        padding: 2rem 1rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+    
+    /* Controls Panel */
+    .controls-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      height: fit-content;
+      position: sticky;
+      top: 2rem;
+    }
+    
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .control-label {
+      font-weight: 500;
+      font-size: 0.875rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .control-value {
+      color: var(--text-muted);
+      font-weight: 400;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+    }
+    
+    .slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      outline: none;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+    
+    select {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-size: 0.9375rem;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    .input-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    .input-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+    
+    .input-group label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    
+    .input-group input {
+      padding: 0.625rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+    }
+    
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    /* Scale Presets */
+    .scale-presets {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+    }
+    
+    .scale-preset {
+      padding: 0.625rem 0.75rem;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+    }
+    
+    .scale-preset:hover {
+      background: var(--surface-hover);
+      border-color: var(--text-muted);
+    }
+    
+    .scale-preset.active {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.1);
+    }
+    
+    .scale-preset-name {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      display: block;
+    }
+    
+    .scale-preset-ratio {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .custom-ratio {
+      margin-top: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .custom-ratio label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    
+    .custom-ratio input {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+    }
+    
+    .custom-ratio input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    /* Preview Area */
+    .preview-area {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .preview-title {
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    
+    .preview-tabs {
+      display: flex;
+      gap: 0.25rem;
+      background: var(--surface-hover);
+      padding: 0.25rem;
+      border-radius: 8px;
+    }
+    
+    .preview-tab {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Jost', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .preview-tab:hover {
+      color: var(--text);
+    }
+    
+    .preview-tab.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .preview-content {
+      padding: 2rem;
+    }
+    
+    .scale-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .scale-step {
+      display: grid;
+      grid-template-columns: 80px 80px 1fr;
+      gap: 1rem;
+      align-items: baseline;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .scale-step:last-child {
+      border-bottom: none;
+    }
+    
+    .step-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    
+    .step-size {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      font-weight: 500;
+    }
+    
+    .step-preview {
+      font-weight: 500;
+      line-height: 1.2;
+      transition: font-size 0.3s ease;
+    }
+    
+    /* Code Output */
+    .code-section {
+      display: none;
+    }
+    
+    .code-section.active {
+      display: block;
+    }
+    
+    .code-output {
+      background: #1e1e1e;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: #2d2d2d;
+    }
+    
+    .code-lang {
+      font-size: 0.75rem;
+      color: #888;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+    
+    .code-copy {
+      padding: 0.375rem 0.75rem;
+      background: #404040;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .code-copy:hover {
+      background: #505050;
+    }
+    
+    .code-copy.copied {
+      background: #22c55e;
+    }
+    
+    .code-body {
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: #d4d4d4;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre;
+    }
+    
+    .code-body .comment { color: #6a9955; }
+    .code-body .property { color: #9cdcfe; }
+    .code-body .value { color: #ce9178; }
+    .code-body .number { color: #b5cea8; }
+    
+    /* Export Tabs */
+    .export-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .export-tab {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .export-tab:hover {
+      background: var(--surface-hover);
+    }
+    
+    .export-tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    /* Buttons */
+    .btn {
+      padding: 0.875rem 1.5rem;
+      border-radius: 10px;
+      font-family: 'Jost', sans-serif;
+      font-weight: 600;
+      font-size: 0.9375rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      width: 100%;
+    }
+    
+    .btn-primary {
+      background: var(--gradient);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+    
+    .btn-secondary {
+      background: var(--surface-hover);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+    
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    .btn-row .btn {
+      flex: 1;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    .footer a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Pro Teaser */
+    .pro-teaser {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(217, 70, 239, 0.1));
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+    
+    .pro-teaser h4 {
+      font-size: 0.9375rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+    
+    .pro-teaser p {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.875rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 0.9375rem;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
+    /* Unit selector */
+    .unit-toggle {
+      display: flex;
+      gap: 0.25rem;
+      background: var(--surface-hover);
+      padding: 0.25rem;
+      border-radius: 8px;
+    }
+    
+    .unit-btn {
+      padding: 0.375rem 0.75rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .unit-btn:hover {
+      color: var(--text);
+    }
+    
+    .unit-btn.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <a href="https://aikemist.com" class="logo">
+      <div class="logo-icon">A</div>
+      <span class="logo-text">aikemist.com</span>
+    </a>
+    <div class="header-actions">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+        <div class="theme-toggle-icon">
+          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="m4.93 4.93 1.41 1.41"></path>
+            <path d="m17.66 17.66 1.41 1.41"></path>
+            <path d="M2 12h2"></path>
+            <path d="M20 12h2"></path>
+            <path d="m6.34 17.66-1.41 1.41"></path>
+            <path d="m19.07 4.93-1.41 1.41"></path>
+          </svg>
+          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </div>
+      </button>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="hero">
+      <h1>Typography Scale</h1>
+      <p>Generate harmonious type scales for your design system.</p>
+    </div>
+
+    <div class="layout">
+      <div class="controls-panel">
+        <div class="control-group">
+          <label class="control-label">Scale Ratio</label>
+          <div class="scale-presets">
+            <button class="scale-preset" data-ratio="1.067" onclick="setRatio(1.067)">
+              <span class="scale-preset-name">Minor Second</span>
+              <span class="scale-preset-ratio">1.067</span>
+            </button>
+            <button class="scale-preset" data-ratio="1.125" onclick="setRatio(1.125)">
+              <span class="scale-preset-name">Major Second</span>
+              <span class="scale-preset-ratio">1.125</span>
+            </button>
+            <button class="scale-preset" data-ratio="1.2" onclick="setRatio(1.2)">
+              <span class="scale-preset-name">Minor Third</span>
+              <span class="scale-preset-ratio">1.200</span>
+            </button>
+            <button class="scale-preset active" data-ratio="1.25" onclick="setRatio(1.25)">
+              <span class="scale-preset-name">Major Third</span>
+              <span class="scale-preset-ratio">1.250</span>
+            </button>
+            <button class="scale-preset" data-ratio="1.333" onclick="setRatio(1.333)">
+              <span class="scale-preset-name">Perfect Fourth</span>
+              <span class="scale-preset-ratio">1.333</span>
+            </button>
+            <button class="scale-preset" data-ratio="1.414" onclick="setRatio(1.414)">
+              <span class="scale-preset-name">Aug. Fourth</span>
+              <span class="scale-preset-ratio">1.414</span>
+            </button>
+            <button class="scale-preset" data-ratio="1.5" onclick="setRatio(1.5)">
+              <span class="scale-preset-name">Perfect Fifth</span>
+              <span class="scale-preset-ratio">1.500</span>
+            </button>
+            <button class="scale-preset" data-ratio="1.618" onclick="setRatio(1.618)">
+              <span class="scale-preset-name">Golden Ratio</span>
+              <span class="scale-preset-ratio">1.618</span>
+            </button>
+          </div>
+          <div class="custom-ratio">
+            <label>Custom ratio</label>
+            <input type="number" id="customRatio" step="0.001" min="1" max="3" placeholder="1.250" onchange="setCustomRatio(this.value)">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            Base Size
+            <span class="control-value" id="baseValue">16px</span>
+          </label>
+          <input type="range" class="slider" id="baseSlider" min="12" max="24" value="16" oninput="setBase(this.value)">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Preview Font</label>
+          <select id="fontSelect" onchange="setFont(this.value)">
+            <option value="Inter">Inter</option>
+            <option value="Jost">Jost</option>
+            <option value="Space Grotesk">Space Grotesk</option>
+            <option value="Playfair Display">Playfair Display</option>
+            <option value="system-ui">System UI</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            Line Height
+            <span class="control-value" id="lineHeightValue">1.5</span>
+          </label>
+          <input type="range" class="slider" id="lineHeightSlider" min="1" max="2" step="0.1" value="1.5" oninput="setLineHeight(this.value)">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Output Unit</label>
+          <div class="unit-toggle">
+            <button class="unit-btn active" data-unit="rem" onclick="setUnit('rem')">rem</button>
+            <button class="unit-btn" data-unit="px" onclick="setUnit('px')">px</button>
+            <button class="unit-btn" data-unit="em" onclick="setUnit('em')">em</button>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="copyCode()">📋 Copy Code</button>
+          <button class="btn btn-secondary" onclick="shareURL()">🔗 Share</button>
+        </div>
+
+      </div>
+
+      <div class="preview-area">
+        <div class="preview-header">
+          <span class="preview-title">Preview</span>
+          <div class="preview-tabs">
+            <button class="preview-tab active" data-view="visual" onclick="setView('visual')">Visual</button>
+            <button class="preview-tab" data-view="code" onclick="setView('code')">Code</button>
+          </div>
+        </div>
+        
+        <div class="preview-content">
+          <div id="visualView" class="scale-preview">
+            <!-- Scale steps injected by JS -->
+          </div>
+          
+          <div id="codeView" class="code-section">
+            <div class="export-tabs">
+              <button class="export-tab active" data-format="css" onclick="setFormat('css')">CSS</button>
+              <button class="export-tab" data-format="tailwind" onclick="setFormat('tailwind')">Tailwind</button>
+              <button class="export-tab" data-format="scss" onclick="setFormat('scss')">SCSS</button>
+              <button class="export-tab" data-format="json" onclick="setFormat('json')">JSON</button>
+            </div>
+            
+            <div class="code-output">
+              <div class="code-header">
+                <span class="code-lang" id="codeLang">CSS</span>
+                <button class="code-copy" onclick="copyCode()">Copy</button>
+              </div>
+              <pre class="code-body" id="codeOutput"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+  </footer>
+
+  <div class="toast" id="toast">Copied!</div>
+
+  <script>
+    const scaleSteps = [
+      { name: 'xs', label: 'Extra Small', level: -2 },
+      { name: 'sm', label: 'Small', level: -1 },
+      { name: 'base', label: 'Base', level: 0 },
+      { name: 'lg', label: 'Large', level: 1 },
+      { name: 'xl', label: 'Extra Large', level: 2 },
+      { name: '2xl', label: '2X Large', level: 3 },
+      { name: '3xl', label: '3X Large', level: 4 },
+      { name: '4xl', label: '4X Large', level: 5 },
+      { name: '5xl', label: '5X Large', level: 6 },
+    ];
+    
+    let state = {
+      ratio: 1.25,
+      base: 16,
+      lineHeight: 1.5,
+      font: 'Inter',
+      unit: 'rem',
+      view: 'visual',
+      format: 'css'
+    };
+    
+    function init() {
+      loadFromURL();
+      updatePreview();
+      updateCode();
+      applyTheme();
+    }
+    
+    function calculateSize(level) {
+      const size = state.base * Math.pow(state.ratio, level);
+      return Math.round(size * 100) / 100;
+    }
+    
+    function formatSize(px) {
+      switch (state.unit) {
+        case 'rem':
+          return (px / 16).toFixed(3).replace(/\.?0+$/, '') + 'rem';
+        case 'em':
+          return (px / state.base).toFixed(3).replace(/\.?0+$/, '') + 'em';
+        default:
+          return Math.round(px) + 'px';
+      }
+    }
+    
+    function setRatio(ratio) {
+      state.ratio = ratio;
+      document.querySelectorAll('.scale-preset').forEach(p => {
+        p.classList.toggle('active', parseFloat(p.dataset.ratio) === ratio);
+      });
+      document.getElementById('customRatio').value = '';
+      updatePreview();
+      updateCode();
+      updateURL();
+    }
+    
+    function setCustomRatio(value) {
+      const ratio = parseFloat(value);
+      if (ratio >= 1 && ratio <= 3) {
+        state.ratio = ratio;
+        document.querySelectorAll('.scale-preset').forEach(p => p.classList.remove('active'));
+        updatePreview();
+        updateCode();
+        updateURL();
+      }
+    }
+    
+    function setLineHeight(value) {
+      state.lineHeight = parseFloat(value);
+      document.getElementById('lineHeightValue').textContent = value;
+      updatePreview();
+      updateCode();
+      updateURL();
+    }
+    
+    function setBase(base) {
+      state.base = parseInt(base);
+      document.getElementById('baseValue').textContent = base + 'px';
+      updatePreview();
+      updateCode();
+      updateURL();
+    }
+    
+    function setFont(font) {
+      state.font = font;
+      updatePreview();
+    }
+    
+    function setUnit(unit) {
+      state.unit = unit;
+      document.querySelectorAll('.unit-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.unit === unit);
+      });
+      updatePreview();
+      updateCode();
+      updateURL();
+    }
+    
+    function setView(view) {
+      state.view = view;
+      document.querySelectorAll('.preview-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.view === view);
+      });
+      document.getElementById('visualView').style.display = view === 'visual' ? 'flex' : 'none';
+      document.getElementById('codeView').style.display = view === 'code' ? 'block' : 'none';
+      document.getElementById('codeView').classList.toggle('active', view === 'code');
+    }
+    
+    function setFormat(format) {
+      state.format = format;
+      document.querySelectorAll('.export-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.format === format);
+      });
+      document.getElementById('codeLang').textContent = format.toUpperCase();
+      updateCode();
+    }
+    
+    const previewTexts = [
+      'Body text for reading',
+      'Slightly larger text',
+      'The quick brown fox',
+      'Section Heading',
+      'Page Title',
+      'Hero Headline',
+      'Display',
+      'Giant',
+      'Massive'
+    ];
+    
+    function updatePreview() {
+      const container = document.getElementById('visualView');
+      container.innerHTML = scaleSteps.map((step, i) => {
+        const px = calculateSize(step.level);
+        const formatted = formatSize(px);
+        return `
+          <div class="scale-step">
+            <span class="step-name">${step.name}</span>
+            <span class="step-size">${formatted}</span>
+            <span class="step-preview" style="font-size: ${px}px; font-family: '${state.font}', sans-serif; line-height: ${state.lineHeight};">
+              ${previewTexts[i] || 'Preview text'}
+            </span>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function generateCSS() {
+      let css = `/* Typography Scale */\n/* Ratio: ${state.ratio} | Base: ${state.base}px | Line Height: ${state.lineHeight} */\n\n:root {\n`;
+      css += `  /* Font sizes */\n`;
+      scaleSteps.forEach(step => {
+        const px = calculateSize(step.level);
+        const formatted = formatSize(px);
+        css += `  --font-size-${step.name}: ${formatted};\n`;
+      });
+      css += `\n  /* Line height */\n`;
+      css += `  --line-height: ${state.lineHeight};\n`;
+      css += `}\n`;
+      return css;
+    }
+    
+    function generateTailwind() {
+      let config = `// tailwind.config.js\n// Ratio: ${state.ratio} | Base: ${state.base}px | Line Height: ${state.lineHeight}\n\nmodule.exports = {\n  theme: {\n    fontSize: {\n`;
+      scaleSteps.forEach(step => {
+        const px = calculateSize(step.level);
+        const formatted = formatSize(px);
+        const lh = (px * state.lineHeight).toFixed(0);
+        config += `      '${step.name}': ['${formatted}', { lineHeight: '${lh}px' }],\n`;
+      });
+      config += `    },\n  },\n};\n`;
+      return config;
+    }
+    
+    function generateSCSS() {
+      let scss = `// Typography Scale\n// Ratio: ${state.ratio} | Base: ${state.base}px\n\n`;
+      scaleSteps.forEach(step => {
+        const px = calculateSize(step.level);
+        const formatted = formatSize(px);
+        scss += `$font-size-${step.name}: ${formatted};\n`;
+      });
+      scss += `\n// Map for iteration\n$font-sizes: (\n`;
+      scaleSteps.forEach((step, i) => {
+        const px = calculateSize(step.level);
+        const formatted = formatSize(px);
+        scss += `  '${step.name}': ${formatted}${i < scaleSteps.length - 1 ? ',' : ''}\n`;
+      });
+      scss += `);\n`;
+      return scss;
+    }
+    
+    function generateJSON() {
+      const obj = {
+        meta: {
+          ratio: state.ratio,
+          base: state.base,
+          unit: state.unit
+        },
+        sizes: {}
+      };
+      scaleSteps.forEach(step => {
+        const px = calculateSize(step.level);
+        obj.sizes[step.name] = {
+          value: formatSize(px),
+          px: Math.round(px)
+        };
+      });
+      return JSON.stringify(obj, null, 2);
+    }
+    
+    function updateCode() {
+      let code;
+      switch (state.format) {
+        case 'tailwind':
+          code = generateTailwind();
+          break;
+        case 'scss':
+          code = generateSCSS();
+          break;
+        case 'json':
+          code = generateJSON();
+          break;
+        default:
+          code = generateCSS();
+      }
+      document.getElementById('codeOutput').textContent = code;
+    }
+    
+    function copyCode() {
+      let code;
+      switch (state.format) {
+        case 'tailwind':
+          code = generateTailwind();
+          break;
+        case 'scss':
+          code = generateSCSS();
+          break;
+        case 'json':
+          code = generateJSON();
+          break;
+        default:
+          code = generateCSS();
+      }
+      navigator.clipboard.writeText(code);
+      showToast('Copied!');
+      
+      const btn = document.querySelector('.code-copy');
+      if (btn) {
+        btn.classList.add('copied');
+        btn.textContent = 'Copied!';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.textContent = 'Copy';
+        }, 2000);
+      }
+    }
+    
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+    
+    function updateURL() {
+      const params = new URLSearchParams();
+      params.set('r', state.ratio);
+      params.set('b', state.base);
+      params.set('lh', state.lineHeight);
+      params.set('u', state.unit);
+      history.replaceState(null, '', '?' + params.toString());
+    }
+    
+    function loadFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('r')) {
+        state.ratio = parseFloat(params.get('r'));
+        document.querySelectorAll('.scale-preset').forEach(p => {
+          p.classList.toggle('active', parseFloat(p.dataset.ratio) === state.ratio);
+        });
+        // Check if it's a custom ratio not in presets
+        const isPreset = Array.from(document.querySelectorAll('.scale-preset')).some(p => parseFloat(p.dataset.ratio) === state.ratio);
+        if (!isPreset) {
+          document.getElementById('customRatio').value = state.ratio;
+        }
+      }
+      if (params.has('b')) {
+        state.base = parseInt(params.get('b'));
+        document.getElementById('baseSlider').value = state.base;
+        document.getElementById('baseValue').textContent = state.base + 'px';
+      }
+      if (params.has('lh')) {
+        state.lineHeight = parseFloat(params.get('lh'));
+        document.getElementById('lineHeightSlider').value = state.lineHeight;
+        document.getElementById('lineHeightValue').textContent = state.lineHeight;
+      }
+      if (params.has('u')) {
+        state.unit = params.get('u');
+        document.querySelectorAll('.unit-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.unit === state.unit);
+        });
+      }
+    }
+    
+    function shareURL() {
+      updateURL();
+      navigator.clipboard.writeText(window.location.href);
+      showToast('Link copied!');
+    }
+    
+    function toggleTheme() {
+      const isDark = document.body.dataset.theme === 'dark';
+      document.body.dataset.theme = isDark ? 'light' : 'dark';
+      updateThemeIcon();
+      localStorage.setItem('theme', document.body.dataset.theme);
+    }
+    
+    function updateThemeIcon() {
+      const isDark = document.body.dataset.theme === 'dark';
+      document.querySelector('.sun-icon').style.display = isDark ? 'block' : 'none';
+      document.querySelector('.moon-icon').style.display = isDark ? 'none' : 'block';
+    }
+    
+    function applyTheme() {
+      const saved = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = saved || (prefersDark ? 'dark' : 'light');
+      document.body.dataset.theme = theme;
+      updateThemeIcon();
+    }
+    
+    init();
+  </script>
+</body>
+</html>

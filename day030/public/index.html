@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrollbar Styler | Alkemist</title>
+    <meta name="description" content="Design custom CSS scrollbars visually. Generate cross-browser scrollbar styles instantly.">
+    <meta property="og:title" content="Scrollbar Styler | Alkemist">
+    <meta property="og:description" content="Design custom CSS scrollbars visually. Cross-browser support.">
+    <meta property="og:image" content="https://day030.aikemist.com/og.png">
+    <meta property="og:url" content="https://day030.aikemist.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #0a0a0a;
+            --bg-subtle: #111;
+            --bg-card: #161616;
+            --border: #2a2a2a;
+            --text: #f5f5f5;
+            --text-muted: #888;
+            --accent: #7c3aed;
+            --accent-hover: #8b5cf6;
+            --success: #10b981;
+            --font: 'Jost', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+        
+        [data-theme="light"] {
+            --bg: #fafafa;
+            --bg-subtle: #f0f0f0;
+            --bg-card: #fff;
+            --border: #e0e0e0;
+            --text: #1a1a1a;
+            --text-muted: #666;
+        }
+        
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.15s;
+        }
+        
+        .theme-toggle:hover {
+            border-color: var(--accent);
+        }
+        
+        /* Main */
+        .main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 800px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Controls */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .control-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+        
+        /* Presets */
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .preset-btn {
+            padding: 0.625rem 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        
+        .preset-btn:hover {
+            border-color: var(--accent);
+        }
+        
+        .preset-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        /* Color inputs */
+        .color-row {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .color-picker {
+            width: 48px;
+            height: 36px;
+            border-radius: 6px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .color-picker input {
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .color-hex {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-card);
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 0.8125rem;
+            text-transform: uppercase;
+        }
+        
+        .color-hex:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        /* Sliders */
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .slider-row input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        .slider-row input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2px solid var(--bg);
+            cursor: pointer;
+        }
+        
+        .slider-value {
+            min-width: 50px;
+            padding: 0.375rem 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            text-align: center;
+        }
+        
+        /* Preview Area */
+        .preview-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .preview-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .preview-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 0.9375rem;
+        }
+        
+        .scroll-demo {
+            flex: 1;
+            overflow-y: scroll;
+            padding: 1rem;
+            background: var(--bg-subtle);
+            border-radius: 10px;
+            /* Custom scrollbar styles injected via JS */
+        }
+        
+        .scroll-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .scroll-item {
+            padding: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+        
+        .scroll-item h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .scroll-item p {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+        
+        /* Code output */
+        .code-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .code-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .code-title {
+            font-weight: 600;
+            font-size: 0.9375rem;
+        }
+        
+        .copy-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: all 0.15s;
+        }
+        
+        .copy-btn:hover {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        .copy-btn.copied {
+            border-color: var(--success);
+            background: var(--success);
+            color: #fff;
+        }
+        
+        .code-content {
+            padding: 1.25rem;
+            overflow-x: auto;
+        }
+        
+        .code-content pre {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+        
+        .code-content .comment { color: var(--text-muted); }
+        .code-content .selector { color: #f59e0b; }
+        .code-content .property { color: var(--accent); }
+        .code-content .value { color: var(--success); }
+        
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.15s;
+        }
+        
+        .action-btn:hover {
+            border-color: var(--accent);
+        }
+        
+        /* Pro teaser */
+        .pro-teaser {
+            padding: 1.25rem;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 12px;
+        }
+        
+        .pro-badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            background: var(--accent);
+            color: #fff;
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .pro-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .pro-desc {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+        
+        /* Footer */
+        .footer {
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 2rem;
+        }
+        
+        .footer a {
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            color: var(--accent);
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 0.75rem 1.25rem;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Browser note */
+        .browser-note {
+            padding: 0.75rem 1rem;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
+            font-size: 0.8125rem;
+            color: #f59e0b;
+            margin-top: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="https://aikemist.com" class="logo">
+            <div class="logo-icon">A</div>
+            <span>Scrollbar Styler</span>
+        </a>
+        <div class="header-actions">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <aside class="controls">
+            <div class="control-group">
+                <span class="control-label">Presets</span>
+                <div class="presets">
+                    <button class="preset-btn active" data-preset="minimal">Minimal</button>
+                    <button class="preset-btn" data-preset="rounded">Rounded</button>
+                    <button class="preset-btn" data-preset="accent">Accent</button>
+                    <button class="preset-btn" data-preset="dark">Dark</button>
+                    <button class="preset-btn" data-preset="light">Light</button>
+                    <button class="preset-btn" data-preset="hidden">Hidden</button>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label">Track Color</span>
+                <div class="color-row">
+                    <div class="color-picker" id="track-preview">
+                        <input type="color" id="track-color" value="#1a1a1a">
+                    </div>
+                    <input type="text" class="color-hex" id="track-hex" value="#1A1A1A" maxlength="7">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label">Thumb Color</span>
+                <div class="color-row">
+                    <div class="color-picker" id="thumb-preview">
+                        <input type="color" id="thumb-color" value="#7c3aed">
+                    </div>
+                    <input type="text" class="color-hex" id="thumb-hex" value="#7C3AED" maxlength="7">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label">Thumb Hover</span>
+                <div class="color-row">
+                    <div class="color-picker" id="hover-preview">
+                        <input type="color" id="hover-color" value="#8b5cf6">
+                    </div>
+                    <input type="text" class="color-hex" id="hover-hex" value="#8B5CF6" maxlength="7">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label">Width</span>
+                <div class="slider-row">
+                    <input type="range" id="width" min="4" max="20" value="8">
+                    <span class="slider-value" id="width-value">8px</span>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label">Border Radius</span>
+                <div class="slider-row">
+                    <input type="range" id="radius" min="0" max="10" value="4">
+                    <span class="slider-value" id="radius-value">4px</span>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button class="action-btn" onclick="shareUrl()">🔗 Share</button>
+                <button class="action-btn" onclick="resetToDefault()">↺ Reset</button>
+            </div>
+            
+            <div class="pro-teaser">
+                <span class="pro-badge">Pro</span>
+                <h3 class="pro-title">Advanced Scrollbars</h3>
+                <p class="pro-desc">Shadows, gradients, Firefox support, horizontal scrollbars</p>
+            </div>
+        </aside>
+
+        <section class="preview-area">
+            <div class="preview-box">
+                <div class="preview-title">Live Preview</div>
+                <div class="scroll-demo" id="scroll-demo">
+                    <div class="scroll-content">
+                        <div class="scroll-item">
+                            <h4>Custom Scrollbars</h4>
+                            <p>Design scrollbars that match your website's aesthetic. Scroll to see it in action.</p>
+                        </div>
+                        <div class="scroll-item">
+                            <h4>WebKit Support</h4>
+                            <p>Works in Chrome, Safari, Edge, and other WebKit-based browsers.</p>
+                        </div>
+                        <div class="scroll-item">
+                            <h4>Easy Integration</h4>
+                            <p>Copy the generated CSS and add it to your stylesheet. It's that simple.</p>
+                        </div>
+                        <div class="scroll-item">
+                            <h4>Customizable</h4>
+                            <p>Adjust colors, width, and border radius to match your design system.</p>
+                        </div>
+                        <div class="scroll-item">
+                            <h4>Hover States</h4>
+                            <p>The thumb changes color on hover for better interactivity feedback.</p>
+                        </div>
+                        <div class="scroll-item">
+                            <h4>Minimal by Default</h4>
+                            <p>Start with a clean, minimal scrollbar and customize from there.</p>
+                        </div>
+                        <div class="scroll-item">
+                            <h4>Keep Scrolling</h4>
+                            <p>There's more content below to demonstrate the scrollbar behavior.</p>
+                        </div>
+                        <div class="scroll-item">
+                            <h4>Almost There</h4>
+                            <p>Just a bit more content to make sure the scrollbar is visible and working.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="browser-note">
+                    ⚠️ Custom scrollbars use WebKit-specific CSS. Firefox has limited support via scrollbar-color/width.
+                </div>
+            </div>
+            
+            <div class="code-section">
+                <div class="code-header">
+                    <span class="code-title">CSS Output</span>
+                    <button class="copy-btn" onclick="copyCode()">
+                        <span>📋</span> Copy
+                    </button>
+                </div>
+                <div class="code-content">
+                    <pre id="code-output"></pre>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+    
+    <div class="toast" id="toast">Copied!</div>
+
+    <script>
+        // State
+        let state = {
+            trackColor: '#1a1a1a',
+            thumbColor: '#7c3aed',
+            hoverColor: '#8b5cf6',
+            width: 8,
+            radius: 4
+        };
+        
+        // Presets
+        const presets = {
+            minimal: { trackColor: '#1a1a1a', thumbColor: '#7c3aed', hoverColor: '#8b5cf6', width: 8, radius: 4 },
+            rounded: { trackColor: '#e5e7eb', thumbColor: '#6b7280', hoverColor: '#4b5563', width: 10, radius: 10 },
+            accent: { trackColor: '#1e1b4b', thumbColor: '#7c3aed', hoverColor: '#a855f7', width: 12, radius: 6 },
+            dark: { trackColor: '#0a0a0a', thumbColor: '#333', hoverColor: '#555', width: 8, radius: 4 },
+            light: { trackColor: '#f5f5f5', thumbColor: '#ccc', hoverColor: '#999', width: 8, radius: 4 },
+            hidden: { trackColor: 'transparent', thumbColor: 'transparent', hoverColor: 'transparent', width: 4, radius: 0 }
+        };
+        
+        // Update scrollbar styles
+        function updateScrollbar() {
+            const demo = document.getElementById('scroll-demo');
+            const styleId = 'custom-scrollbar';
+            
+            // Remove existing style
+            const existing = document.getElementById(styleId);
+            if (existing) existing.remove();
+            
+            // Create new style
+            const style = document.createElement('style');
+            style.id = styleId;
+            style.textContent = `
+                #scroll-demo::-webkit-scrollbar {
+                    width: ${state.width}px;
+                }
+                #scroll-demo::-webkit-scrollbar-track {
+                    background: ${state.trackColor};
+                    border-radius: ${state.radius}px;
+                }
+                #scroll-demo::-webkit-scrollbar-thumb {
+                    background: ${state.thumbColor};
+                    border-radius: ${state.radius}px;
+                }
+                #scroll-demo::-webkit-scrollbar-thumb:hover {
+                    background: ${state.hoverColor};
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Update color previews
+            document.getElementById('track-preview').style.background = state.trackColor;
+            document.getElementById('thumb-preview').style.background = state.thumbColor;
+            document.getElementById('hover-preview').style.background = state.hoverColor;
+        }
+        
+        // Generate code
+        function generateCode() {
+            const code = `<span class="comment">/* Custom Scrollbar */</span>
+<span class="selector">.scrollable</span> {
+  <span class="comment">/* Firefox */</span>
+  <span class="property">scrollbar-width</span>: <span class="value">${state.width <= 8 ? 'thin' : 'auto'}</span>;
+  <span class="property">scrollbar-color</span>: <span class="value">${state.thumbColor} ${state.trackColor}</span>;
+}
+
+<span class="comment">/* Chrome, Edge, Safari */</span>
+<span class="selector">.scrollable::-webkit-scrollbar</span> {
+  <span class="property">width</span>: <span class="value">${state.width}px</span>;
+}
+
+<span class="selector">.scrollable::-webkit-scrollbar-track</span> {
+  <span class="property">background</span>: <span class="value">${state.trackColor}</span>;
+  <span class="property">border-radius</span>: <span class="value">${state.radius}px</span>;
+}
+
+<span class="selector">.scrollable::-webkit-scrollbar-thumb</span> {
+  <span class="property">background</span>: <span class="value">${state.thumbColor}</span>;
+  <span class="property">border-radius</span>: <span class="value">${state.radius}px</span>;
+}
+
+<span class="selector">.scrollable::-webkit-scrollbar-thumb:hover</span> {
+  <span class="property">background</span>: <span class="value">${state.hoverColor}</span>;
+}`;
+            
+            document.getElementById('code-output').innerHTML = code;
+        }
+        
+        // Copy code
+        function copyCode() {
+            const plainCode = `/* Custom Scrollbar */
+.scrollable {
+  /* Firefox */
+  scrollbar-width: ${state.width <= 8 ? 'thin' : 'auto'};
+  scrollbar-color: ${state.thumbColor} ${state.trackColor};
+}
+
+/* Chrome, Edge, Safari */
+.scrollable::-webkit-scrollbar {
+  width: ${state.width}px;
+}
+
+.scrollable::-webkit-scrollbar-track {
+  background: ${state.trackColor};
+  border-radius: ${state.radius}px;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background: ${state.thumbColor};
+  border-radius: ${state.radius}px;
+}
+
+.scrollable::-webkit-scrollbar-thumb:hover {
+  background: ${state.hoverColor};
+}`;
+            
+            navigator.clipboard.writeText(plainCode);
+            const btn = document.querySelector('.copy-btn');
+            btn.classList.add('copied');
+            btn.innerHTML = '<span>✓</span> Copied!';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.innerHTML = '<span>📋</span> Copy';
+            }, 2000);
+        }
+        
+        // Apply preset
+        function applyPreset(name) {
+            const preset = presets[name];
+            if (!preset) return;
+            
+            state = { ...preset };
+            
+            // Update inputs
+            document.getElementById('track-color').value = state.trackColor;
+            document.getElementById('track-hex').value = state.trackColor.toUpperCase();
+            document.getElementById('thumb-color').value = state.thumbColor;
+            document.getElementById('thumb-hex').value = state.thumbColor.toUpperCase();
+            document.getElementById('hover-color').value = state.hoverColor;
+            document.getElementById('hover-hex').value = state.hoverColor.toUpperCase();
+            document.getElementById('width').value = state.width;
+            document.getElementById('width-value').textContent = state.width + 'px';
+            document.getElementById('radius').value = state.radius;
+            document.getElementById('radius-value').textContent = state.radius + 'px';
+            
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.preset === name);
+            });
+            
+            updateScrollbar();
+            generateCode();
+        }
+        
+        // Reset
+        function resetToDefault() {
+            applyPreset('minimal');
+        }
+        
+        // Share URL
+        function shareUrl() {
+            const params = new URLSearchParams({
+                t: state.trackColor.replace('#', ''),
+                th: state.thumbColor.replace('#', ''),
+                h: state.hoverColor.replace('#', ''),
+                w: state.width,
+                r: state.radius
+            });
+            const url = `${window.location.origin}${window.location.pathname}?${params}`;
+            navigator.clipboard.writeText(url);
+            showToast('Link copied!');
+        }
+        
+        // Toast
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            document.querySelector('.theme-icon').textContent = next === 'light' ? '☀️' : '🌙';
+            localStorage.setItem('theme', next);
+        }
+        
+        // Validate hex
+        function isValidHex(hex) {
+            return /^#[0-9A-Fa-f]{6}$/.test(hex);
+        }
+        
+        // Initialize
+        function init() {
+            // Load theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.querySelector('.theme-icon').textContent = savedTheme === 'light' ? '☀️' : '🌙';
+            
+            // Load from URL
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('t')) state.trackColor = '#' + params.get('t');
+            if (params.has('th')) state.thumbColor = '#' + params.get('th');
+            if (params.has('h')) state.hoverColor = '#' + params.get('h');
+            if (params.has('w')) state.width = parseInt(params.get('w'));
+            if (params.has('r')) state.radius = parseInt(params.get('r'));
+            
+            // Sync inputs
+            document.getElementById('track-color').value = state.trackColor;
+            document.getElementById('track-hex').value = state.trackColor.toUpperCase();
+            document.getElementById('thumb-color').value = state.thumbColor;
+            document.getElementById('thumb-hex').value = state.thumbColor.toUpperCase();
+            document.getElementById('hover-color').value = state.hoverColor;
+            document.getElementById('hover-hex').value = state.hoverColor.toUpperCase();
+            document.getElementById('width').value = state.width;
+            document.getElementById('width-value').textContent = state.width + 'px';
+            document.getElementById('radius').value = state.radius;
+            document.getElementById('radius-value').textContent = state.radius + 'px';
+            
+            // Event listeners
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+            });
+            
+            // Color inputs
+            ['track', 'thumb', 'hover'].forEach(type => {
+                const colorInput = document.getElementById(`${type}-color`);
+                const hexInput = document.getElementById(`${type}-hex`);
+                const stateKey = type === 'track' ? 'trackColor' : type === 'thumb' ? 'thumbColor' : 'hoverColor';
+                
+                colorInput.addEventListener('input', (e) => {
+                    state[stateKey] = e.target.value;
+                    hexInput.value = e.target.value.toUpperCase();
+                    updateScrollbar();
+                    generateCode();
+                });
+                
+                hexInput.addEventListener('input', (e) => {
+                    let val = e.target.value.toUpperCase();
+                    if (!val.startsWith('#')) val = '#' + val;
+                    if (isValidHex(val)) {
+                        state[stateKey] = val;
+                        colorInput.value = val;
+                        updateScrollbar();
+                        generateCode();
+                    }
+                });
+            });
+            
+            // Sliders
+            document.getElementById('width').addEventListener('input', (e) => {
+                state.width = parseInt(e.target.value);
+                document.getElementById('width-value').textContent = state.width + 'px';
+                updateScrollbar();
+                generateCode();
+            });
+            
+            document.getElementById('radius').addEventListener('input', (e) => {
+                state.radius = parseInt(e.target.value);
+                document.getElementById('radius-value').textContent = state.radius + 'px';
+                updateScrollbar();
+                generateCode();
+            });
+            
+            updateScrollbar();
+            generateCode();
+        }
+        
+        init();
+    </script>
+</body>
+</html>

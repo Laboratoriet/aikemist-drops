@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Generator — Aikemist</title>
-    <meta name="description" content="Create beautiful, customizable QR codes. Custom colors, logo embedding, multiple styles. Free from Alkemist.">
+    <meta name="description" content="Create beautiful, customizable QR codes. Custom colors, multiple styles, instant download. Free from Alkemist.">
     <meta property="og:title" content="QR Code Generator — Aikemist">
     <meta property="og:description" content="Create beautiful, customizable QR codes with custom colors and styles.">
     <meta property="og:type" content="website">
@@ -28,8 +28,8 @@
             --text: #ffffff;
             --text-muted: #888;
             --border: #2a2a2a;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
             --warning: #f59e0b;
             --success: #22c55e;
         }
@@ -52,7 +52,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 2rem 1.5rem;
         }
@@ -75,8 +75,8 @@
         .logo-icon {
             width: 36px;
             height: 36px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
-            border-radius: 8px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -90,38 +90,53 @@
 
         .logo-text {
             font-weight: 600;
-            font-size: 1.25rem;
+            font-size: 1.125rem;
         }
 
         .theme-toggle {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
-            color: var(--text);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             cursor: pointer;
-            font-family: inherit;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease, background 0.2s ease;
         }
 
-        .theme-toggle:hover {
-            border-color: var(--accent);
+        [data-theme="light"] .theme-toggle {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.1);
         }
+
+        .theme-toggle:hover { transform: scale(1.05); }
+        .theme-toggle:active { transform: scale(0.95); }
+
+        .theme-toggle-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .theme-toggle-icon svg { width: 20px; height: 20px; }
+        .theme-toggle-icon .sun-icon { color: #facc15; }
+        .theme-toggle-icon .moon-icon { color: #64748b; }
+        [data-theme="light"] .theme-toggle-icon { transform: rotate(180deg); }
 
         .hero {
             text-align: center;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
         }
 
         h1 {
-            font-size: clamp(1.75rem, 5vw, 2.5rem);
+            font-size: 2rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            margin-bottom: 0.25rem;
         }
 
         .subtitle {
@@ -131,12 +146,12 @@
 
         .main-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 380px;
             gap: 2rem;
             align-items: start;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .main-grid {
                 grid-template-columns: 1fr;
             }
@@ -152,99 +167,100 @@
             padding: 1.5rem;
         }
 
-        .panel-title {
-            font-size: 0.8rem;
+        .section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 0.7rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        /* Quick Templates */
+        .templates {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
             margin-bottom: 1rem;
         }
 
-        .input-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        textarea, input[type="text"], input[type="url"] {
-            width: 100%;
+        .template-btn {
             background: var(--bg-input);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 0.75rem 1rem;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .template-btn:hover {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .template-btn.active {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.15);
+        }
+
+        textarea {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.875rem 1rem;
             color: var(--text);
             font-family: inherit;
-            font-size: 1rem;
+            font-size: 0.9375rem;
             resize: vertical;
+            min-height: 90px;
             transition: border-color 0.2s;
         }
 
-        textarea:focus, input:focus {
+        textarea:focus {
             outline: none;
             border-color: var(--accent);
         }
 
-        textarea {
-            min-height: 80px;
-        }
-
-        .quick-inputs {
-            display: flex;
-            gap: 0.4rem;
-            flex-wrap: wrap;
-            margin-bottom: 0.75rem;
-        }
-
-        .quick-input-btn {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 0.35rem 0.6rem;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.15s;
-            font-family: inherit;
-        }
-
-        .quick-input-btn:hover {
-            border-color: var(--accent);
-            color: var(--text);
-        }
-
-        .row {
-            display: flex;
+        /* Colors */
+        .color-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 1rem;
-            margin-bottom: 1.25rem;
-        }
-
-        .row > * {
-            flex: 1;
         }
 
         .color-group label {
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 500;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
         }
 
-        .color-picker-wrap {
+        .color-control {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
         .color-swatch {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             border: 2px solid var(--border);
             cursor: pointer;
             overflow: hidden;
@@ -263,75 +279,123 @@
 
         .color-presets {
             display: flex;
-            gap: 0.25rem;
+            gap: 0.35rem;
             flex-wrap: wrap;
         }
 
         .color-preset {
-            width: 24px;
-            height: 24px;
-            border-radius: 5px;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
             border: 2px solid transparent;
             cursor: pointer;
             transition: all 0.15s;
             padding: 0;
         }
 
-        .color-preset:hover {
-            transform: scale(1.1);
+        .color-preset:hover { transform: scale(1.15); }
+        .color-preset.active { border-color: var(--accent); }
+
+        .color-preset-wrapper {
+            position: relative;
+            display: inline-block;
         }
 
-        .color-preset.active {
+        .color-preset-remove {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 10px;
+            line-height: 14px;
+            text-align: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.15s, background 0.15s;
+            z-index: 1;
+        }
+
+        .color-preset-wrapper:hover .color-preset-remove {
+            opacity: 1;
+        }
+
+        .color-preset-remove:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
+        }
+
+        .color-add {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 2px dashed var(--border);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.15s;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .color-add:hover {
             border-color: var(--accent);
+            color: var(--accent);
+            transform: scale(1.15);
         }
 
         .contrast-warning {
             display: none;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.6rem 0.8rem;
+            padding: 0.6rem 0.875rem;
             background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
+            border: 1px solid rgba(245, 158, 11, 0.25);
             border-radius: 8px;
             font-size: 0.8rem;
             color: var(--warning);
-            margin-bottom: 1rem;
+            margin-top: 0.75rem;
         }
 
-        .contrast-warning.show {
-            display: flex;
-        }
+        .contrast-warning.show { display: flex; }
 
+        /* Style Options */
         .style-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 0.5rem;
-            margin-bottom: 1.25rem;
         }
 
         .style-btn {
             background: var(--bg-input);
             border: 2px solid var(--border);
             border-radius: 10px;
-            padding: 0.75rem 0.25rem;
+            padding: 0.75rem 0.5rem;
             cursor: pointer;
             text-align: center;
             transition: all 0.2s;
             color: var(--text);
         }
 
-        .style-btn:hover {
-            border-color: var(--text-muted);
-        }
+        .style-btn:hover { border-color: var(--text-muted); }
 
         .style-btn.active {
             border-color: var(--accent);
-            background: rgba(59, 130, 246, 0.1);
+            background: rgba(99, 102, 241, 0.1);
         }
 
         .style-btn-icon {
             font-size: 1.25rem;
-            margin-bottom: 0.15rem;
+            margin-bottom: 0.2rem;
         }
 
         .style-btn-label {
@@ -339,6 +403,49 @@
             font-weight: 500;
         }
 
+        /* Options Row */
+        .options-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .option-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .option-buttons {
+            display: flex;
+            gap: 0.35rem;
+        }
+
+        .option-btn {
+            flex: 1;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.5rem 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+
+        .option-btn:hover { border-color: var(--text-muted); }
+
+        .option-btn.active {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--accent);
+        }
+
+        /* Size Options */
         .size-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -349,7 +456,7 @@
             background: var(--bg-input);
             border: 2px solid var(--border);
             border-radius: 8px;
-            padding: 0.5rem 0.25rem;
+            padding: 0.6rem 0.25rem;
             cursor: pointer;
             text-align: center;
             transition: all 0.2s;
@@ -357,17 +464,15 @@
             font-family: inherit;
         }
 
-        .size-btn:hover {
-            border-color: var(--text-muted);
-        }
+        .size-btn:hover { border-color: var(--text-muted); }
 
         .size-btn.active {
             border-color: var(--accent);
-            background: rgba(59, 130, 246, 0.1);
+            background: rgba(99, 102, 241, 0.1);
         }
 
         .size-btn-label {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 600;
         }
 
@@ -376,55 +481,70 @@
             color: var(--text-muted);
         }
 
-        .preview-area {
+        /* Preview Panel */
+        .preview-panel .panel {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1.25rem;
         }
 
-        .qr-preview {
+        .qr-preview-wrapper {
+            padding: 1.5rem;
             background: white;
-            padding: 1.25rem;
             border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.15);
-            position: relative;
-        }
-
-        .qr-preview::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 16px;
-            border: 1px solid rgba(0,0,0,0.05);
-            pointer-events: none;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+            margin-bottom: 1rem;
         }
 
         #qrCanvas {
             display: block;
         }
 
+        .scan-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-bottom: 1.25rem;
+        }
+
+        .scan-status.good {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+
+        .scan-status.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
         .download-buttons {
             display: flex;
             gap: 0.5rem;
-            flex-wrap: wrap;
-            justify-content: center;
+            width: 100%;
         }
 
         .btn {
+            flex: 1;
             background: var(--accent);
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 0.65rem 1rem;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
             font-family: inherit;
-            font-size: 0.85rem;
-            font-weight: 500;
+            font-size: 0.875rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
         .btn:hover {
@@ -440,49 +560,12 @@
 
         .btn-secondary:hover {
             background: var(--border);
+            transform: translateY(-1px);
         }
 
         .btn svg {
-            width: 14px;
-            height: 14px;
-        }
-
-        .pro-teaser {
-            margin-top: 1.5rem;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.08));
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .pro-teaser h3 {
-            font-size: 0.9rem;
-            margin-bottom: 0.4rem;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .pro-teaser p {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
-        }
-
-        .pro-features {
-            display: flex;
-            justify-content: center;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .pro-features span::before {
-            content: "✦ ";
-            color: var(--accent);
+            width: 16px;
+            height: 16px;
         }
 
         footer {
@@ -499,44 +582,15 @@
             text-decoration: none;
         }
 
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        .scanned-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.4rem 0.75rem;
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 6px;
-            font-size: 0.75rem;
-            color: var(--success);
-        }
-
-        .scanned-badge::before {
-            content: '✓';
-            font-weight: bold;
-        }
+        footer a:hover { text-decoration: underline; }
 
         @media (max-width: 480px) {
-            .container {
-                padding: 1rem;
-            }
-            .panel {
-                padding: 1rem;
-            }
-            .size-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .quick-inputs {
-                gap: 0.3rem;
-            }
-            .quick-input-btn {
-                padding: 0.3rem 0.5rem;
-                font-size: 0.7rem;
-            }
+            .container { padding: 1rem; }
+            .panel { padding: 1.25rem; }
+            .style-grid { grid-template-columns: repeat(2, 1fr); }
+            .options-row { grid-template-columns: 1fr; }
+            .templates { gap: 0.4rem; }
+            .template-btn { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -549,129 +603,154 @@
                 </div>
                 <span class="logo-text">aikemist</span>
             </a>
-            <button class="theme-toggle" onclick="toggleTheme()">
-                <span id="themeIcon">☀️</span> Light
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+                <div class="theme-toggle-icon">
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <path d="M12 2v2"></path><path d="M12 20v2"></path>
+                        <path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path>
+                        <path d="M2 12h2"></path><path d="M20 12h2"></path>
+                        <path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>
+                    </svg>
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                    </svg>
+                </div>
             </button>
         </header>
 
         <div class="hero">
             <h1>QR Code Generator</h1>
-            <p class="subtitle">Create beautiful, customizable QR codes in seconds</p>
+            <p class="subtitle">Create customizable QR codes in seconds</p>
         </div>
 
         <div class="main-grid">
             <div class="controls-panel">
                 <div class="panel">
-                    <div class="panel-title">Content</div>
-                    
-                    <div class="quick-inputs">
-                        <button class="quick-input-btn" onclick="setQuickInput('url')">🔗 URL</button>
-                        <button class="quick-input-btn" onclick="setQuickInput('email')">✉️ Email</button>
-                        <button class="quick-input-btn" onclick="setQuickInput('phone')">📞 Phone</button>
-                        <button class="quick-input-btn" onclick="setQuickInput('wifi')">📶 WiFi</button>
-                        <button class="quick-input-btn" onclick="setQuickInput('vcard')">👤 Contact</button>
+                    <div class="section">
+                        <div class="section-title">Content</div>
+                        <div class="templates">
+                            <button class="template-btn active" data-type="url" onclick="setTemplate('url')">🔗 URL</button>
+                            <button class="template-btn" data-type="email" onclick="setTemplate('email')">✉️ Email</button>
+                            <button class="template-btn" data-type="phone" onclick="setTemplate('phone')">📞 Phone</button>
+                            <button class="template-btn" data-type="wifi" onclick="setTemplate('wifi')">📶 WiFi</button>
+                            <button class="template-btn" data-type="vcard" onclick="setTemplate('vcard')">👤 vCard</button>
+                        </div>
+                        <textarea id="qrContent" placeholder="https://example.com">https://aikemist.com</textarea>
                     </div>
 
-                    <div class="input-group">
-                        <textarea id="qrContent" placeholder="https://yourwebsite.com">https://aikemist.com</textarea>
-                    </div>
-
-                    <div id="contrastWarning" class="contrast-warning">
-                        <span>⚠️</span>
-                        <span>Low contrast — QR may be hard to scan</span>
-                    </div>
-
-                    <div class="row">
-                        <div class="color-group">
-                            <label>Foreground</label>
-                            <div class="color-picker-wrap">
-                                <div class="color-swatch" id="fgSwatch">
-                                    <input type="color" id="fgColor" value="#000000">
+                    <div class="section">
+                        <div class="section-title">Colors</div>
+                        <div class="color-row">
+                            <div class="color-group">
+                                <label>Foreground</label>
+                                <div class="color-control">
+                                    <div class="color-swatch" id="fgSwatch">
+                                        <input type="color" id="fgColor" value="#000000">
+                                    </div>
+                                    <div class="color-presets" id="fgPresets"></div>
                                 </div>
-                                <div class="color-presets" id="fgPresets"></div>
+                            </div>
+                            <div class="color-group">
+                                <label>Background</label>
+                                <div class="color-control">
+                                    <div class="color-swatch" id="bgSwatch">
+                                        <input type="color" id="bgColor" value="#ffffff">
+                                    </div>
+                                    <div class="color-presets" id="bgPresets"></div>
+                                </div>
                             </div>
                         </div>
-                        <div class="color-group">
-                            <label>Background</label>
-                            <div class="color-picker-wrap">
-                                <div class="color-swatch" id="bgSwatch">
-                                    <input type="color" id="bgColor" value="#ffffff">
+                        <div id="contrastWarning" class="contrast-warning">
+                            <span>⚠️</span>
+                            <span>Low contrast may affect scanning</span>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Style</div>
+                        <div class="style-grid">
+                            <button class="style-btn active" data-style="square" onclick="setStyle('square')">
+                                <div class="style-btn-icon">■</div>
+                                <div class="style-btn-label">Square</div>
+                            </button>
+                            <button class="style-btn" data-style="rounded" onclick="setStyle('rounded')">
+                                <div class="style-btn-icon">▢</div>
+                                <div class="style-btn-label">Rounded</div>
+                            </button>
+                            <button class="style-btn" data-style="dots" onclick="setStyle('dots')">
+                                <div class="style-btn-icon">●</div>
+                                <div class="style-btn-label">Dots</div>
+                            </button>
+                            <button class="style-btn" data-style="diamond" onclick="setStyle('diamond')">
+                                <div class="style-btn-icon">◆</div>
+                                <div class="style-btn-label">Diamond</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="options-row">
+                            <div class="option-group">
+                                <label>Error Correction</label>
+                                <div class="option-buttons">
+                                    <button class="option-btn" data-level="L" onclick="setErrorLevel('L')">L</button>
+                                    <button class="option-btn active" data-level="M" onclick="setErrorLevel('M')">M</button>
+                                    <button class="option-btn" data-level="Q" onclick="setErrorLevel('Q')">Q</button>
+                                    <button class="option-btn" data-level="H" onclick="setErrorLevel('H')">H</button>
                                 </div>
-                                <div class="color-presets" id="bgPresets"></div>
+                            </div>
+                            <div class="option-group">
+                                <label>Margin</label>
+                                <div class="option-buttons">
+                                    <button class="option-btn" data-margin="0" onclick="setMargin(0)">None</button>
+                                    <button class="option-btn active" data-margin="1" onclick="setMargin(1)">Small</button>
+                                    <button class="option-btn" data-margin="2" onclick="setMargin(2)">Medium</button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="panel-title">Style</div>
-                    <div class="style-grid">
-                        <button class="style-btn active" data-style="square" onclick="setStyle('square')">
-                            <div class="style-btn-icon">⬛</div>
-                            <div class="style-btn-label">Square</div>
-                        </button>
-                        <button class="style-btn" data-style="rounded" onclick="setStyle('rounded')">
-                            <div class="style-btn-icon">🔲</div>
-                            <div class="style-btn-label">Rounded</div>
-                        </button>
-                        <button class="style-btn" data-style="dots" onclick="setStyle('dots')">
-                            <div class="style-btn-icon">⚫</div>
-                            <div class="style-btn-label">Dots</div>
-                        </button>
-                    </div>
-
-                    <div class="panel-title">Export Size</div>
-                    <div class="size-grid">
-                        <button class="size-btn" data-size="128" onclick="setSize(128)">
-                            <div class="size-btn-label">S</div>
-                            <div class="size-btn-dim">128px</div>
-                        </button>
-                        <button class="size-btn" data-size="256" onclick="setSize(256)">
-                            <div class="size-btn-label">M</div>
-                            <div class="size-btn-dim">256px</div>
-                        </button>
-                        <button class="size-btn active" data-size="512" onclick="setSize(512)">
-                            <div class="size-btn-label">L</div>
-                            <div class="size-btn-dim">512px</div>
-                        </button>
-                        <button class="size-btn" data-size="1024" onclick="setSize(1024)">
-                            <div class="size-btn-label">XL</div>
-                            <div class="size-btn-dim">1024px</div>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="pro-teaser">
-                    <h3>✨ Pro Features Coming</h3>
-                    <p>Logo embedding, gradient fills, bulk generation</p>
-                    <div class="pro-features">
-                        <span>Logo center</span>
-                        <span>Gradients</span>
-                        <span>Analytics</span>
+                    <div class="section">
+                        <div class="section-title">Export Size</div>
+                        <div class="size-grid">
+                            <button class="size-btn" data-size="256" onclick="setSize(256)">
+                                <div class="size-btn-label">S</div>
+                                <div class="size-btn-dim">256px</div>
+                            </button>
+                            <button class="size-btn active" data-size="512" onclick="setSize(512)">
+                                <div class="size-btn-label">M</div>
+                                <div class="size-btn-dim">512px</div>
+                            </button>
+                            <button class="size-btn" data-size="1024" onclick="setSize(1024)">
+                                <div class="size-btn-label">L</div>
+                                <div class="size-btn-dim">1024px</div>
+                            </button>
+                            <button class="size-btn" data-size="2048" onclick="setSize(2048)">
+                                <div class="size-btn-label">XL</div>
+                                <div class="size-btn-dim">2048px</div>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="preview-panel">
                 <div class="panel">
-                    <div class="panel-title">Preview</div>
-                    <div class="preview-area">
-                        <div class="qr-preview">
-                            <canvas id="qrCanvas" width="200" height="200"></canvas>
-                        </div>
-                        <div class="scanned-badge">Scannable</div>
-                        <div class="download-buttons">
-                            <button class="btn" onclick="downloadPNG()">
-                                <svg fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
-                                PNG
-                            </button>
-                            <button class="btn btn-secondary" onclick="downloadSVG()">
-                                <svg fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
-                                SVG
-                            </button>
-                            <button class="btn btn-secondary" onclick="copyDataURL()">
-                                <svg fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
-                                Copy
-                            </button>
-                        </div>
+                    <div class="section-title" style="text-align: center; margin-bottom: 1rem;">Preview</div>
+                    <div class="qr-preview-wrapper">
+                        <canvas id="qrCanvas" width="200" height="200"></canvas>
+                    </div>
+                    <div class="scan-status good" id="scanStatus">✓ Ready to scan</div>
+                    <div class="download-buttons">
+                        <button class="btn" onclick="downloadPNG()">
+                            <svg fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                            PNG
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadSVG()">
+                            <svg fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                            SVG
+                        </button>
                     </div>
                 </div>
             </div>
@@ -683,27 +762,32 @@
     </div>
 
     <script>
-        const fgColors = ['#000000', '#1a1a2e', '#16213e', '#0f3460', '#533483', '#e94560'];
-        const bgColors = ['#ffffff', '#f8f9fa', '#fff3cd', '#d4edda', '#cce5ff', '#f8d7da'];
-
-        let currentStyle = 'square';
-        let currentFg = '#000000';
-        let currentBg = '#ffffff';
-        let exportSize = 512;
+        let state = {
+            style: 'square',
+            fgColor: '#000000',
+            bgColor: '#ffffff',
+            errorLevel: 'M',
+            margin: 1,
+            exportSize: 512,
+            fgColors: ['#000000', '#1e293b', '#374151', '#6366f1', '#8b5cf6', '#ec4899', '#ef4444', '#f97316'],
+            bgColors: ['#ffffff', '#f8fafc', '#fef3c7', '#dcfce7', '#dbeafe', '#fce7f3', '#1e1e1e', '#0a0a0a']
+        };
 
         document.addEventListener('DOMContentLoaded', () => {
             initColorPresets();
             generateQR();
             
-            document.getElementById('qrContent').addEventListener('input', debounce(generateQR, 300));
+            document.getElementById('qrContent').addEventListener('input', debounce(generateQR, 250));
             document.getElementById('fgColor').addEventListener('input', (e) => {
-                currentFg = e.target.value;
+                state.fgColor = e.target.value;
+                updatePresetActive('fg', e.target.value);
                 updateSwatches();
                 checkContrast();
                 generateQR();
             });
             document.getElementById('bgColor').addEventListener('input', (e) => {
-                currentBg = e.target.value;
+                state.bgColor = e.target.value;
+                updatePresetActive('bg', e.target.value);
                 updateSwatches();
                 checkContrast();
                 generateQR();
@@ -711,61 +795,104 @@
 
             if (localStorage.getItem('theme') === 'light') {
                 document.documentElement.setAttribute('data-theme', 'light');
-                document.getElementById('themeIcon').textContent = '🌙';
-                document.querySelector('.theme-toggle').innerHTML = '<span id="themeIcon">🌙</span> Dark';
             }
+            updateThemeIcon();
         });
 
         function initColorPresets() {
-            const fgPresetsEl = document.getElementById('fgPresets');
-            const bgPresetsEl = document.getElementById('bgPresets');
-
-            fgColors.forEach(color => {
-                const btn = document.createElement('button');
-                btn.className = 'color-preset' + (color === currentFg ? ' active' : '');
-                btn.style.background = color;
-                btn.onclick = () => selectFgColor(color);
-                fgPresetsEl.appendChild(btn);
-            });
-
-            bgColors.forEach(color => {
-                const btn = document.createElement('button');
-                btn.className = 'color-preset' + (color === currentBg ? ' active' : '');
-                btn.style.background = color;
-                btn.onclick = () => selectBgColor(color);
-                bgPresetsEl.appendChild(btn);
-            });
-
+            renderColorPresets('fg');
+            renderColorPresets('bg');
             updateSwatches();
         }
 
-        function selectFgColor(color) {
-            currentFg = color;
-            document.getElementById('fgColor').value = color;
-            updateSwatches();
-            updatePresetActive('fgPresets', color);
-            checkContrast();
-            generateQR();
+        function renderColorPresets(type) {
+            const presetsEl = document.getElementById(type + 'Presets');
+            const colors = type === 'fg' ? state.fgColors : state.bgColors;
+            const currentColor = type === 'fg' ? state.fgColor : state.bgColor;
+            
+            presetsEl.innerHTML = '';
+
+            colors.forEach((color, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'color-preset-wrapper';
+                
+                const btn = document.createElement('button');
+                btn.className = 'color-preset' + (color === currentColor ? ' active' : '');
+                btn.style.background = color;
+                if (color.toLowerCase() === '#ffffff') {
+                    btn.style.border = '1px solid #e5e5e5';
+                }
+                btn.onclick = () => selectColor(type, color);
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'color-preset-remove';
+                removeBtn.innerHTML = '×';
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    removeColor(type, index);
+                };
+                
+                wrapper.appendChild(btn);
+                wrapper.appendChild(removeBtn);
+                presetsEl.appendChild(wrapper);
+            });
+
+            // Add "+" button
+            const addBtn = document.createElement('button');
+            addBtn.className = 'color-add';
+            addBtn.innerHTML = '+';
+            addBtn.title = 'Add current color';
+            addBtn.onclick = () => addColor(type);
+            presetsEl.appendChild(addBtn);
         }
 
-        function selectBgColor(color) {
-            currentBg = color;
-            document.getElementById('bgColor').value = color;
+        function addColor(type) {
+            const colors = type === 'fg' ? state.fgColors : state.bgColors;
+            const currentColor = type === 'fg' ? state.fgColor : state.bgColor;
+            
+            // Don't add if already exists
+            if (colors.some(c => c.toLowerCase() === currentColor.toLowerCase())) {
+                return;
+            }
+            
+            colors.push(currentColor);
+            renderColorPresets(type);
+        }
+
+        function removeColor(type, index) {
+            const colors = type === 'fg' ? state.fgColors : state.bgColors;
+            
+            // Don't remove if only one left
+            if (colors.length <= 1) return;
+            
+            colors.splice(index, 1);
+            renderColorPresets(type);
+        }
+
+        function selectColor(type, color) {
+            if (type === 'fg') {
+                state.fgColor = color;
+                document.getElementById('fgColor').value = color;
+            } else {
+                state.bgColor = color;
+                document.getElementById('bgColor').value = color;
+            }
+            updatePresetActive(type, color);
             updateSwatches();
-            updatePresetActive('bgPresets', color);
             checkContrast();
             generateQR();
         }
 
         function updateSwatches() {
-            document.getElementById('fgSwatch').style.background = currentFg;
-            document.getElementById('bgSwatch').style.background = currentBg;
+            document.getElementById('fgSwatch').style.background = state.fgColor;
+            document.getElementById('bgSwatch').style.background = state.bgColor;
         }
 
-        function updatePresetActive(containerId, activeColor) {
-            const presets = document.querySelectorAll(`#${containerId} .color-preset`);
-            presets.forEach(p => {
-                p.classList.toggle('active', rgbToHex(p.style.background) === activeColor.toLowerCase());
+        function updatePresetActive(type, activeColor) {
+            const containerId = type + 'Presets';
+            document.querySelectorAll(`#${containerId} .color-preset`).forEach(p => {
+                const pColor = rgbToHex(p.style.background);
+                p.classList.toggle('active', pColor === activeColor.toLowerCase());
             });
         }
 
@@ -785,68 +912,84 @@
             } : null;
         }
 
-        function getLuminance(r, g, b) {
-            const [rs, gs, bs] = [r, g, b].map(c => {
-                c = c / 255;
-                return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-            });
-            return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
-        }
-
         function getContrastRatio(fg, bg) {
             const fgRgb = hexToRgb(fg);
             const bgRgb = hexToRgb(bg);
             if (!fgRgb || !bgRgb) return 21;
-            const l1 = getLuminance(fgRgb.r, fgRgb.g, fgRgb.b);
-            const l2 = getLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
-            const lighter = Math.max(l1, l2);
-            const darker = Math.min(l1, l2);
-            return (lighter + 0.05) / (darker + 0.05);
+            
+            const lum = (r, g, b) => {
+                const [rs, gs, bs] = [r, g, b].map(c => {
+                    c = c / 255;
+                    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+                });
+                return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+            };
+            
+            const l1 = lum(fgRgb.r, fgRgb.g, fgRgb.b);
+            const l2 = lum(bgRgb.r, bgRgb.g, bgRgb.b);
+            return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
         }
 
         function checkContrast() {
-            const ratio = getContrastRatio(currentFg, currentBg);
+            const ratio = getContrastRatio(state.fgColor, state.bgColor);
             const warning = document.getElementById('contrastWarning');
-            const badge = document.querySelector('.scanned-badge');
+            const status = document.getElementById('scanStatus');
             
             if (ratio < 3) {
                 warning.classList.add('show');
-                badge.textContent = 'Low contrast';
-                badge.style.background = 'rgba(245, 158, 11, 0.1)';
-                badge.style.borderColor = 'rgba(245, 158, 11, 0.2)';
-                badge.style.color = 'var(--warning)';
+                status.className = 'scan-status warning';
+                status.textContent = '⚠ Low contrast';
             } else {
                 warning.classList.remove('show');
-                badge.textContent = 'Scannable';
-                badge.style.background = 'rgba(34, 197, 94, 0.1)';
-                badge.style.borderColor = 'rgba(34, 197, 94, 0.2)';
-                badge.style.color = 'var(--success)';
+                status.className = 'scan-status good';
+                status.textContent = '✓ Ready to scan';
             }
         }
 
         function setStyle(style) {
-            currentStyle = style;
+            state.style = style;
             document.querySelectorAll('.style-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.style === style);
             });
             generateQR();
         }
 
+        function setErrorLevel(level) {
+            state.errorLevel = level;
+            document.querySelectorAll('.option-btn[data-level]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.level === level);
+            });
+            generateQR();
+        }
+
+        function setMargin(margin) {
+            state.margin = margin;
+            document.querySelectorAll('.option-btn[data-margin]').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.margin) === margin);
+            });
+            generateQR();
+        }
+
         function setSize(size) {
-            exportSize = size;
+            state.exportSize = size;
             document.querySelectorAll('.size-btn').forEach(btn => {
                 btn.classList.toggle('active', parseInt(btn.dataset.size) === size);
             });
         }
 
-        function setQuickInput(type) {
+        function setTemplate(type) {
             const templates = {
-                url: 'https://yourwebsite.com',
-                email: 'mailto:hello@example.com',
+                url: 'https://example.com',
+                email: 'mailto:hello@example.com?subject=Hello',
                 phone: 'tel:+1234567890',
                 wifi: 'WIFI:T:WPA;S:NetworkName;P:Password;;',
                 vcard: 'BEGIN:VCARD\nVERSION:3.0\nN:Doe;John\nFN:John Doe\nTEL:+1234567890\nEMAIL:john@example.com\nEND:VCARD'
             };
+            
+            document.querySelectorAll('.template-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === type);
+            });
+            
             document.getElementById('qrContent').value = templates[type] || '';
             generateQR();
         }
@@ -856,177 +999,201 @@
             const canvas = document.getElementById('qrCanvas');
             const ctx = canvas.getContext('2d');
             
-            const qr = qrcode(0, 'M');
-            qr.addData(content);
-            qr.make();
+            try {
+                const qr = qrcode(0, state.errorLevel);
+                qr.addData(content);
+                qr.make();
 
-            const moduleCount = qr.getModuleCount();
-            const size = 200;
-            const moduleSize = size / moduleCount;
-            
-            ctx.fillStyle = currentBg;
-            ctx.fillRect(0, 0, size, size);
+                const moduleCount = qr.getModuleCount();
+                const margin = state.margin * 4;
+                const size = 200;
+                const moduleSize = (size - margin * 2) / moduleCount;
+                
+                ctx.fillStyle = state.bgColor;
+                ctx.fillRect(0, 0, size, size);
 
-            ctx.fillStyle = currentFg;
-            
-            for (let row = 0; row < moduleCount; row++) {
-                for (let col = 0; col < moduleCount; col++) {
-                    if (qr.isDark(row, col)) {
-                        const x = col * moduleSize;
-                        const y = row * moduleSize;
-                        
-                        if (currentStyle === 'dots') {
-                            ctx.beginPath();
-                            ctx.arc(x + moduleSize / 2, y + moduleSize / 2, moduleSize / 2.5, 0, Math.PI * 2);
-                            ctx.fill();
-                        } else if (currentStyle === 'rounded') {
-                            roundRect(ctx, x + 0.5, y + 0.5, moduleSize - 1, moduleSize - 1, moduleSize / 4);
-                        } else {
-                            ctx.fillRect(x, y, moduleSize, moduleSize);
+                ctx.fillStyle = state.fgColor;
+                
+                for (let row = 0; row < moduleCount; row++) {
+                    for (let col = 0; col < moduleCount; col++) {
+                        if (qr.isDark(row, col)) {
+                            const x = margin + col * moduleSize;
+                            const y = margin + row * moduleSize;
+                            
+                            switch (state.style) {
+                                case 'dots':
+                                    ctx.beginPath();
+                                    ctx.arc(x + moduleSize / 2, y + moduleSize / 2, moduleSize / 2.5, 0, Math.PI * 2);
+                                    ctx.fill();
+                                    break;
+                                case 'rounded':
+                                    roundRect(ctx, x + 0.5, y + 0.5, moduleSize - 1, moduleSize - 1, moduleSize / 3.5);
+                                    break;
+                                case 'diamond':
+                                    ctx.beginPath();
+                                    ctx.moveTo(x + moduleSize / 2, y + 1);
+                                    ctx.lineTo(x + moduleSize - 1, y + moduleSize / 2);
+                                    ctx.lineTo(x + moduleSize / 2, y + moduleSize - 1);
+                                    ctx.lineTo(x + 1, y + moduleSize / 2);
+                                    ctx.closePath();
+                                    ctx.fill();
+                                    break;
+                                default:
+                                    ctx.fillRect(x, y, moduleSize, moduleSize);
+                            }
                         }
                     }
                 }
+            } catch (e) {
+                console.error('QR generation error:', e);
             }
         }
 
-        function roundRect(ctx, x, y, width, height, radius) {
+        function roundRect(ctx, x, y, w, h, r) {
             ctx.beginPath();
-            ctx.moveTo(x + radius, y);
-            ctx.lineTo(x + width - radius, y);
-            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-            ctx.lineTo(x + width, y + height - radius);
-            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-            ctx.lineTo(x + radius, y + height);
-            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-            ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            ctx.lineTo(x + r, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
             ctx.closePath();
             ctx.fill();
         }
 
         function downloadPNG() {
             const content = document.getElementById('qrContent').value || 'https://aikemist.com';
+            const size = state.exportSize;
             
-            const exportCanvas = document.createElement('canvas');
-            exportCanvas.width = exportSize;
-            exportCanvas.height = exportSize;
-            const ctx = exportCanvas.getContext('2d');
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
             
-            const qr = qrcode(0, 'M');
+            const qr = qrcode(0, state.errorLevel);
             qr.addData(content);
             qr.make();
 
             const moduleCount = qr.getModuleCount();
-            const moduleSize = exportSize / moduleCount;
+            const margin = state.margin * (size / 50);
+            const moduleSize = (size - margin * 2) / moduleCount;
             
-            ctx.fillStyle = currentBg;
-            ctx.fillRect(0, 0, exportSize, exportSize);
+            ctx.fillStyle = state.bgColor;
+            ctx.fillRect(0, 0, size, size);
 
-            ctx.fillStyle = currentFg;
+            ctx.fillStyle = state.fgColor;
             
             for (let row = 0; row < moduleCount; row++) {
                 for (let col = 0; col < moduleCount; col++) {
                     if (qr.isDark(row, col)) {
-                        const x = col * moduleSize;
-                        const y = row * moduleSize;
+                        const x = margin + col * moduleSize;
+                        const y = margin + row * moduleSize;
                         
-                        if (currentStyle === 'dots') {
-                            ctx.beginPath();
-                            ctx.arc(x + moduleSize / 2, y + moduleSize / 2, moduleSize / 2.5, 0, Math.PI * 2);
-                            ctx.fill();
-                        } else if (currentStyle === 'rounded') {
-                            roundRect(ctx, x + 0.5, y + 0.5, moduleSize - 1, moduleSize - 1, moduleSize / 4);
-                        } else {
-                            ctx.fillRect(x, y, moduleSize, moduleSize);
+                        switch (state.style) {
+                            case 'dots':
+                                ctx.beginPath();
+                                ctx.arc(x + moduleSize / 2, y + moduleSize / 2, moduleSize / 2.5, 0, Math.PI * 2);
+                                ctx.fill();
+                                break;
+                            case 'rounded':
+                                roundRect(ctx, x + 0.5, y + 0.5, moduleSize - 1, moduleSize - 1, moduleSize / 3.5);
+                                break;
+                            case 'diamond':
+                                ctx.beginPath();
+                                ctx.moveTo(x + moduleSize / 2, y + 1);
+                                ctx.lineTo(x + moduleSize - 1, y + moduleSize / 2);
+                                ctx.lineTo(x + moduleSize / 2, y + moduleSize - 1);
+                                ctx.lineTo(x + 1, y + moduleSize / 2);
+                                ctx.closePath();
+                                ctx.fill();
+                                break;
+                            default:
+                                ctx.fillRect(x, y, moduleSize, moduleSize);
                         }
                     }
                 }
             }
             
             const link = document.createElement('a');
-            link.download = `qrcode-${exportSize}px.png`;
-            link.href = exportCanvas.toDataURL('image/png');
+            link.download = `qrcode-${size}px.png`;
+            link.href = canvas.toDataURL('image/png');
             link.click();
         }
 
         function downloadSVG() {
             const content = document.getElementById('qrContent').value || 'https://aikemist.com';
+            const size = state.exportSize;
             
-            const qr = qrcode(0, 'M');
+            const qr = qrcode(0, state.errorLevel);
             qr.addData(content);
             qr.make();
 
             const moduleCount = qr.getModuleCount();
-            const size = exportSize;
-            const moduleSize = size / moduleCount;
+            const margin = state.margin * (size / 50);
+            const moduleSize = (size - margin * 2) / moduleCount;
             
             let paths = '';
             
             for (let row = 0; row < moduleCount; row++) {
                 for (let col = 0; col < moduleCount; col++) {
                     if (qr.isDark(row, col)) {
-                        const x = col * moduleSize;
-                        const y = row * moduleSize;
+                        const x = margin + col * moduleSize;
+                        const y = margin + row * moduleSize;
                         
-                        if (currentStyle === 'dots') {
-                            paths += `<circle cx="${x + moduleSize/2}" cy="${y + moduleSize/2}" r="${moduleSize/2.5}"/>`;
-                        } else if (currentStyle === 'rounded') {
-                            const r = moduleSize / 4;
-                            paths += `<rect x="${x}" y="${y}" width="${moduleSize}" height="${moduleSize}" rx="${r}"/>`;
-                        } else {
-                            paths += `<rect x="${x}" y="${y}" width="${moduleSize}" height="${moduleSize}"/>`;
+                        switch (state.style) {
+                            case 'dots':
+                                paths += `<circle cx="${x + moduleSize/2}" cy="${y + moduleSize/2}" r="${moduleSize/2.5}"/>`;
+                                break;
+                            case 'rounded':
+                                const r = moduleSize / 3.5;
+                                paths += `<rect x="${x}" y="${y}" width="${moduleSize}" height="${moduleSize}" rx="${r}"/>`;
+                                break;
+                            case 'diamond':
+                                paths += `<polygon points="${x + moduleSize/2},${y} ${x + moduleSize},${y + moduleSize/2} ${x + moduleSize/2},${y + moduleSize} ${x},${y + moduleSize/2}"/>`;
+                                break;
+                            default:
+                                paths += `<rect x="${x}" y="${y}" width="${moduleSize}" height="${moduleSize}"/>`;
                         }
                     }
                 }
             }
-
+            
             const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
-  <rect width="${size}" height="${size}" fill="${currentBg}"/>
-  <g fill="${currentFg}">${paths}</g>
+<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+  <rect width="${size}" height="${size}" fill="${state.bgColor}"/>
+  <g fill="${state.fgColor}">${paths}</g>
 </svg>`;
-
+            
             const blob = new Blob([svg], { type: 'image/svg+xml' });
             const link = document.createElement('a');
-            link.download = `qrcode-${exportSize}px.svg`;
+            link.download = `qrcode-${size}px.svg`;
             link.href = URL.createObjectURL(blob);
             link.click();
         }
 
-        function copyDataURL() {
-            const canvas = document.getElementById('qrCanvas');
-            const dataURL = canvas.toDataURL('image/png');
-            
-            navigator.clipboard.writeText(dataURL).then(() => {
-                const btn = document.querySelector('.download-buttons .btn-secondary:last-child');
-                const original = btn.innerHTML;
-                btn.innerHTML = '✓ Copied!';
-                setTimeout(() => btn.innerHTML = original, 1500);
-            });
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
         }
 
         function toggleTheme() {
             const current = document.documentElement.getAttribute('data-theme');
             const newTheme = current === 'light' ? '' : 'light';
             document.documentElement.setAttribute('data-theme', newTheme);
-            
-            const icon = newTheme === 'light' ? '🌙' : '☀️';
-            const label = newTheme === 'light' ? 'Dark' : 'Light';
-            document.querySelector('.theme-toggle').innerHTML = `<span id="themeIcon">${icon}</span> ${label}`;
-            
+            updateThemeIcon();
             localStorage.setItem('theme', newTheme || 'dark');
         }
 
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
+        function updateThemeIcon() {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            document.querySelector('.sun-icon').style.display = isLight ? 'block' : 'none';
+            document.querySelector('.moon-icon').style.display = isLight ? 'none' : 'block';
         }
     </script>
 </body>

@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Shadow Generator — Alkemist</title>
+    <meta name="description" content="Create stunning CSS text shadows visually. Neon glow, 3D depth, embossed, retro effects with multi-layer support. Copy CSS instantly.">
+    <meta property="og:title" content="Text Shadow Generator — Alkemist">
+    <meta property="og:description" content="Create stunning CSS text shadows visually. Multi-layer effects, presets, custom fonts.">
+    <meta property="og:image" content="https://day022.aikemist.com/og.png">
+    <meta property="og:url" content="https://day022.aikemist.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Inter:wght@400;500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-2: #1a1a1a;
+            --border: #2a2a2a;
+            --text: #ffffff;
+            --text-muted: #888888;
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+        }
+        
+        [data-theme="light"] {
+            --bg: #f5f5f5;
+            --surface: #ffffff;
+            --surface-2: #fafafa;
+            --border: #e0e0e0;
+            --text: #0a0a0a;
+            --text-muted: #666666;
+        }
+        
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        
+        .logo svg {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .logo span {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+            .theme-toggle {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, background 0.2s ease;
+      overflow: hidden;
+    }
+    
+    [data-theme="dark"] .theme-toggle {
+      background: rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    [data-theme="dark"] .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:active {
+      transform: scale(0.95);
+    }
+    
+    .theme-toggle-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .theme-toggle-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .theme-toggle-icon .sun-icon {
+      color: #facc15;
+    }
+    
+    .theme-toggle-icon .moon-icon {
+      color: #64748b;
+    }
+    
+    [data-theme="dark"] .theme-toggle-icon {
+      transform: rotate(180deg);
+    }
+        
+        /* Main Layout */
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            min-height: calc(100vh - 65px);
+        }
+        
+        @media (max-width: 900px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Preview Area */
+        .preview-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .preview-bg {
+            position: absolute;
+            inset: 0;
+            background: var(--preview-bg, linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%));
+        }
+        
+        .preview-text {
+            position: relative;
+            z-index: 1;
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 700;
+            text-align: center;
+            max-width: 100%;
+            word-break: break-word;
+            color: var(--text-color, #ffffff);
+            transition: text-shadow 0.15s ease;
+        }
+        
+        /* Controls Panel */
+        .controls {
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: calc(100vh - 65px);
+        }
+        
+        @media (max-width: 900px) {
+            .controls {
+                border-left: none;
+                border-top: 1px solid var(--border);
+                max-height: none;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 0.75rem;
+                text-align: center;
+            }
+            .controls {
+                padding: 1rem;
+            }
+            .preview-area {
+                padding: 1.5rem 1rem;
+            }
+            .presets-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .fonts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .backgrounds-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .actions {
+                flex-direction: column;
+            }
+            h1 {
+                font-size: 1.25rem;
+            }
+        }
+        
+        .section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+        
+        /* Text Input */
+        .text-input {
+            width: 100%;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .text-input:focus {
+            border-color: var(--accent);
+        }
+        
+        /* Font Selector */
+        .font-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .font-btn {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .font-btn:hover {
+            background: var(--border);
+        }
+        
+        .font-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        
+        .font-btn[data-font="Inter"] { font-family: 'Inter', sans-serif; }
+        .font-btn[data-font="Space Grotesk"] { font-family: 'Space Grotesk', sans-serif; }
+        .font-btn[data-font="Playfair Display"] { font-family: 'Playfair Display', serif; }
+        .font-btn[data-font="Jost"] { font-family: 'Jost', sans-serif; }
+        
+        /* Presets */
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .preset-btn {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .preset-btn:hover {
+            background: var(--border);
+        }
+        
+        .preset-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        
+        /* Backgrounds */
+        .bg-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .bg-btn {
+            aspect-ratio: 1;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .bg-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .bg-btn.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+        
+        /* Layers */
+        .layers-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        
+        .add-layer-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .add-layer-btn:hover {
+            background: var(--accent-hover);
+        }
+        
+        .layers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .layer-card {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem;
+        }
+        
+        .layer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        
+        .layer-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .layer-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .layer-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        
+        .layer-action-btn:hover {
+            color: var(--text);
+            background: var(--border);
+        }
+        
+        .layer-action-btn.delete:hover {
+            color: #ef4444;
+        }
+        
+        .layer-controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .control-group.full {
+            grid-column: span 2;
+        }
+        
+        .control-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .control-value {
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .control-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .control-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        
+        .control-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        
+        .color-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .color-picker {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .color-picker::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        
+        .color-picker::-webkit-color-swatch {
+            border: 2px solid var(--border);
+            border-radius: 6px;
+        }
+        
+        .color-hex {
+            flex: 1;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.375rem 0.5rem;
+            color: var(--text);
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+        
+        /* Actions */
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-btn.primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+        
+        .action-btn.primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        
+        .action-btn.secondary {
+            background: var(--surface-2);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .action-btn.secondary:hover {
+            background: var(--border);
+        }
+        
+        /* CSS Output */
+        .css-output {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 0.75rem;
+            color: var(--text);
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        
+        /* Pro Teaser */
+        .pro-teaser {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .pro-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .pro-features {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        
+        /* Footer */
+        .footer {
+            padding: 1.5rem 2rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+        }
+        
+        .footer a {
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text);
+            color: var(--bg);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <header class="header">
+        <a href="https://aikemist.com" class="logo">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#8b5cf6"/>
+                        <stop offset="100%" style="stop-color:#3b82f6"/>
+                    </linearGradient>
+                </defs>
+                <rect width="100" height="100" rx="20" fill="url(#logoGrad)"/>
+                <path d="M50 20L75 70H25L50 20Z" fill="white" opacity="0.9"/>
+                <circle cx="50" cy="58" r="8" fill="white"/>
+            </svg>
+            <span>Text Shadow Generator</span>
+        </a>
+        <div class="header-actions">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+    
+    <main class="main">
+        <div class="preview-area">
+            <div class="preview-bg" id="previewBg"></div>
+            <div class="preview-text" id="previewText">SHADOW</div>
+        </div>
+        
+        <div class="controls">
+            <div class="section">
+                <div class="section-title">Preview Text</div>
+                <input type="text" class="text-input" id="textInput" value="SHADOW" maxlength="50">
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Font</div>
+                <div class="font-grid">
+                    <button class="font-btn active" data-font="Inter">Inter</button>
+                    <button class="font-btn" data-font="Space Grotesk">Space Grotesk</button>
+                    <button class="font-btn" data-font="Playfair Display">Playfair</button>
+                    <button class="font-btn" data-font="Jost">Jost</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Text Color</div>
+                <div class="color-input-wrapper">
+                    <input type="color" class="color-picker" id="textColor" value="#ffffff">
+                    <input type="text" class="color-hex" id="textColorHex" value="#ffffff">
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Presets</div>
+                <div class="presets-grid">
+                    <button class="preset-btn" data-preset="none">None</button>
+                    <button class="preset-btn active" data-preset="soft">Soft</button>
+                    <button class="preset-btn" data-preset="neon">Neon</button>
+                    <button class="preset-btn" data-preset="emboss">Emboss</button>
+                    <button class="preset-btn" data-preset="3d">3D</button>
+                    <button class="preset-btn" data-preset="long">Long</button>
+                    <button class="preset-btn" data-preset="retro">Retro</button>
+                    <button class="preset-btn" data-preset="outline">Outline</button>
+                    <button class="preset-btn" data-preset="fire">Fire</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Background</div>
+                <div class="bg-grid">
+                    <button class="bg-btn active" data-bg="gradient1" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);"></button>
+                    <button class="bg-btn" data-bg="gradient2" style="background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);"></button>
+                    <button class="bg-btn" data-bg="gradient3" style="background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);"></button>
+                    <button class="bg-btn" data-bg="dark" style="background: #0a0a0a;"></button>
+                    <button class="bg-btn" data-bg="light" style="background: #f5f5f5;"></button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="layers-header">
+                    <div class="section-title" style="margin: 0;">Shadow Layers</div>
+                    <button class="add-layer-btn" id="addLayerBtn">+ Add Layer</button>
+                </div>
+                <div class="layers-list" id="layersList"></div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">CSS Output</div>
+                <pre class="css-output" id="cssOutput">text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);</pre>
+            </div>
+            
+            <div class="actions">
+                <button class="action-btn primary" id="copyBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2"/>
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                    </svg>
+                    Copy CSS
+                </button>
+                <button class="action-btn secondary" id="shareBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="18" cy="5" r="3"/>
+                        <circle cx="6" cy="12" r="3"/>
+                        <circle cx="18" cy="19" r="3"/>
+                        <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
+                    </svg>
+                    Share URL
+                </button>
+            </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+    
+    <div class="toast" id="toast">Copied to clipboard!</div>
+
+    <script>
+        // State
+        let layers = [];
+        let currentFont = 'Inter';
+        let textColor = '#ffffff';
+        let layerIdCounter = 0;
+        
+        // Elements
+        const previewText = document.getElementById('previewText');
+        const previewBg = document.getElementById('previewBg');
+        const textInput = document.getElementById('textInput');
+        const textColorPicker = document.getElementById('textColor');
+        const textColorHex = document.getElementById('textColorHex');
+        const layersList = document.getElementById('layersList');
+        const cssOutput = document.getElementById('cssOutput');
+        const toast = document.getElementById('toast');
+        
+        // Presets
+        const presets = {
+            none: [],
+            soft: [
+                { offsetX: 2, offsetY: 2, blur: 4, color: '#000000', opacity: 0.3 }
+            ],
+            neon: [
+                { offsetX: 0, offsetY: 0, blur: 10, color: '#00ffff', opacity: 1 },
+                { offsetX: 0, offsetY: 0, blur: 20, color: '#00ffff', opacity: 0.8 },
+                { offsetX: 0, offsetY: 0, blur: 40, color: '#00ffff', opacity: 0.6 },
+                { offsetX: 0, offsetY: 0, blur: 80, color: '#00ffff', opacity: 0.4 }
+            ],
+            emboss: [
+                { offsetX: -1, offsetY: -1, blur: 0, color: '#ffffff', opacity: 0.6 },
+                { offsetX: 1, offsetY: 1, blur: 0, color: '#000000', opacity: 0.6 }
+            ],
+            '3d': [
+                { offsetX: 1, offsetY: 1, blur: 0, color: '#888888', opacity: 1 },
+                { offsetX: 2, offsetY: 2, blur: 0, color: '#777777', opacity: 1 },
+                { offsetX: 3, offsetY: 3, blur: 0, color: '#666666', opacity: 1 },
+                { offsetX: 4, offsetY: 4, blur: 0, color: '#555555', opacity: 1 },
+                { offsetX: 5, offsetY: 5, blur: 0, color: '#444444', opacity: 1 },
+                { offsetX: 6, offsetY: 6, blur: 8, color: '#000000', opacity: 0.4 }
+            ],
+            long: [
+                { offsetX: 1, offsetY: 1, blur: 0, color: '#8b5cf6', opacity: 1 },
+                { offsetX: 2, offsetY: 2, blur: 0, color: '#8b5cf6', opacity: 1 },
+                { offsetX: 3, offsetY: 3, blur: 0, color: '#8b5cf6', opacity: 1 },
+                { offsetX: 4, offsetY: 4, blur: 0, color: '#8b5cf6', opacity: 1 },
+                { offsetX: 5, offsetY: 5, blur: 0, color: '#8b5cf6', opacity: 1 },
+                { offsetX: 6, offsetY: 6, blur: 0, color: '#8b5cf6', opacity: 1 },
+                { offsetX: 7, offsetY: 7, blur: 0, color: '#8b5cf6', opacity: 1 },
+                { offsetX: 8, offsetY: 8, blur: 0, color: '#8b5cf6', opacity: 1 }
+            ],
+            retro: [
+                { offsetX: 4, offsetY: 4, blur: 0, color: '#ff6b6b', opacity: 1 },
+                { offsetX: 8, offsetY: 8, blur: 0, color: '#4ecdc4', opacity: 1 }
+            ],
+            outline: [
+                { offsetX: -2, offsetY: -2, blur: 0, color: '#000000', opacity: 1 },
+                { offsetX: 2, offsetY: -2, blur: 0, color: '#000000', opacity: 1 },
+                { offsetX: -2, offsetY: 2, blur: 0, color: '#000000', opacity: 1 },
+                { offsetX: 2, offsetY: 2, blur: 0, color: '#000000', opacity: 1 }
+            ],
+            fire: [
+                { offsetX: 0, offsetY: -2, blur: 4, color: '#ff0000', opacity: 1 },
+                { offsetX: 0, offsetY: -4, blur: 8, color: '#ff6600', opacity: 0.8 },
+                { offsetX: 0, offsetY: -6, blur: 12, color: '#ffcc00', opacity: 0.6 },
+                { offsetX: 0, offsetY: 4, blur: 8, color: '#000000', opacity: 0.3 }
+            ]
+        };
+        
+        // Backgrounds
+        const backgrounds = {
+            gradient1: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+            gradient2: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
+            gradient3: 'linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%)',
+            dark: '#0a0a0a',
+            light: '#f5f5f5'
+        };
+        
+        // Initialize with soft preset
+        function init() {
+            loadFromURL();
+            if (layers.length === 0) {
+                applyPreset('soft');
+            }
+            render();
+        }
+        
+        // Create layer
+        function createLayer(config = {}) {
+            return {
+                id: layerIdCounter++,
+                offsetX: config.offsetX ?? 2,
+                offsetY: config.offsetY ?? 2,
+                blur: config.blur ?? 4,
+                color: config.color ?? '#000000',
+                opacity: config.opacity ?? 0.5
+            };
+        }
+        
+        // Render layer card
+        function renderLayerCard(layer, index) {
+            const card = document.createElement('div');
+            card.className = 'layer-card';
+            card.dataset.layerId = layer.id;
+            
+            card.innerHTML = `
+                <div class="layer-header">
+                    <span class="layer-title">Layer ${index + 1}</span>
+                    <div class="layer-actions">
+                        <button class="layer-action-btn delete" data-action="delete" title="Remove layer">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="layer-controls">
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span>Offset X</span>
+                            <span class="control-value">${layer.offsetX}px</span>
+                        </label>
+                        <input type="range" class="control-slider" data-prop="offsetX" min="-50" max="50" value="${layer.offsetX}">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span>Offset Y</span>
+                            <span class="control-value">${layer.offsetY}px</span>
+                        </label>
+                        <input type="range" class="control-slider" data-prop="offsetY" min="-50" max="50" value="${layer.offsetY}">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span>Blur</span>
+                            <span class="control-value">${layer.blur}px</span>
+                        </label>
+                        <input type="range" class="control-slider" data-prop="blur" min="0" max="100" value="${layer.blur}">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span>Opacity</span>
+                            <span class="control-value">${Math.round(layer.opacity * 100)}%</span>
+                        </label>
+                        <input type="range" class="control-slider" data-prop="opacity" min="0" max="100" value="${layer.opacity * 100}">
+                    </div>
+                    <div class="control-group full">
+                        <label class="control-label">Color</label>
+                        <div class="color-input-wrapper">
+                            <input type="color" class="color-picker" data-prop="color" value="${layer.color}">
+                            <input type="text" class="color-hex" data-prop="colorHex" value="${layer.color}">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // Render all layers
+        function renderLayers() {
+            layersList.innerHTML = '';
+            layers.forEach((layer, index) => {
+                layersList.appendChild(renderLayerCard(layer, index));
+            });
+        }
+        
+        // Generate CSS
+        function generateCSS() {
+            if (layers.length === 0) return 'text-shadow: none;';
+            
+            const shadows = layers.map(layer => {
+                const r = parseInt(layer.color.slice(1, 3), 16);
+                const g = parseInt(layer.color.slice(3, 5), 16);
+                const b = parseInt(layer.color.slice(5, 7), 16);
+                return `${layer.offsetX}px ${layer.offsetY}px ${layer.blur}px rgba(${r}, ${g}, ${b}, ${layer.opacity})`;
+            });
+            
+            return `text-shadow: ${shadows.join(',\n             ')};`;
+        }
+        
+        // Update preview
+        function updatePreview() {
+            if (layers.length === 0) {
+                previewText.style.textShadow = 'none';
+            } else {
+                const shadows = layers.map(layer => {
+                    const r = parseInt(layer.color.slice(1, 3), 16);
+                    const g = parseInt(layer.color.slice(3, 5), 16);
+                    const b = parseInt(layer.color.slice(5, 7), 16);
+                    return `${layer.offsetX}px ${layer.offsetY}px ${layer.blur}px rgba(${r}, ${g}, ${b}, ${layer.opacity})`;
+                });
+                previewText.style.textShadow = shadows.join(', ');
+            }
+            
+            cssOutput.textContent = generateCSS();
+        }
+        
+        // Apply preset
+        function applyPreset(presetName) {
+            layers = presets[presetName].map(config => createLayer(config));
+            
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.preset === presetName);
+            });
+            
+            renderLayers();
+            updatePreview();
+        }
+        
+        // Full render
+        function render() {
+            renderLayers();
+            updatePreview();
+        }
+        
+        // Event: Text input
+        textInput.addEventListener('input', (e) => {
+            previewText.textContent = e.target.value || 'SHADOW';
+        });
+        
+        // Event: Text color
+        textColorPicker.addEventListener('input', (e) => {
+            textColor = e.target.value;
+            textColorHex.value = textColor;
+            previewText.style.color = textColor;
+        });
+        
+        textColorHex.addEventListener('input', (e) => {
+            if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+                textColor = e.target.value;
+                textColorPicker.value = textColor;
+                previewText.style.color = textColor;
+            }
+        });
+        
+        // Event: Font selection
+        document.querySelectorAll('.font-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFont = btn.dataset.font;
+                previewText.style.fontFamily = `'${currentFont}', sans-serif`;
+            });
+        });
+        
+        // Event: Preset selection
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                applyPreset(btn.dataset.preset);
+            });
+        });
+        
+        // Event: Background selection
+        document.querySelectorAll('.bg-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.bg-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                previewBg.style.background = backgrounds[btn.dataset.bg];
+            });
+        });
+        
+        // Event: Add layer
+        document.getElementById('addLayerBtn').addEventListener('click', () => {
+            layers.push(createLayer());
+            render();
+            
+            // Clear preset selection
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        });
+        
+        // Event: Layer controls (delegation)
+        layersList.addEventListener('input', (e) => {
+            const card = e.target.closest('.layer-card');
+            if (!card) return;
+            
+            const layerId = parseInt(card.dataset.layerId);
+            const layer = layers.find(l => l.id === layerId);
+            if (!layer) return;
+            
+            const prop = e.target.dataset.prop;
+            
+            if (prop === 'offsetX' || prop === 'offsetY' || prop === 'blur') {
+                layer[prop] = parseInt(e.target.value);
+                e.target.previousElementSibling.querySelector('.control-value').textContent = `${layer[prop]}px`;
+            } else if (prop === 'opacity') {
+                layer.opacity = parseInt(e.target.value) / 100;
+                e.target.previousElementSibling.querySelector('.control-value').textContent = `${Math.round(layer.opacity * 100)}%`;
+            } else if (prop === 'color') {
+                layer.color = e.target.value;
+                const hexInput = card.querySelector('[data-prop="colorHex"]');
+                if (hexInput) hexInput.value = layer.color;
+            } else if (prop === 'colorHex') {
+                if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+                    layer.color = e.target.value;
+                    const picker = card.querySelector('[data-prop="color"]');
+                    if (picker) picker.value = layer.color;
+                }
+            }
+            
+            // Clear preset selection
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            
+            updatePreview();
+        });
+        
+        // Event: Delete layer
+        layersList.addEventListener('click', (e) => {
+            const deleteBtn = e.target.closest('[data-action="delete"]');
+            if (!deleteBtn) return;
+            
+            const card = deleteBtn.closest('.layer-card');
+            const layerId = parseInt(card.dataset.layerId);
+            layers = layers.filter(l => l.id !== layerId);
+            
+            render();
+        });
+        
+        // Event: Copy CSS
+        document.getElementById('copyBtn').addEventListener('click', async () => {
+            const css = generateCSS();
+            await navigator.clipboard.writeText(css);
+            showToast('Copied to clipboard!');
+        });
+        
+        // Event: Share URL
+        document.getElementById('shareBtn').addEventListener('click', async () => {
+            const state = {
+                text: textInput.value,
+                font: currentFont,
+                color: textColor,
+                layers: layers.map(l => ({
+                    x: l.offsetX,
+                    y: l.offsetY,
+                    b: l.blur,
+                    c: l.color,
+                    o: l.opacity
+                }))
+            };
+            
+            const encoded = btoa(JSON.stringify(state));
+            const url = `${location.origin}${location.pathname}?s=${encoded}`;
+            
+            await navigator.clipboard.writeText(url);
+            showToast('Share URL copied!');
+        });
+        
+        // Load from URL
+        function loadFromURL() {
+            const params = new URLSearchParams(location.search);
+            const encoded = params.get('s');
+            
+            if (encoded) {
+                try {
+                    const state = JSON.parse(atob(encoded));
+                    
+                    if (state.text) {
+                        textInput.value = state.text;
+                        previewText.textContent = state.text;
+                    }
+                    
+                    if (state.font) {
+                        currentFont = state.font;
+                        previewText.style.fontFamily = `'${currentFont}', sans-serif`;
+                        document.querySelectorAll('.font-btn').forEach(btn => {
+                            btn.classList.toggle('active', btn.dataset.font === currentFont);
+                        });
+                    }
+                    
+                    if (state.color) {
+                        textColor = state.color;
+                        textColorPicker.value = textColor;
+                        textColorHex.value = textColor;
+                        previewText.style.color = textColor;
+                    }
+                    
+                    if (state.layers) {
+                        layers = state.layers.map(l => createLayer({
+                            offsetX: l.x,
+                            offsetY: l.y,
+                            blur: l.b,
+                            color: l.c,
+                            opacity: l.o
+                        }));
+                    }
+                } catch (e) {
+                    console.error('Failed to load state from URL');
+                }
+            }
+        }
+        
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const body = document.body;
+            const isDark = body.dataset.theme === 'dark';
+            body.dataset.theme = isDark ? 'light' : 'dark';
+        });
+        
+        // Toast
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        // Init
+        init();
+    </script>
+</body>
+</html>

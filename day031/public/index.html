@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Color Extractor | Alkemist</title>
+    <meta name="description" content="Extract color palettes from any image. Get dominant colors, export to CSS, Tailwind, or JSON.">
+    <meta property="og:title" content="Image Color Extractor | Alkemist">
+    <meta property="og:description" content="Extract color palettes from any image instantly.">
+    <meta property="og:image" content="https://day031.aikemist.com/og.png">
+    <meta property="og:url" content="https://day031.aikemist.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #0a0a0a;
+            --bg-subtle: #111;
+            --bg-card: #161616;
+            --border: #2a2a2a;
+            --text: #f5f5f5;
+            --text-muted: #888;
+            --accent: #7c3aed;
+            --accent-hover: #8b5cf6;
+            --success: #10b981;
+            --font: 'Jost', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+        
+        [data-theme="light"] {
+            --bg: #fafafa;
+            --bg-subtle: #f0f0f0;
+            --bg-card: #fff;
+            --border: #e0e0e0;
+            --text: #1a1a1a;
+            --text-muted: #666;
+        }
+        
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.15s;
+        }
+        
+        .theme-toggle:hover {
+            border-color: var(--accent);
+        }
+        
+        /* Main */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.0625rem;
+        }
+        
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg-card);
+            margin-bottom: 2rem;
+        }
+        
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--accent);
+            background: rgba(124, 58, 237, 0.05);
+        }
+        
+        .upload-zone.has-image {
+            padding: 1rem;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+        
+        .upload-text {
+            font-size: 1.125rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .upload-hint {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        .upload-zone input {
+            display: none;
+        }
+        
+        /* Preview Image */
+        .preview-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .upload-zone.has-image .preview-container {
+            display: flex;
+        }
+        
+        .upload-zone.has-image .upload-prompt {
+            display: none;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+        
+        .change-image-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-subtle);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .change-image-btn:hover {
+            border-color: var(--accent);
+        }
+        
+        /* Results */
+        .results {
+            display: none;
+        }
+        
+        .results.visible {
+            display: block;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .results-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .color-count {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .color-count label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        .color-count select {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-card);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+        
+        /* Palette Display */
+        .palette-display {
+            display: flex;
+            gap: 0;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            min-height: 120px;
+        }
+        
+        .palette-color {
+            flex: 1;
+            min-height: 120px;
+            cursor: pointer;
+            position: relative;
+            transition: flex 0.2s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 0.75rem;
+        }
+        
+        .palette-color:hover {
+            flex: 1.5;
+        }
+        
+        .palette-color .hex {
+            font-family: var(--mono);
+            font-size: 0.6875rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            text-transform: uppercase;
+        }
+        
+        .palette-color:hover .hex {
+            opacity: 1;
+        }
+        
+        /* Color Cards */
+        .color-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .color-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .color-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        
+        .color-card-swatch {
+            height: 80px;
+            position: relative;
+        }
+        
+        .color-card-swatch::after {
+            content: '📋 Copy';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .color-card:hover .color-card-swatch::after {
+            opacity: 1;
+        }
+        
+        .color-card-info {
+            padding: 1rem;
+        }
+        
+        .color-card-hex {
+            font-family: var(--mono);
+            font-size: 0.9375rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.375rem;
+        }
+        
+        .color-card-rgb {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        .color-card-percent {
+            font-size: 0.6875rem;
+            color: var(--text-muted);
+            margin-top: 0.375rem;
+        }
+        
+        /* Export Section */
+        .export-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .export-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .export-title {
+            font-weight: 600;
+        }
+        
+        .export-formats {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .format-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .format-btn:hover {
+            border-color: var(--text-muted);
+            color: var(--text);
+        }
+        
+        .format-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        .export-content {
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .export-content pre {
+            font-family: var(--mono);
+            font-size: 0.8125rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .copy-export-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-subtle);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: all 0.15s;
+        }
+        
+        .copy-export-btn:hover {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        .copy-export-btn.copied {
+            border-color: var(--success);
+            background: var(--success);
+        }
+        
+        /* Sample Images */
+        .sample-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .sample-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+        
+        .sample-images {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+        
+        .sample-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .sample-image:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+        
+        /* Footer */
+        .footer {
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 3rem;
+        }
+        
+        .footer a {
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            color: var(--accent);
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 0.875rem 1.5rem;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 10px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .loading.visible {
+            display: block;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="https://aikemist.com" class="logo">
+            <div class="logo-icon">A</div>
+            <span>Image Color Extractor</span>
+        </a>
+        <div class="header-actions">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="hero">
+            <h1>Extract Colors from Images</h1>
+            <p>Upload any image and get a beautiful color palette instantly. Export to CSS, Tailwind, or JSON.</p>
+        </div>
+        
+        <div class="upload-zone" id="upload-zone">
+            <div class="upload-prompt">
+                <div class="upload-icon">🎨</div>
+                <div class="upload-text">Drop an image here or click to upload</div>
+                <div class="upload-hint">Supports JPG, PNG, WebP, GIF</div>
+            </div>
+            <div class="preview-container">
+                <img class="preview-image" id="preview-image" alt="Preview">
+                <button class="change-image-btn">Change Image</button>
+            </div>
+            <input type="file" id="file-input" accept="image/*">
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>Extracting colors...</p>
+        </div>
+        
+        <div class="results" id="results">
+            <div class="results-header">
+                <h2 class="results-title">Extracted Palette</h2>
+                <div class="color-count">
+                    <label for="color-count">Colors:</label>
+                    <select id="color-count">
+                        <option value="5">5</option>
+                        <option value="6" selected>6</option>
+                        <option value="8">8</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="palette-display" id="palette-display"></div>
+            
+            <div class="color-cards" id="color-cards"></div>
+            
+            <div class="export-section">
+                <div class="export-header">
+                    <span class="export-title">Export</span>
+                    <div class="export-formats">
+                        <button class="format-btn active" data-format="css">CSS</button>
+                        <button class="format-btn" data-format="tailwind">Tailwind</button>
+                        <button class="format-btn" data-format="scss">SCSS</button>
+                        <button class="format-btn" data-format="json">JSON</button>
+                    </div>
+                </div>
+                <div class="export-content">
+                    <button class="copy-export-btn" onclick="copyExport()">
+                        <span>📋</span> Copy
+                    </button>
+                    <pre id="export-code"></pre>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sample-section">
+            <div class="sample-title">Try with sample images</div>
+            <div class="sample-images">
+                <img class="sample-image" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop" alt="Mountains" onclick="loadSample(this.src)">
+                <img class="sample-image" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=300&fit=crop" alt="Beach" onclick="loadSample(this.src)">
+                <img class="sample-image" src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=400&h=300&fit=crop" alt="Ocean" onclick="loadSample(this.src)">
+                <img class="sample-image" src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=300&fit=crop" alt="Forest" onclick="loadSample(this.src)">
+                <img class="sample-image" src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&h=300&fit=crop" alt="Snow" onclick="loadSample(this.src)">
+                <img class="sample-image" src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&h=300&fit=crop" alt="Japan" onclick="loadSample(this.src)">
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+    
+    <div class="toast" id="toast">Copied!</div>
+    
+    <canvas id="canvas" style="display: none;"></canvas>
+
+    <script>
+        // State
+        let extractedColors = [];
+        let currentFormat = 'css';
+        let colorCount = 6;
+        
+        // DOM elements
+        const uploadZone = document.getElementById('upload-zone');
+        const fileInput = document.getElementById('file-input');
+        const previewImage = document.getElementById('preview-image');
+        const results = document.getElementById('results');
+        const loading = document.getElementById('loading');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        
+        // Upload zone events
+        uploadZone.addEventListener('click', (e) => {
+            if (e.target.classList.contains('change-image-btn')) {
+                fileInput.click();
+            } else if (!uploadZone.classList.contains('has-image')) {
+                fileInput.click();
+            }
+        });
+        
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+        
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                processImage(file);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                processImage(file);
+            }
+        });
+        
+        // Paste support
+        document.addEventListener('paste', (e) => {
+            const items = e.clipboardData.items;
+            for (let item of items) {
+                if (item.type.startsWith('image/')) {
+                    const file = item.getAsFile();
+                    processImage(file);
+                    break;
+                }
+            }
+        });
+        
+        // Color count change
+        document.getElementById('color-count').addEventListener('change', (e) => {
+            colorCount = parseInt(e.target.value);
+            if (previewImage.src) {
+                extractColors();
+            }
+        });
+        
+        // Format buttons
+        document.querySelectorAll('.format-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFormat = btn.dataset.format;
+                renderExport();
+            });
+        });
+        
+        // Process uploaded image
+        function processImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                uploadZone.classList.add('has-image');
+                previewImage.onload = () => extractColors();
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Load sample image
+        function loadSample(url) {
+            loading.classList.add('visible');
+            results.classList.remove('visible');
+            
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                previewImage.src = img.src;
+                uploadZone.classList.add('has-image');
+                extractColors();
+            };
+            img.onerror = () => {
+                loading.classList.remove('visible');
+                showToast('Failed to load image');
+            };
+            img.src = url;
+        }
+        
+        // Extract colors using median cut algorithm
+        function extractColors() {
+            loading.classList.add('visible');
+            results.classList.remove('visible');
+            
+            // Use setTimeout to allow UI to update
+            setTimeout(() => {
+                const img = previewImage;
+                
+                // Scale down for performance
+                const maxSize = 150;
+                const scale = Math.min(maxSize / img.naturalWidth, maxSize / img.naturalHeight, 1);
+                canvas.width = img.naturalWidth * scale;
+                canvas.height = img.naturalHeight * scale;
+                
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const pixels = [];
+                
+                // Sample pixels
+                for (let i = 0; i < imageData.data.length; i += 4) {
+                    const r = imageData.data[i];
+                    const g = imageData.data[i + 1];
+                    const b = imageData.data[i + 2];
+                    const a = imageData.data[i + 3];
+                    
+                    // Skip transparent pixels
+                    if (a < 128) continue;
+                    
+                    // Skip very dark or very light pixels for better results
+                    const brightness = (r + g + b) / 3;
+                    if (brightness < 10 || brightness > 245) continue;
+                    
+                    pixels.push([r, g, b]);
+                }
+                
+                // Quantize using median cut
+                extractedColors = medianCut(pixels, colorCount);
+                
+                // Sort by luminance
+                extractedColors.sort((a, b) => {
+                    const lumA = 0.299 * a.rgb[0] + 0.587 * a.rgb[1] + 0.114 * a.rgb[2];
+                    const lumB = 0.299 * b.rgb[0] + 0.587 * b.rgb[1] + 0.114 * b.rgb[2];
+                    return lumB - lumA;
+                });
+                
+                loading.classList.remove('visible');
+                renderResults();
+            }, 50);
+        }
+        
+        // Median cut algorithm
+        function medianCut(pixels, numColors) {
+            if (pixels.length === 0) return [];
+            
+            // Create initial bucket
+            let buckets = [pixels];
+            
+            // Split until we have enough buckets
+            while (buckets.length < numColors) {
+                // Find bucket with most range
+                let maxRange = 0;
+                let maxBucketIndex = 0;
+                let maxChannel = 0;
+                
+                buckets.forEach((bucket, i) => {
+                    if (bucket.length < 2) return;
+                    
+                    for (let c = 0; c < 3; c++) {
+                        const values = bucket.map(p => p[c]);
+                        const range = Math.max(...values) - Math.min(...values);
+                        if (range > maxRange) {
+                            maxRange = range;
+                            maxBucketIndex = i;
+                            maxChannel = c;
+                        }
+                    }
+                });
+                
+                if (maxRange === 0) break;
+                
+                // Split the bucket
+                const bucket = buckets[maxBucketIndex];
+                bucket.sort((a, b) => a[maxChannel] - b[maxChannel]);
+                const mid = Math.floor(bucket.length / 2);
+                
+                buckets.splice(maxBucketIndex, 1, bucket.slice(0, mid), bucket.slice(mid));
+            }
+            
+            // Calculate average color and pixel count for each bucket
+            const totalPixels = pixels.length;
+            return buckets.map(bucket => {
+                const avg = [0, 0, 0];
+                bucket.forEach(p => {
+                    avg[0] += p[0];
+                    avg[1] += p[1];
+                    avg[2] += p[2];
+                });
+                avg[0] = Math.round(avg[0] / bucket.length);
+                avg[1] = Math.round(avg[1] / bucket.length);
+                avg[2] = Math.round(avg[2] / bucket.length);
+                
+                return {
+                    rgb: avg,
+                    hex: rgbToHex(avg[0], avg[1], avg[2]),
+                    percent: ((bucket.length / totalPixels) * 100).toFixed(1)
+                };
+            }).filter(c => c.rgb[0] !== undefined);
+        }
+        
+        // RGB to Hex
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+        }
+        
+        // Render results
+        function renderResults() {
+            results.classList.add('visible');
+            
+            // Palette display
+            const paletteDisplay = document.getElementById('palette-display');
+            paletteDisplay.innerHTML = extractedColors.map(c => `
+                <div class="palette-color" style="background: ${c.hex}" onclick="copyColor('${c.hex}')">
+                    <span class="hex">${c.hex}</span>
+                </div>
+            `).join('');
+            
+            // Color cards
+            const colorCards = document.getElementById('color-cards');
+            colorCards.innerHTML = extractedColors.map(c => `
+                <div class="color-card" onclick="copyColor('${c.hex}')">
+                    <div class="color-card-swatch" style="background: ${c.hex}"></div>
+                    <div class="color-card-info">
+                        <div class="color-card-hex">${c.hex}</div>
+                        <div class="color-card-rgb">rgb(${c.rgb.join(', ')})</div>
+                        <div class="color-card-percent">${c.percent}% of image</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            renderExport();
+        }
+        
+        // Render export code
+        function renderExport() {
+            const exportCode = document.getElementById('export-code');
+            let code = '';
+            
+            switch (currentFormat) {
+                case 'css':
+                    code = ':root {\n';
+                    extractedColors.forEach((c, i) => {
+                        code += `  --color-${i + 1}: ${c.hex};\n`;
+                    });
+                    code += '}';
+                    break;
+                    
+                case 'tailwind':
+                    code = '// tailwind.config.js\nmodule.exports = {\n  theme: {\n    extend: {\n      colors: {\n        palette: {\n';
+                    extractedColors.forEach((c, i) => {
+                        code += `          '${i + 1}': '${c.hex}',\n`;
+                    });
+                    code += '        }\n      }\n    }\n  }\n}';
+                    break;
+                    
+                case 'scss':
+                    extractedColors.forEach((c, i) => {
+                        code += `$color-${i + 1}: ${c.hex};\n`;
+                    });
+                    code += '\n$palette: (\n';
+                    extractedColors.forEach((c, i) => {
+                        code += `  '${i + 1}': ${c.hex}${i < extractedColors.length - 1 ? ',' : ''}\n`;
+                    });
+                    code += ');';
+                    break;
+                    
+                case 'json':
+                    const jsonObj = {
+                        colors: extractedColors.map((c, i) => ({
+                            name: `color-${i + 1}`,
+                            hex: c.hex,
+                            rgb: { r: c.rgb[0], g: c.rgb[1], b: c.rgb[2] },
+                            percent: parseFloat(c.percent)
+                        }))
+                    };
+                    code = JSON.stringify(jsonObj, null, 2);
+                    break;
+            }
+            
+            exportCode.textContent = code;
+        }
+        
+        // Copy color
+        function copyColor(hex) {
+            navigator.clipboard.writeText(hex);
+            showToast(`Copied ${hex}`);
+        }
+        
+        // Copy export
+        function copyExport() {
+            const code = document.getElementById('export-code').textContent;
+            navigator.clipboard.writeText(code);
+            const btn = document.querySelector('.copy-export-btn');
+            btn.classList.add('copied');
+            btn.innerHTML = '<span>✓</span> Copied!';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.innerHTML = '<span>📋</span> Copy';
+            }, 2000);
+        }
+        
+        // Toast
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            document.querySelector('.theme-icon').textContent = next === 'light' ? '☀️' : '🌙';
+            localStorage.setItem('theme', next);
+        }
+        
+        // Init
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.querySelector('.theme-icon').textContent = savedTheme === 'light' ? '☀️' : '🌙';
+        })();
+    </script>
+</body>
+</html>

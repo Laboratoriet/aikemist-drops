@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Contrast Checker | Alkemist</title>
+    <meta name="description" content="Check WCAG color contrast ratios instantly. Test accessibility compliance for AA and AAA standards.">
+    <meta property="og:title" content="Color Contrast Checker | Alkemist">
+    <meta property="og:description" content="Check WCAG color contrast ratios instantly. Test accessibility compliance.">
+    <meta property="og:image" content="https://day028.aikemist.com/og.png">
+    <meta property="og:url" content="https://day028.aikemist.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #0a0a0a;
+            --bg-subtle: #111;
+            --bg-card: #161616;
+            --border: #2a2a2a;
+            --text: #f5f5f5;
+            --text-muted: #888;
+            --accent: #7c3aed;
+            --accent-hover: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --font: 'Jost', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+        
+        [data-theme="light"] {
+            --bg: #fafafa;
+            --bg-subtle: #f0f0f0;
+            --bg-card: #fff;
+            --border: #e0e0e0;
+            --text: #1a1a1a;
+            --text-muted: #666;
+        }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.2s;
+        }
+        
+        .theme-toggle:hover {
+            border-color: var(--accent);
+        }
+        
+        /* Main */
+        .main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.0625rem;
+        }
+        
+        /* Color Inputs */
+        .color-inputs {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1.5rem;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 700px) {
+            .color-inputs {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+        
+        .color-input-group {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+        
+        .color-input-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .color-picker-wrap {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .color-preview {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .color-preview input[type="color"] {
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            top: -25%;
+            left: -25%;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .color-hex-input {
+            flex: 1;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-subtle);
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+        
+        .color-hex-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .swap-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text);
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .swap-btn:hover {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+            transform: rotate(180deg);
+        }
+        
+        @media (max-width: 700px) {
+            .swap-btn {
+                margin: 0 auto;
+            }
+        }
+        
+        /* Ratio Display */
+        .ratio-display {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .ratio-value {
+            font-size: 4rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+        
+        .ratio-label {
+            color: var(--text-muted);
+            font-size: 0.9375rem;
+        }
+        
+        /* WCAG Results */
+        .wcag-results {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 600px) {
+            .wcag-results {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .wcag-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+        
+        .wcag-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .wcag-level {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+        
+        .wcag-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        
+        .wcag-badge.pass {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+        
+        .wcag-badge.fail {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--error);
+        }
+        
+        .wcag-tests {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .wcag-test {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--bg-subtle);
+            border-radius: 10px;
+        }
+        
+        .wcag-test-label {
+            font-size: 0.875rem;
+        }
+        
+        .wcag-test-result {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .wcag-test-result.pass {
+            color: var(--success);
+        }
+        
+        .wcag-test-result.fail {
+            color: var(--error);
+        }
+        
+        .wcag-test-result .icon {
+            font-size: 1rem;
+        }
+        
+        /* Preview Section */
+        .preview-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .preview-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .preview-title {
+            font-weight: 600;
+        }
+        
+        .preview-content {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+            transition: background 0.2s;
+        }
+        
+        .preview-text-large {
+            font-size: 2rem;
+            font-weight: 600;
+            text-align: center;
+            transition: color 0.2s;
+        }
+        
+        .preview-text-normal {
+            font-size: 1rem;
+            max-width: 500px;
+            text-align: center;
+            transition: color 0.2s;
+        }
+        
+        .preview-text-small {
+            font-size: 0.75rem;
+            transition: color 0.2s;
+        }
+        
+        /* Suggestions */
+        .suggestions {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .suggestions-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .suggestion-chip {
+            padding: 0.75rem;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        
+        .suggestion-chip:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        
+        .suggestion-swatch {
+            width: 100%;
+            height: 40px;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .suggestion-info {
+            font-family: var(--mono);
+            font-size: 0.6875rem;
+            color: var(--text-muted);
+        }
+        
+        .suggestion-ratio {
+            font-weight: 600;
+            color: var(--success);
+        }
+        
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 0.875rem 1.5rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-card);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.9375rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.15s;
+        }
+        
+        .action-btn:hover {
+            border-color: var(--accent);
+            background: var(--bg-subtle);
+        }
+        
+        .action-btn.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        
+        .action-btn.primary:hover {
+            background: var(--accent-hover);
+        }
+        
+        /* Pro Teaser */
+        .pro-teaser {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 16px;
+        }
+        
+        .pro-badge {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            background: var(--accent);
+            color: #fff;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 4px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .pro-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .pro-desc {
+            color: var(--text-muted);
+            font-size: 0.9375rem;
+        }
+        
+        .pro-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        
+        .pro-feature {
+            padding: 0.375rem 0.75rem;
+            background: var(--bg);
+            border-radius: 20px;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+        
+        /* Footer */
+        .footer {
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 2rem;
+        }
+        
+        .footer a {
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            color: var(--accent);
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 0.875rem 1.5rem;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 10px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="https://aikemist.com" class="logo">
+            <div class="logo-icon">A</div>
+            <span>Color Contrast Checker</span>
+        </a>
+        <div class="header-actions">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="hero">
+            <h1>Color Contrast Checker</h1>
+            <p>Test WCAG accessibility compliance instantly. Make your designs readable for everyone.</p>
+        </div>
+        
+        <div class="color-inputs">
+            <div class="color-input-group">
+                <label class="color-input-label">Foreground (Text)</label>
+                <div class="color-picker-wrap">
+                    <div class="color-preview" id="fg-preview">
+                        <input type="color" id="fg-color" value="#ffffff">
+                    </div>
+                    <input type="text" class="color-hex-input" id="fg-hex" value="#FFFFFF" maxlength="7">
+                </div>
+            </div>
+            
+            <button class="swap-btn" onclick="swapColors()" title="Swap colors">⇄</button>
+            
+            <div class="color-input-group">
+                <label class="color-input-label">Background</label>
+                <div class="color-picker-wrap">
+                    <div class="color-preview" id="bg-preview">
+                        <input type="color" id="bg-color" value="#000000">
+                    </div>
+                    <input type="text" class="color-hex-input" id="bg-hex" value="#000000" maxlength="7">
+                </div>
+            </div>
+        </div>
+        
+        <div class="ratio-display">
+            <div class="ratio-value" id="ratio-value">21:1</div>
+            <div class="ratio-label">Contrast Ratio</div>
+        </div>
+        
+        <div class="wcag-results">
+            <div class="wcag-card">
+                <div class="wcag-card-header">
+                    <span class="wcag-level">WCAG AA</span>
+                    <span class="wcag-badge pass" id="aa-badge">PASS</span>
+                </div>
+                <div class="wcag-tests">
+                    <div class="wcag-test">
+                        <span class="wcag-test-label">Normal text (≥4.5:1)</span>
+                        <span class="wcag-test-result pass" id="aa-normal">
+                            <span class="icon">✓</span> Pass
+                        </span>
+                    </div>
+                    <div class="wcag-test">
+                        <span class="wcag-test-label">Large text (≥3:1)</span>
+                        <span class="wcag-test-result pass" id="aa-large">
+                            <span class="icon">✓</span> Pass
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="wcag-card">
+                <div class="wcag-card-header">
+                    <span class="wcag-level">WCAG AAA</span>
+                    <span class="wcag-badge pass" id="aaa-badge">PASS</span>
+                </div>
+                <div class="wcag-tests">
+                    <div class="wcag-test">
+                        <span class="wcag-test-label">Normal text (≥7:1)</span>
+                        <span class="wcag-test-result pass" id="aaa-normal">
+                            <span class="icon">✓</span> Pass
+                        </span>
+                    </div>
+                    <div class="wcag-test">
+                        <span class="wcag-test-label">Large text (≥4.5:1)</span>
+                        <span class="wcag-test-result pass" id="aaa-large">
+                            <span class="icon">✓</span> Pass
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="preview-section">
+            <div class="preview-header">
+                <span class="preview-title">Live Preview</span>
+            </div>
+            <div class="preview-content" id="preview-content">
+                <div class="preview-text-large" id="preview-large">Large Text (24px+)</div>
+                <div class="preview-text-normal" id="preview-normal">Normal body text. The quick brown fox jumps over the lazy dog. This demonstrates readability at standard sizes.</div>
+                <div class="preview-text-small" id="preview-small">Small text (12px) — fine print and captions</div>
+            </div>
+        </div>
+        
+        <div class="suggestions" id="suggestions">
+            <div class="suggestions-title">
+                💡 Accessible Alternatives
+            </div>
+            <div class="suggestions-grid" id="suggestions-grid">
+                <!-- Generated dynamically -->
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="action-btn" onclick="shareUrl()">
+                <span>🔗</span> Copy Link
+            </button>
+            <button class="action-btn" onclick="copyCSS()">
+                <span>📋</span> Copy CSS
+            </button>
+            <button class="action-btn" onclick="randomColors()">
+                <span>🎲</span> Random
+            </button>
+        </div>
+        
+        <div class="pro-teaser">
+            <span class="pro-badge">Pro</span>
+            <h3 class="pro-title">Palette Accessibility Scanner</h3>
+            <p class="pro-desc">Check entire color palettes at once. Export accessibility reports.</p>
+            <div class="pro-features">
+                <span class="pro-feature">Batch checking</span>
+                <span class="pro-feature">PDF reports</span>
+                <span class="pro-feature">Figma plugin</span>
+                <span class="pro-feature">API access</span>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+    
+    <div class="toast" id="toast">Copied!</div>
+
+    <script>
+        // State
+        let fgColor = '#ffffff';
+        let bgColor = '#000000';
+        
+        // Calculate relative luminance
+        function getLuminance(hex) {
+            const rgb = hexToRgb(hex);
+            const [r, g, b] = [rgb.r, rgb.g, rgb.b].map(v => {
+                v /= 255;
+                return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            });
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        }
+        
+        // Calculate contrast ratio
+        function getContrastRatio(fg, bg) {
+            const l1 = getLuminance(fg);
+            const l2 = getLuminance(bg);
+            const lighter = Math.max(l1, l2);
+            const darker = Math.min(l1, l2);
+            return (lighter + 0.05) / (darker + 0.05);
+        }
+        
+        // Hex to RGB
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 0, g: 0, b: 0 };
+        }
+        
+        // RGB to Hex
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(x => {
+                const hex = Math.round(Math.max(0, Math.min(255, x))).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
+        }
+        
+        // Validate hex color
+        function isValidHex(hex) {
+            return /^#[0-9A-Fa-f]{6}$/.test(hex);
+        }
+        
+        // Format ratio
+        function formatRatio(ratio) {
+            return ratio.toFixed(2) + ':1';
+        }
+        
+        // Update display
+        function updateDisplay() {
+            const ratio = getContrastRatio(fgColor, bgColor);
+            
+            // Update ratio display
+            document.getElementById('ratio-value').textContent = formatRatio(ratio);
+            
+            // Update color previews
+            document.getElementById('fg-preview').style.background = fgColor;
+            document.getElementById('bg-preview').style.background = bgColor;
+            
+            // WCAG results
+            const aaLarge = ratio >= 3;
+            const aaNormal = ratio >= 4.5;
+            const aaaLarge = ratio >= 4.5;
+            const aaaNormal = ratio >= 7;
+            
+            updateWcagResult('aa-normal', aaNormal);
+            updateWcagResult('aa-large', aaLarge);
+            updateWcagResult('aaa-normal', aaaNormal);
+            updateWcagResult('aaa-large', aaaLarge);
+            
+            updateBadge('aa-badge', aaNormal && aaLarge);
+            updateBadge('aaa-badge', aaaNormal && aaaLarge);
+            
+            // Preview
+            document.getElementById('preview-content').style.background = bgColor;
+            document.getElementById('preview-large').style.color = fgColor;
+            document.getElementById('preview-normal').style.color = fgColor;
+            document.getElementById('preview-small').style.color = fgColor;
+            
+            // Generate suggestions if failing
+            generateSuggestions(ratio);
+        }
+        
+        function updateWcagResult(id, pass) {
+            const el = document.getElementById(id);
+            el.className = `wcag-test-result ${pass ? 'pass' : 'fail'}`;
+            el.innerHTML = `<span class="icon">${pass ? '✓' : '✗'}</span> ${pass ? 'Pass' : 'Fail'}`;
+        }
+        
+        function updateBadge(id, pass) {
+            const el = document.getElementById(id);
+            el.className = `wcag-badge ${pass ? 'pass' : 'fail'}`;
+            el.textContent = pass ? 'PASS' : 'FAIL';
+        }
+        
+        // Generate accessible color suggestions
+        function generateSuggestions(currentRatio) {
+            const container = document.getElementById('suggestions');
+            const grid = document.getElementById('suggestions-grid');
+            
+            // Hide if already passing AAA
+            if (currentRatio >= 7) {
+                container.style.display = 'none';
+                return;
+            }
+            container.style.display = 'block';
+            
+            const suggestions = [];
+            const fgRgb = hexToRgb(fgColor);
+            const bgRgb = hexToRgb(bgColor);
+            
+            // Try adjusting foreground lighter and darker
+            for (let factor = 0.1; factor <= 1; factor += 0.1) {
+                // Lighter foreground
+                const lighterFg = rgbToHex(
+                    fgRgb.r + (255 - fgRgb.r) * factor,
+                    fgRgb.g + (255 - fgRgb.g) * factor,
+                    fgRgb.b + (255 - fgRgb.b) * factor
+                );
+                const lighterRatio = getContrastRatio(lighterFg, bgColor);
+                if (lighterRatio >= 4.5 && lighterRatio > currentRatio) {
+                    suggestions.push({ fg: lighterFg, bg: bgColor, ratio: lighterRatio, type: 'fg' });
+                }
+                
+                // Darker foreground
+                const darkerFg = rgbToHex(
+                    fgRgb.r * (1 - factor),
+                    fgRgb.g * (1 - factor),
+                    fgRgb.b * (1 - factor)
+                );
+                const darkerRatio = getContrastRatio(darkerFg, bgColor);
+                if (darkerRatio >= 4.5 && darkerRatio > currentRatio) {
+                    suggestions.push({ fg: darkerFg, bg: bgColor, ratio: darkerRatio, type: 'fg' });
+                }
+                
+                // Lighter background
+                const lighterBg = rgbToHex(
+                    bgRgb.r + (255 - bgRgb.r) * factor,
+                    bgRgb.g + (255 - bgRgb.g) * factor,
+                    bgRgb.b + (255 - bgRgb.b) * factor
+                );
+                const lighterBgRatio = getContrastRatio(fgColor, lighterBg);
+                if (lighterBgRatio >= 4.5 && lighterBgRatio > currentRatio) {
+                    suggestions.push({ fg: fgColor, bg: lighterBg, ratio: lighterBgRatio, type: 'bg' });
+                }
+                
+                // Darker background
+                const darkerBg = rgbToHex(
+                    bgRgb.r * (1 - factor),
+                    bgRgb.g * (1 - factor),
+                    bgRgb.b * (1 - factor)
+                );
+                const darkerBgRatio = getContrastRatio(fgColor, darkerBg);
+                if (darkerBgRatio >= 4.5 && darkerBgRatio > currentRatio) {
+                    suggestions.push({ fg: fgColor, bg: darkerBg, ratio: darkerBgRatio, type: 'bg' });
+                }
+            }
+            
+            // Sort by ratio and dedupe
+            const unique = [];
+            const seen = new Set();
+            suggestions
+                .sort((a, b) => b.ratio - a.ratio)
+                .forEach(s => {
+                    const key = s.fg + s.bg;
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        unique.push(s);
+                    }
+                });
+            
+            // Show top 6
+            grid.innerHTML = unique.slice(0, 6).map(s => `
+                <div class="suggestion-chip" onclick="applySuggestion('${s.fg}', '${s.bg}')">
+                    <div class="suggestion-swatch" style="background: ${s.bg}; display: flex; align-items: center; justify-content: center; color: ${s.fg}; font-weight: 600;">Aa</div>
+                    <div class="suggestion-info">
+                        <span class="suggestion-ratio">${formatRatio(s.ratio)}</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            if (unique.length === 0) {
+                grid.innerHTML = '<p style="color: var(--text-muted); font-size: 0.875rem;">No close alternatives found. Try different base colors.</p>';
+            }
+        }
+        
+        function applySuggestion(fg, bg) {
+            fgColor = fg;
+            bgColor = bg;
+            document.getElementById('fg-color').value = fg;
+            document.getElementById('fg-hex').value = fg.toUpperCase();
+            document.getElementById('bg-color').value = bg;
+            document.getElementById('bg-hex').value = bg.toUpperCase();
+            updateDisplay();
+            showToast('Colors applied!');
+        }
+        
+        // Swap colors
+        function swapColors() {
+            [fgColor, bgColor] = [bgColor, fgColor];
+            document.getElementById('fg-color').value = fgColor;
+            document.getElementById('fg-hex').value = fgColor.toUpperCase();
+            document.getElementById('bg-color').value = bgColor;
+            document.getElementById('bg-hex').value = bgColor.toUpperCase();
+            updateDisplay();
+        }
+        
+        // Random colors
+        function randomColors() {
+            fgColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            bgColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            document.getElementById('fg-color').value = fgColor;
+            document.getElementById('fg-hex').value = fgColor.toUpperCase();
+            document.getElementById('bg-color').value = bgColor;
+            document.getElementById('bg-hex').value = bgColor.toUpperCase();
+            updateDisplay();
+        }
+        
+        // Share URL
+        function shareUrl() {
+            const params = new URLSearchParams({
+                fg: fgColor.replace('#', ''),
+                bg: bgColor.replace('#', '')
+            });
+            const url = `${window.location.origin}${window.location.pathname}?${params}`;
+            navigator.clipboard.writeText(url);
+            showToast('Link copied!');
+        }
+        
+        // Copy CSS
+        function copyCSS() {
+            const css = `color: ${fgColor};\nbackground-color: ${bgColor};`;
+            navigator.clipboard.writeText(css);
+            showToast('CSS copied!');
+        }
+        
+        // Toast
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            document.querySelector('.theme-icon').textContent = next === 'light' ? '☀️' : '🌙';
+            localStorage.setItem('theme', next);
+        }
+        
+        // Initialize
+        function init() {
+            // Load theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.querySelector('.theme-icon').textContent = savedTheme === 'light' ? '☀️' : '🌙';
+            
+            // Load from URL
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('fg')) fgColor = '#' + params.get('fg');
+            if (params.has('bg')) bgColor = '#' + params.get('bg');
+            
+            // Sync inputs
+            document.getElementById('fg-color').value = fgColor;
+            document.getElementById('fg-hex').value = fgColor.toUpperCase();
+            document.getElementById('bg-color').value = bgColor;
+            document.getElementById('bg-hex').value = bgColor.toUpperCase();
+            
+            // Event listeners
+            document.getElementById('fg-color').addEventListener('input', (e) => {
+                fgColor = e.target.value;
+                document.getElementById('fg-hex').value = fgColor.toUpperCase();
+                updateDisplay();
+            });
+            
+            document.getElementById('bg-color').addEventListener('input', (e) => {
+                bgColor = e.target.value;
+                document.getElementById('bg-hex').value = bgColor.toUpperCase();
+                updateDisplay();
+            });
+            
+            document.getElementById('fg-hex').addEventListener('input', (e) => {
+                let val = e.target.value.toUpperCase();
+                if (!val.startsWith('#')) val = '#' + val;
+                if (isValidHex(val)) {
+                    fgColor = val;
+                    document.getElementById('fg-color').value = fgColor;
+                    updateDisplay();
+                }
+            });
+            
+            document.getElementById('bg-hex').addEventListener('input', (e) => {
+                let val = e.target.value.toUpperCase();
+                if (!val.startsWith('#')) val = '#' + val;
+                if (isValidHex(val)) {
+                    bgColor = val;
+                    document.getElementById('bg-color').value = bgColor;
+                    updateDisplay();
+                }
+            });
+            
+            updateDisplay();
+        }
+        
+        init();
+    </script>
+</body>
+</html>

@@ -653,6 +653,268 @@
       margin-top: 2px;
     }
 
+    .swatch-remove {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 16px;
+      line-height: 20px;
+      text-align: center;
+      cursor: pointer;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 2;
+    }
+
+    .swatch:hover .swatch-remove {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .swatch-remove:hover {
+      background: #ef4444;
+      border-color: #ef4444;
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .swatch-add {
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .swatch-add:hover {
+      transform: translateY(-4px) scale(1.02);
+    }
+
+    .swatch-add-color {
+      aspect-ratio: 1;
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      border: 2px dashed var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-elevated);
+    }
+
+    .swatch-add:hover .swatch-add-color {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.05);
+    }
+
+    .swatch-add-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .swatch-add-text {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+    }
+
+    .swatch-add:hover .swatch-add-text {
+      color: var(--accent);
+    }
+
+    /* Color Picker Modal */
+    .color-picker-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .color-picker-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .color-picker {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      width: 280px;
+      transform: scale(0.95);
+      transition: transform 0.2s;
+    }
+
+    .color-picker-overlay.visible .color-picker {
+      transform: scale(1);
+    }
+
+    .color-picker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .color-picker-title {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .color-picker-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 26px;
+      transition: all 0.15s;
+    }
+
+    .color-picker-close:hover {
+      background: var(--border);
+      color: var(--text-primary);
+    }
+
+    .color-picker-saturation {
+      position: relative;
+      width: 100%;
+      height: 160px;
+      border-radius: var(--radius-sm);
+      cursor: crosshair;
+      margin-bottom: 12px;
+    }
+
+    .color-picker-saturation-white {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(to right, white, transparent);
+    }
+
+    .color-picker-saturation-black {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(to top, black, transparent);
+    }
+
+    .color-picker-saturation-handle {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border: 2px solid white;
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.3);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .color-picker-hue {
+      position: relative;
+      width: 100%;
+      height: 14px;
+      border-radius: 7px;
+      background: linear-gradient(to right, 
+        #ff0000, #ff8000, #ffff00, #80ff00, 
+        #00ff00, #00ff80, #00ffff, #0080ff, 
+        #0000ff, #8000ff, #ff00ff, #ff0080, #ff0000
+      );
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+
+    .color-picker-hue-handle {
+      position: absolute;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border: 2px solid white;
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.2);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .color-picker-input-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .color-picker-preview {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .color-picker-hex-input {
+      flex: 1;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 14px;
+      color: var(--text-primary);
+      text-transform: uppercase;
+    }
+
+    .color-picker-hex-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .color-picker-add-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: white;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .color-picker-add-btn:hover {
+      background: #6366f1;
+      transform: translateY(-1px);
+    }
+
     /* Gradient Section */
     .gradient-section {
       margin-bottom: 32px;
@@ -1261,6 +1523,29 @@
     </footer>
   </div>
 
+  <!-- Color Picker Modal -->
+  <div class="color-picker-overlay" id="colorPickerOverlay" onclick="if(event.target === this) closeColorPicker()">
+    <div class="color-picker">
+      <div class="color-picker-header">
+        <span class="color-picker-title">Add Color</span>
+        <button class="color-picker-close" onclick="closeColorPicker()">×</button>
+      </div>
+      <div class="color-picker-saturation" id="saturationArea">
+        <div class="color-picker-saturation-white"></div>
+        <div class="color-picker-saturation-black"></div>
+        <div class="color-picker-saturation-handle" id="saturationHandle"></div>
+      </div>
+      <div class="color-picker-hue" id="hueSlider">
+        <div class="color-picker-hue-handle" id="hueHandle"></div>
+      </div>
+      <div class="color-picker-input-row">
+        <div class="color-picker-preview" id="colorPreview"></div>
+        <input type="text" class="color-picker-hex-input" id="hexInput" value="#6366F1" maxlength="7" spellcheck="false">
+      </div>
+      <button class="color-picker-add-btn" onclick="confirmAddColor()">Add Color</button>
+    </div>
+  </div>
+
   <script>
     // =====================================================
     // STATE
@@ -1398,16 +1683,57 @@
 
     function extractColorsFromCanvas(ctx, w, h) {
       const data = ctx.getImageData(0, 0, w, h).data;
-      const counts = {};
-      for (let i = 0; i < data.length; i += 16) {
-        const r = Math.round(data[i] / 32) * 32;
-        const g = Math.round(data[i+1] / 32) * 32;
-        const b = Math.round(data[i+2] / 32) * 32;
-        const hex = `#${[r,g,b].map(x => x.toString(16).padStart(2,'0')).join('')}`;
-        counts[hex] = (counts[hex] || 0) + 1;
+      
+      // Sample pixels more densely
+      const pixels = [];
+      for (let i = 0; i < data.length; i += 8) {
+        const a = data[i+3];
+        if (a > 128) {
+          pixels.push([data[i], data[i+1], data[i+2]]);
+        }
       }
-      const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 12).map(([h]) => h);
-      return clusterColors(sorted).slice(0, 8);
+      
+      if (pixels.length < 10) {
+        return ['#6366f1', '#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b']; // fallback
+      }
+      
+      // K-means clustering for better color extraction
+      const k = 8;
+      let centroids = [];
+      const step = Math.floor(pixels.length / k);
+      for (let i = 0; i < k; i++) {
+        centroids.push([...pixels[Math.min(i * step, pixels.length - 1)]]);
+      }
+      
+      // Run k-means
+      for (let iter = 0; iter < 20; iter++) {
+        const clusters = Array(k).fill().map(() => []);
+        for (const p of pixels) {
+          let minD = Infinity, idx = 0;
+          for (let i = 0; i < k; i++) {
+            const d = (p[0]-centroids[i][0])**2 + (p[1]-centroids[i][1])**2 + (p[2]-centroids[i][2])**2;
+            if (d < minD) { minD = d; idx = i; }
+          }
+          clusters[idx].push(p);
+        }
+        for (let i = 0; i < k; i++) {
+          if (clusters[i].length) {
+            centroids[i] = [
+              Math.round(clusters[i].reduce((s,p) => s+p[0], 0) / clusters[i].length),
+              Math.round(clusters[i].reduce((s,p) => s+p[1], 0) / clusters[i].length),
+              Math.round(clusters[i].reduce((s,p) => s+p[2], 0) / clusters[i].length)
+            ];
+          }
+        }
+      }
+      
+      // Convert to hex, clamp values, filter duplicates
+      const colors = centroids
+        .map(c => '#' + c.map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2,'0')).join(''))
+        .filter((c, i, arr) => arr.indexOf(c) === i);
+      
+      // Sort by luminance for visual appeal
+      return colors.sort((a, b) => lum(b) - lum(a));
     }
 
     function clusterColors(colors, threshold = 50) {
@@ -1776,13 +2102,23 @@
       document.getElementById('sourceLabel').textContent = palette.hostname;
       document.getElementById('vibeName').textContent = palette.vibeName;
 
-      document.getElementById('paletteGrid').innerHTML = palette.colors.map(c => `
+      document.getElementById('paletteGrid').innerHTML = palette.colors.map((c, i) => `
         <div class="swatch" onclick="copySwatch(this, '${c}')">
-          <div class="swatch-color" style="background:${c}"></div>
+          <div class="swatch-color" style="background:${c}">
+            <button class="swatch-remove" onclick="event.stopPropagation(); removeColor(${i})" title="Remove color">×</button>
+          </div>
           <div class="swatch-hex">${c.toUpperCase()}</div>
           <div class="swatch-name">${getColorName(c)}</div>
         </div>
-      `).join('');
+      `).join('') + `
+        <div class="swatch swatch-add" title="Add color" onclick="openColorPicker()">
+          <div class="swatch-add-color">
+            <div class="swatch-add-icon">+</div>
+            <div class="swatch-add-text">Add</div>
+          </div>
+          <div class="swatch-hex" style="visibility:hidden">------</div>
+          <div class="swatch-name" style="visibility:hidden">-</div>
+        </div>`;
 
       document.getElementById('colorToggles').innerHTML = palette.colors.map((c, i) => `
         <div class="color-toggle active" style="background:${c}" data-index="${i}" onclick="toggleColor(${i})"></div>
@@ -1796,6 +2132,202 @@
       el.querySelector('.swatch-color').classList.add('copied');
       setTimeout(() => el.querySelector('.swatch-color').classList.remove('copied'), 800);
       toast('Copied ' + hex);
+    }
+
+    function addColor(hex) {
+      if (!palette) return;
+      // Don't add duplicates
+      if (palette.colors.some(c => c.toLowerCase() === hex.toLowerCase())) {
+        toast('Color already exists');
+        return;
+      }
+      palette.colors.push(hex);
+      activeColors = [...palette.colors];
+      initBlobs();
+      render();
+      renderGradient();
+      updateMiniPreview();
+      toast('Added ' + hex.toUpperCase());
+    }
+
+    function removeColor(index) {
+      if (!palette) return;
+      if (palette.colors.length <= 1) {
+        toast('Need at least one color');
+        return;
+      }
+      const removed = palette.colors.splice(index, 1)[0];
+      activeColors = [...palette.colors];
+      initBlobs();
+      render();
+      renderGradient();
+      updateMiniPreview();
+      toast('Removed ' + removed.toUpperCase());
+    }
+
+    // =====================================================
+    // COLOR PICKER
+    // =====================================================
+    let pickerHue = 240;
+    let pickerSat = 70;
+    let pickerLight = 60;
+    let isDraggingSat = false;
+    let isDraggingHue = false;
+
+    function openColorPicker() {
+      document.getElementById('colorPickerOverlay').classList.add('visible');
+      updatePickerUI();
+      setupPickerListeners();
+    }
+
+    function closeColorPicker() {
+      document.getElementById('colorPickerOverlay').classList.remove('visible');
+    }
+
+    function confirmAddColor() {
+      const hex = document.getElementById('hexInput').value;
+      if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+        closeColorPicker();
+        addColor(hex);
+      } else {
+        toast('Invalid hex code');
+      }
+    }
+
+    function updatePickerUI() {
+      const satArea = document.getElementById('saturationArea');
+      const satHandle = document.getElementById('saturationHandle');
+      const hueHandle = document.getElementById('hueHandle');
+      const preview = document.getElementById('colorPreview');
+      const hexInput = document.getElementById('hexInput');
+
+      // Update saturation area background
+      satArea.style.background = `hsl(${pickerHue}, 100%, 50%)`;
+
+      // Position handles
+      satHandle.style.left = pickerSat + '%';
+      satHandle.style.top = (100 - pickerLight) + '%';
+      hueHandle.style.left = (pickerHue / 360 * 100) + '%';
+
+      // Calculate actual color
+      const hex = pickerHslToHex(pickerHue, pickerSat, pickerLight);
+      preview.style.background = hex;
+      hexInput.value = hex.toUpperCase();
+    }
+
+    function setupPickerListeners() {
+      const satArea = document.getElementById('saturationArea');
+      const hueSlider = document.getElementById('hueSlider');
+      const hexInput = document.getElementById('hexInput');
+
+      // Remove old listeners by cloning
+      const newSatArea = satArea.cloneNode(true);
+      const newHueSlider = hueSlider.cloneNode(true);
+      satArea.parentNode.replaceChild(newSatArea, satArea);
+      hueSlider.parentNode.replaceChild(newHueSlider, hueSlider);
+
+      // Saturation/Lightness drag
+      newSatArea.addEventListener('mousedown', startSatDrag);
+      newSatArea.addEventListener('touchstart', startSatDrag, { passive: false });
+
+      // Hue drag
+      newHueSlider.addEventListener('mousedown', startHueDrag);
+      newHueSlider.addEventListener('touchstart', startHueDrag, { passive: false });
+
+      // Hex input
+      hexInput.addEventListener('input', onHexInput);
+      hexInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') confirmAddColor();
+      });
+
+      // Global mouse/touch move and up
+      document.addEventListener('mousemove', onPickerDrag);
+      document.addEventListener('mouseup', stopPickerDrag);
+      document.addEventListener('touchmove', onPickerDrag, { passive: false });
+      document.addEventListener('touchend', stopPickerDrag);
+    }
+
+    function startSatDrag(e) {
+      e.preventDefault();
+      isDraggingSat = true;
+      onPickerDrag(e);
+    }
+
+    function startHueDrag(e) {
+      e.preventDefault();
+      isDraggingHue = true;
+      onPickerDrag(e);
+    }
+
+    function stopPickerDrag() {
+      isDraggingSat = false;
+      isDraggingHue = false;
+    }
+
+    function onPickerDrag(e) {
+      if (!isDraggingSat && !isDraggingHue) return;
+      e.preventDefault();
+
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      if (isDraggingSat) {
+        const satArea = document.getElementById('saturationArea');
+        const rect = satArea.getBoundingClientRect();
+        pickerSat = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+        pickerLight = Math.max(0, Math.min(100, 100 - ((clientY - rect.top) / rect.height) * 100));
+        updatePickerUI();
+      }
+
+      if (isDraggingHue) {
+        const hueSlider = document.getElementById('hueSlider');
+        const rect = hueSlider.getBoundingClientRect();
+        pickerHue = Math.max(0, Math.min(360, ((clientX - rect.left) / rect.width) * 360));
+        updatePickerUI();
+      }
+    }
+
+    function onHexInput(e) {
+      let val = e.target.value.toUpperCase();
+      if (!val.startsWith('#')) val = '#' + val;
+      val = '#' + val.slice(1).replace(/[^0-9A-F]/g, '').slice(0, 6);
+      e.target.value = val;
+
+      if (/^#[0-9A-F]{6}$/.test(val)) {
+        const hsl = pickerHexToHsl(val);
+        pickerHue = hsl.h;
+        pickerSat = hsl.s;
+        pickerLight = hsl.l;
+        updatePickerUI();
+      }
+    }
+
+    function pickerHslToHex(h, s, l) {
+      // s and l are 0-100, convert to 0-1 for the main hslToHex
+      return hslToHex(h, s / 100, l / 100);
+    }
+
+    function pickerHexToHsl(hex) {
+      let r = parseInt(hex.slice(1, 3), 16) / 255;
+      let g = parseInt(hex.slice(3, 5), 16) / 255;
+      let b = parseInt(hex.slice(5, 7), 16) / 255;
+
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+
+      if (max === min) {
+        h = s = 0;
+      } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+          case g: h = ((b - r) / d + 2) / 6; break;
+          case b: h = ((r - g) / d + 4) / 6; break;
+        }
+      }
+
+      return { h: h * 360, s: s * 100, l: l * 100 };
     }
 
     function toggleColor(index) {

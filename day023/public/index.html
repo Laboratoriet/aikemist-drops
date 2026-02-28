@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aspect Ratio Calculator — Alkemist</title>
+    <meta name="description" content="Calculate dimensions for any aspect ratio. Common presets for video, photo, and social media. Visual preview, instant calculations.">
+    <meta property="og:title" content="Aspect Ratio Calculator — Alkemist">
+    <meta property="og:description" content="Calculate dimensions for any aspect ratio. Video, photo, social media presets.">
+    <meta property="og:image" content="https://day023.aikemist.com/og.png">
+    <meta property="og:url" content="https://day023.aikemist.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📐</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-2: #1a1a1a;
+            --border: #2a2a2a;
+            --text: #ffffff;
+            --text-muted: #888888;
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+        }
+        
+        [data-theme="light"] {
+            --bg: #f5f5f5;
+            --surface: #ffffff;
+            --surface-2: #fafafa;
+            --border: #e0e0e0;
+            --text: #0a0a0a;
+            --text-muted: #666666;
+        }
+        
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        
+        .logo svg {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .logo span {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+            .theme-toggle {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, background 0.2s ease;
+      overflow: hidden;
+    }
+    
+    [data-theme="dark"] .theme-toggle {
+      background: rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    [data-theme="dark"] .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:active {
+      transform: scale(0.95);
+    }
+    
+    .theme-toggle-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .theme-toggle-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .theme-toggle-icon .sun-icon {
+      color: #facc15;
+    }
+    
+    .theme-toggle-icon .moon-icon {
+      color: #64748b;
+    }
+    
+    [data-theme="dark"] .theme-toggle-icon {
+      transform: rotate(180deg);
+    }
+        
+        /* Main */
+        .main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Calculator Card */
+        .calculator {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 700px) {
+            .calc-grid {
+                grid-template-columns: 1fr;
+            }
+            .preview-panel {
+                order: -1;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            header {
+                flex-direction: column;
+                gap: 0.75rem;
+                text-align: center;
+            }
+            .panel {
+                padding: 1rem;
+            }
+            .presets-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .input-row {
+                flex-direction: column;
+            }
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* Ratio Input */
+        .ratio-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        
+        .ratio-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .ratio-input {
+            flex: 1;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+        
+        .ratio-input:focus {
+            border-color: var(--accent);
+        }
+        
+        .ratio-separator {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        
+        /* Presets */
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.5rem;
+        }
+        
+        .preset-btn {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.625rem 0.5rem;
+            color: var(--text);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .preset-btn:hover {
+            background: var(--border);
+        }
+        
+        .preset-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        
+        .preset-label {
+            display: block;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        
+        .preset-btn.active .preset-label {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        /* Dimensions */
+        .dimensions-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .dimension-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .dimension-group {
+            flex: 1;
+        }
+        
+        .dimension-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 0.375rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .lock-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        
+        .lock-btn:hover {
+            color: var(--text);
+            background: var(--border);
+        }
+        
+        .lock-btn.locked {
+            color: var(--accent);
+        }
+        
+        .dimension-input {
+            width: 100%;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.875rem 1rem;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 1.125rem;
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .dimension-input:focus {
+            border-color: var(--accent);
+        }
+        
+        .dimension-input.calculated {
+            background: var(--bg);
+            border-style: dashed;
+        }
+        
+        .swap-btn {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .swap-btn:hover {
+            background: var(--border);
+            color: var(--text);
+        }
+        
+        /* Preview */
+        .preview-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .preview-container {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+        
+        .preview-box {
+            background: linear-gradient(135deg, var(--accent) 0%, #3b82f6 100%);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            max-width: 100%;
+            max-height: 160px;
+        }
+        
+        .preview-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        .preview-ratio {
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .preview-decimal {
+            font-family: monospace;
+        }
+        
+        /* Results */
+        .results {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .result-item {
+            text-align: center;
+        }
+        
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+        
+        .result-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .action-btn.primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+        
+        .action-btn.primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        
+        .action-btn.secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .action-btn.secondary:hover {
+            background: var(--surface-2);
+        }
+        
+        /* Common Ratios Reference */
+        .reference {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+        }
+        
+        .reference-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .reference-category {
+            background: var(--surface-2);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+        
+        .reference-category-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+        
+        .reference-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .reference-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+        }
+        
+        .reference-name {
+            color: var(--text-muted);
+        }
+        
+        .reference-value {
+            font-weight: 500;
+        }
+        
+        /* Footer */
+        .footer {
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        
+        .footer a {
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text);
+            color: var(--bg);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <header class="header">
+        <a href="https://aikemist.com" class="logo">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#8b5cf6"/>
+                        <stop offset="100%" style="stop-color:#3b82f6"/>
+                    </linearGradient>
+                </defs>
+                <rect width="100" height="100" rx="20" fill="url(#logoGrad)"/>
+                <path d="M50 20L75 70H25L50 20Z" fill="white" opacity="0.9"/>
+                <circle cx="50" cy="58" r="8" fill="white"/>
+            </svg>
+            <span>Aspect Ratio Calculator</span>
+        </a>
+        <div class="header-actions">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+    
+    <main class="main">
+        <div class="calculator">
+            <div class="calc-grid">
+                <div class="ratio-section">
+                    <div>
+                        <div class="section-title">Aspect Ratio</div>
+                        <div class="ratio-input-group">
+                            <input type="number" class="ratio-input" id="ratioW" value="16" min="1" max="999">
+                            <span class="ratio-separator">:</span>
+                            <input type="number" class="ratio-input" id="ratioH" value="9" min="1" max="999">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="section-title">Quick Presets</div>
+                        <div class="presets-grid">
+                            <button class="preset-btn active" data-w="16" data-h="9">
+                                16:9
+                                <span class="preset-label">HD Video</span>
+                            </button>
+                            <button class="preset-btn" data-w="4" data-h="3">
+                                4:3
+                                <span class="preset-label">Classic</span>
+                            </button>
+                            <button class="preset-btn" data-w="1" data-h="1">
+                                1:1
+                                <span class="preset-label">Square</span>
+                            </button>
+                            <button class="preset-btn" data-w="9" data-h="16">
+                                9:16
+                                <span class="preset-label">Stories</span>
+                            </button>
+                            <button class="preset-btn" data-w="21" data-h="9">
+                                21:9
+                                <span class="preset-label">Ultrawide</span>
+                            </button>
+                            <button class="preset-btn" data-w="3" data-h="2">
+                                3:2
+                                <span class="preset-label">Photo</span>
+                            </button>
+                            <button class="preset-btn" data-w="4" data-h="5">
+                                4:5
+                                <span class="preset-label">Instagram</span>
+                            </button>
+                            <button class="preset-btn" data-w="2.39" data-h="1">
+                                2.39:1
+                                <span class="preset-label">Cinema</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dimensions-section">
+                    <div class="section-title">Dimensions</div>
+                    
+                    <div class="dimension-row">
+                        <div class="dimension-group">
+                            <div class="dimension-label">
+                                Width (px)
+                                <button class="lock-btn locked" id="lockW" title="Lock width">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="11" width="18" height="11" rx="2"/>
+                                        <path d="M7 11V7a5 5 0 0110 0v4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <input type="number" class="dimension-input" id="width" value="1920" min="1">
+                        </div>
+                        
+                        <button class="swap-btn" id="swapBtn" title="Swap dimensions">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 16V4M7 4L3 8M7 4l4 4M17 8v12M17 20l4-4M17 20l-4-4"/>
+                            </svg>
+                        </button>
+                        
+                        <div class="dimension-group">
+                            <div class="dimension-label">
+                                Height (px)
+                                <button class="lock-btn" id="lockH" title="Lock height">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="11" width="18" height="11" rx="2"/>
+                                        <path d="M7 11V7a5 5 0 0110 0v4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <input type="number" class="dimension-input calculated" id="height" value="1080" min="1">
+                        </div>
+                    </div>
+                    
+                    <div class="preview-section">
+                        <div class="section-title">Preview</div>
+                        <div class="preview-container">
+                            <div class="preview-box" id="previewBox">16:9</div>
+                        </div>
+                        <div class="preview-info">
+                            <span class="preview-ratio" id="previewRatio">16:9</span>
+                            <span class="preview-decimal" id="previewDecimal">≈ 1.778</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="results">
+            <div class="results-grid">
+                <div class="result-item">
+                    <div class="result-value" id="resultDimensions">1920 × 1080</div>
+                    <div class="result-label">Dimensions</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value" id="resultPixels">2,073,600</div>
+                    <div class="result-label">Total Pixels</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value" id="resultMegapixels">2.07 MP</div>
+                    <div class="result-label">Megapixels</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-value" id="resultRatio">1.78:1</div>
+                    <div class="result-label">Decimal Ratio</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="action-btn primary" id="copyBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2"/>
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                </svg>
+                Copy Dimensions
+            </button>
+            <button class="action-btn secondary" id="shareBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="18" cy="5" r="3"/>
+                    <circle cx="6" cy="12" r="3"/>
+                    <circle cx="18" cy="19" r="3"/>
+                    <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
+                </svg>
+                Share URL
+            </button>
+        </div>
+        
+        <div class="reference">
+            <div class="reference-title">Common Aspect Ratios</div>
+            <div class="reference-grid">
+                <div class="reference-category">
+                    <div class="reference-category-title">Video</div>
+                    <div class="reference-list">
+                        <div class="reference-item">
+                            <span class="reference-name">YouTube/HD</span>
+                            <span class="reference-value">16:9</span>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-name">Ultrawide</span>
+                            <span class="reference-value">21:9</span>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-name">Cinemascope</span>
+                            <span class="reference-value">2.39:1</span>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-name">IMAX</span>
+                            <span class="reference-value">1.43:1</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="reference-category">
+                    <div class="reference-category-title">Social Media</div>
+                    <div class="reference-list">
+                        <div class="reference-item">
+                            <span class="reference-name">Stories/Reels</span>
+                            <span class="reference-value">9:16</span>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-name">Instagram Post</span>
+                            <span class="reference-value">4:5</span>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-name">Square Post</span>
+                            <span class="reference-value">1:1</span>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-name">Twitter Card</span>
+                            <span class="reference-value">2:1</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="reference-category">
+                    <div class="reference-category-title">Photography</div>
+                    <div class="reference-list">
+                        <div class="reference-item">
+                            <span class="reference-name">35mm Film</span>
+                            <span class="reference-value">3:2</span>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-name">Medium Format</span>
+                            <span class="reference-value">4:3</span>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-name">Large Format</span>
+                            <span class="reference-value">5:4</span>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-name">Panoramic</span>
+                            <span class="reference-value">3:1</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="reference-category">
+                    <div class="reference-category-title">Devices</div>
+                    <div class="reference-list">
+                        <div class="reference-item">
+                            <span class="reference-name">iPhone</span>
+                            <span class="reference-value">19.5:9</span>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-name">iPad</span>
+                            <span class="reference-value">4:3</span>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-name">MacBook</span>
+                            <span class="reference-value">16:10</span>
+                        </div>
+                        <div class="reference-item">
+                            <span class="reference-name">4K Monitor</span>
+                            <span class="reference-value">16:9</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+    
+    <div class="toast" id="toast">Copied!</div>
+
+    <script>
+        // State
+        let ratioW = 16;
+        let ratioH = 9;
+        let width = 1920;
+        let height = 1080;
+        let lockWidth = true;
+        
+        // Elements
+        const ratioWInput = document.getElementById('ratioW');
+        const ratioHInput = document.getElementById('ratioH');
+        const widthInput = document.getElementById('width');
+        const heightInput = document.getElementById('height');
+        const lockWBtn = document.getElementById('lockW');
+        const lockHBtn = document.getElementById('lockH');
+        const previewBox = document.getElementById('previewBox');
+        const previewRatio = document.getElementById('previewRatio');
+        const previewDecimal = document.getElementById('previewDecimal');
+        const resultDimensions = document.getElementById('resultDimensions');
+        const resultPixels = document.getElementById('resultPixels');
+        const resultMegapixels = document.getElementById('resultMegapixels');
+        const resultRatio = document.getElementById('resultRatio');
+        const toast = document.getElementById('toast');
+        
+        // GCD for simplifying ratios
+        function gcd(a, b) {
+            a = Math.abs(Math.round(a));
+            b = Math.abs(Math.round(b));
+            while (b) {
+                [a, b] = [b, a % b];
+            }
+            return a;
+        }
+        
+        // Calculate dimensions
+        function calculate() {
+            const ratio = ratioW / ratioH;
+            
+            if (lockWidth) {
+                height = Math.round(width / ratio);
+                heightInput.value = height;
+                widthInput.classList.remove('calculated');
+                heightInput.classList.add('calculated');
+            } else {
+                width = Math.round(height * ratio);
+                widthInput.value = width;
+                heightInput.classList.remove('calculated');
+                widthInput.classList.add('calculated');
+            }
+            
+            updatePreview();
+            updateResults();
+        }
+        
+        // Update preview
+        function updatePreview() {
+            const ratio = ratioW / ratioH;
+            const maxSize = 160;
+            
+            let boxWidth, boxHeight;
+            if (ratio >= 1) {
+                boxWidth = maxSize;
+                boxHeight = maxSize / ratio;
+            } else {
+                boxHeight = maxSize;
+                boxWidth = maxSize * ratio;
+            }
+            
+            previewBox.style.width = `${boxWidth}px`;
+            previewBox.style.height = `${boxHeight}px`;
+            
+            // Simplified ratio display
+            const g = gcd(ratioW, ratioH);
+            const simpleW = Math.round(ratioW / g);
+            const simpleH = Math.round(ratioH / g);
+            
+            previewBox.textContent = `${simpleW}:${simpleH}`;
+            previewRatio.textContent = `${simpleW}:${simpleH}`;
+            previewDecimal.textContent = `≈ ${ratio.toFixed(3)}`;
+        }
+        
+        // Update results
+        function updateResults() {
+            const pixels = width * height;
+            const megapixels = pixels / 1000000;
+            const ratio = width / height;
+            
+            resultDimensions.textContent = `${width.toLocaleString()} × ${height.toLocaleString()}`;
+            resultPixels.textContent = pixels.toLocaleString();
+            resultMegapixels.textContent = `${megapixels.toFixed(2)} MP`;
+            resultRatio.textContent = `${ratio.toFixed(2)}:1`;
+        }
+        
+        // Event: Ratio inputs
+        ratioWInput.addEventListener('input', (e) => {
+            ratioW = parseFloat(e.target.value) || 1;
+            clearPresetSelection();
+            calculate();
+        });
+        
+        ratioHInput.addEventListener('input', (e) => {
+            ratioH = parseFloat(e.target.value) || 1;
+            clearPresetSelection();
+            calculate();
+        });
+        
+        // Event: Dimension inputs
+        widthInput.addEventListener('input', (e) => {
+            width = parseInt(e.target.value) || 1;
+            if (!lockWidth) {
+                lockWidth = true;
+                updateLockButtons();
+            }
+            calculate();
+        });
+        
+        heightInput.addEventListener('input', (e) => {
+            height = parseInt(e.target.value) || 1;
+            if (lockWidth) {
+                lockWidth = false;
+                updateLockButtons();
+            }
+            calculate();
+        });
+        
+        // Event: Lock buttons
+        lockWBtn.addEventListener('click', () => {
+            lockWidth = true;
+            updateLockButtons();
+            calculate();
+        });
+        
+        lockHBtn.addEventListener('click', () => {
+            lockWidth = false;
+            updateLockButtons();
+            calculate();
+        });
+        
+        function updateLockButtons() {
+            lockWBtn.classList.toggle('locked', lockWidth);
+            lockHBtn.classList.toggle('locked', !lockWidth);
+        }
+        
+        // Event: Swap dimensions
+        document.getElementById('swapBtn').addEventListener('click', () => {
+            [width, height] = [height, width];
+            [ratioW, ratioH] = [ratioH, ratioW];
+            
+            widthInput.value = width;
+            heightInput.value = height;
+            ratioWInput.value = ratioW;
+            ratioHInput.value = ratioH;
+            
+            clearPresetSelection();
+            updatePreview();
+            updateResults();
+        });
+        
+        // Event: Presets
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                ratioW = parseFloat(btn.dataset.w);
+                ratioH = parseFloat(btn.dataset.h);
+                ratioWInput.value = ratioW;
+                ratioHInput.value = ratioH;
+                
+                calculate();
+            });
+        });
+        
+        function clearPresetSelection() {
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        }
+        
+        // Event: Copy
+        document.getElementById('copyBtn').addEventListener('click', async () => {
+            const text = `${width} × ${height}`;
+            await navigator.clipboard.writeText(text);
+            showToast('Copied to clipboard!');
+        });
+        
+        // Event: Share
+        document.getElementById('shareBtn').addEventListener('click', async () => {
+            const params = new URLSearchParams({
+                r: `${ratioW}:${ratioH}`,
+                w: width,
+                l: lockWidth ? 'w' : 'h'
+            });
+            const url = `${location.origin}${location.pathname}?${params}`;
+            await navigator.clipboard.writeText(url);
+            showToast('Share URL copied!');
+        });
+        
+        // Load from URL
+        function loadFromURL() {
+            const params = new URLSearchParams(location.search);
+            
+            const r = params.get('r');
+            if (r) {
+                const parts = r.split(':').map(parseFloat);
+                if (parts.length === 2 && parts[0] > 0 && parts[1] > 0) {
+                    ratioW = parts[0];
+                    ratioH = parts[1];
+                    ratioWInput.value = ratioW;
+                    ratioHInput.value = ratioH;
+                }
+            }
+            
+            const w = params.get('w');
+            if (w) {
+                width = parseInt(w);
+                widthInput.value = width;
+            }
+            
+            const l = params.get('l');
+            if (l === 'h') {
+                lockWidth = false;
+                updateLockButtons();
+            }
+            
+            // Update preset selection
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                const btnW = parseFloat(btn.dataset.w);
+                const btnH = parseFloat(btn.dataset.h);
+                btn.classList.toggle('active', btnW === ratioW && btnH === ratioH);
+            });
+            
+            calculate();
+        }
+        
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const body = document.body;
+            const isDark = body.dataset.theme === 'dark';
+            body.dataset.theme = isDark ? 'light' : 'dark';
+        });
+        
+        // Toast
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        // Init
+        loadFromURL();
+    </script>
+</body>
+</html>

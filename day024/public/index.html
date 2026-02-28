@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Animation Generator — Alkemist</title>
+    <meta name="description" content="Create beautiful CSS animations visually. 16 presets, live preview with shapes, timing controls. Export production-ready code.">
+    <meta property="og:title" content="CSS Animation Generator — Alkemist">
+    <meta property="og:description" content="Create beautiful CSS animations visually with presets and live preview.">
+    <meta property="og:image" content="https://day024.aikemist.com/og.png">
+    <meta property="og:url" content="https://day024.aikemist.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #fafafa;
+            --bg-card: #ffffff;
+            --text: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e5e5e5;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --code-bg: #f4f4f5;
+            --success: #22c55e;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --bg-card: #141414;
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --accent: #818cf8;
+            --accent-hover: #a5b4fc;
+            --code-bg: #1e1e1e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .logo-mark {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .logo-text {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+            .theme-toggle {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, background 0.2s ease;
+      overflow: hidden;
+    }
+    
+    [data-theme="dark"] .theme-toggle {
+      background: rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    [data-theme="dark"] .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:active {
+      transform: scale(0.95);
+    }
+    
+    .theme-toggle-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .theme-toggle-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .theme-toggle-icon .sun-icon {
+      color: #facc15;
+    }
+    
+    .theme-toggle-icon .moon-icon {
+      color: #64748b;
+    }
+    
+    [data-theme="dark"] .theme-toggle-icon {
+      transform: rotate(180deg);
+    }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .panel {
+                padding: 1rem;
+            }
+        }
+
+        .panel-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Preview Panel */
+        .preview-wrapper {
+            position: relative;
+        }
+
+        .preview-area {
+            aspect-ratio: 16/10;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .preview-area.bg-light {
+            background: #f4f4f5;
+        }
+
+        .preview-area.bg-dark {
+            background: #1e1e1e;
+        }
+
+        .preview-area.bg-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .preview-area.bg-grid {
+            background-color: var(--code-bg);
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .preview-object {
+            transition: none;
+        }
+
+        .preview-object.shape-box {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 16px;
+        }
+
+        .preview-object.shape-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ec4899, #f97316);
+            border-radius: 50%;
+        }
+
+        .preview-object.shape-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .preview-object.shape-button {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);
+        }
+
+        .preview-object.shape-card {
+            width: 120px;
+            height: 80px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            padding: 0.75rem;
+            gap: 0.5rem;
+        }
+
+        .preview-object.shape-card::before {
+            content: '';
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 8px;
+        }
+
+        .preview-object.shape-card::after {
+            content: '';
+            flex: 1;
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .preview-options {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .option-group {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg);
+            padding: 0.25rem;
+            border-radius: 8px;
+        }
+
+        .option-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.375rem 0.625rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.75rem;
+            transition: all 0.15s;
+        }
+
+        .option-btn:hover {
+            color: var(--text);
+        }
+
+        .option-btn.active {
+            background: var(--bg-card);
+            color: var(--text);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .preview-controls {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .preview-btn {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.15s;
+        }
+
+        .preview-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .preview-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* Timeline with playhead */
+        .timeline {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .timeline-track {
+            height: 40px;
+            background: var(--code-bg);
+            border-radius: 6px;
+            position: relative;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .timeline-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+            transition: none;
+        }
+
+        .timeline-playhead {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 100%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+            transition: none;
+        }
+
+        .keyframe-marker {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 14px;
+            height: 14px;
+            background: var(--accent);
+            border-radius: 3px;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.15s;
+            z-index: 2;
+        }
+
+        .keyframe-marker:hover {
+            transform: translate(-50%, -50%) scale(1.3);
+        }
+
+        .keyframe-marker::after {
+            content: attr(data-percent);
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.625rem;
+            color: var(--text-muted);
+            opacity: 0;
+            transition: opacity 0.15s;
+            white-space: nowrap;
+        }
+
+        .keyframe-marker:hover::after {
+            opacity: 1;
+        }
+
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.625rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Preset Categories */
+        .preset-category {
+            margin-bottom: 1rem;
+        }
+
+        .preset-category:last-child {
+            margin-bottom: 0;
+        }
+
+        .preset-category-title {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.375rem;
+        }
+
+        @media (max-width: 600px) {
+            .presets-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .preset-btn {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem 0.25rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.6875rem;
+            text-align: center;
+            transition: all 0.15s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--accent);
+            background: var(--bg-card);
+            transform: translateY(-1px);
+        }
+
+        .preset-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .preset-btn.active::after {
+            content: '✓';
+            position: absolute;
+            top: 2px;
+            right: 3px;
+            font-size: 0.5rem;
+        }
+
+        /* Controls */
+        .control-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .control-value {
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--border);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.625rem 1rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+
+        select:hover {
+            border-color: var(--accent);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 400px) {
+            .row-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Code Output */
+        .code-output {
+            background: var(--code-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            position: relative;
+            margin-bottom: 1rem;
+            max-height: 200px;
+            overflow: auto;
+        }
+
+        .code-output pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.6;
+            white-space: pre;
+            color: var(--text);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: all 0.15s;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+            animation: copyPulse 0.3s ease;
+        }
+
+        @keyframes copyPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.15s;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.15s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+        }
+
+        /* Pro Banner */
+        .pro-banner {
+            background: linear-gradient(135deg, #1e1b4b, #312e81);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+            color: white;
+        }
+
+        .pro-banner h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pro-banner p {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: 0.75rem;
+        }
+
+        .pro-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .pro-features span {
+            background: rgba(255,255,255,0.15);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        footer a:hover {
+            color: var(--accent);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text);
+            color: var(--bg);
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Surprise button */
+        .surprise-btn {
+            width: 100%;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .surprise-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .surprise-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .surprise-btn:hover::before {
+            left: 100%;
+        }
+
+        .surprise-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Speed presets */
+        .speed-presets {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .speed-btn {
+            flex: 1;
+            padding: 0.5rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .speed-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .speed-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* Animated styles will be injected */
+        .animated {
+            animation-fill-mode: both;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="https://aikemist.com" class="logo">
+                <div class="logo-mark">🎬</div>
+                <span class="logo-text">CSS Animation Generator</span>
+            </a>
+            <div class="header-actions">
+                      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+        <div class="theme-toggle-icon">
+          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="m4.93 4.93 1.41 1.41"></path>
+            <path d="m17.66 17.66 1.41 1.41"></path>
+            <path d="M2 12h2"></path>
+            <path d="M20 12h2"></path>
+            <path d="m6.34 17.66-1.41 1.41"></path>
+            <path d="m19.07 4.93-1.41 1.41"></path>
+          </svg>
+          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </div>
+      </button>
+            </div>
+        </header>
+
+        <h1>CSS Animation Generator</h1>
+        <p class="subtitle">19 presets, 5 preview shapes, live timeline. Export production-ready CSS keyframes.</p>
+
+        <div class="main-layout">
+            <div class="left-column">
+                <div class="panel">
+                    <div class="panel-title">Preview</div>
+                    
+                    <div class="preview-options">
+                        <div class="option-group" id="shapeOptions">
+                            <button class="option-btn active" data-shape="box" title="Box">◼</button>
+                            <button class="option-btn" data-shape="circle" title="Circle">●</button>
+                            <button class="option-btn" data-shape="text" title="Text">Aa</button>
+                            <button class="option-btn" data-shape="button" title="Button">⬚</button>
+                            <button class="option-btn" data-shape="card" title="Card">▭</button>
+                        </div>
+                        <div class="option-group" id="bgOptions">
+                            <button class="option-btn" data-bg="light" title="Light">☀</button>
+                            <button class="option-btn active" data-bg="dark" title="Dark">☾</button>
+                            <button class="option-btn" data-bg="gradient" title="Gradient">◐</button>
+                            <button class="option-btn" data-bg="grid" title="Grid">▦</button>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-wrapper">
+                        <div class="preview-area bg-dark" id="previewArea">
+                            <div class="preview-object shape-box animated" id="previewObject"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-controls">
+                        <button class="preview-btn active" id="playBtn" onclick="togglePlay()">
+                            <span id="playIcon">⏸</span> <span id="playText">Pause</span>
+                        </button>
+                        <button class="preview-btn" onclick="resetAnimation()">↺ Reset</button>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top: 1.5rem;">
+                    <div class="panel-title">Timeline</div>
+                    <div class="timeline">
+                        <div class="timeline-track" id="timelineTrack">
+                            <div class="timeline-progress" id="timelineProgress"></div>
+                            <div class="timeline-playhead" id="timelinePlayhead"></div>
+                        </div>
+                        <div class="timeline-labels">
+                            <span>0%</span>
+                            <span>25%</span>
+                            <span>50%</span>
+                            <span>75%</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top: 1.5rem;">
+                    <div class="panel-title">CSS Output</div>
+                    <div class="code-output">
+                        <button class="copy-btn" id="copyBtn" onclick="copyCSS()">📋 Copy</button>
+                        <pre id="codeOutput"></pre>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="copyCSS()">📋 Copy CSS</button>
+                        <button class="btn-secondary" onclick="shareURL()">🔗 Share</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="panel">
+                    <div class="panel-title">Presets</div>
+                    
+                    <div class="preset-category">
+                        <div class="preset-category-title">Entrances</div>
+                        <div class="presets-grid" id="entrancePresets"></div>
+                    </div>
+                    
+                    <div class="preset-category">
+                        <div class="preset-category-title">Attention</div>
+                        <div class="presets-grid" id="attentionPresets"></div>
+                    </div>
+                    
+                    <div class="preset-category">
+                        <div class="preset-category-title">Exits</div>
+                        <div class="presets-grid" id="exitPresets"></div>
+                    </div>
+                    
+                    <button class="surprise-btn" onclick="surpriseMe()">🎲 Surprise me</button>
+
+                    <div class="panel-title" style="margin-top: 1.5rem;">Animation</div>
+                    
+                    <div class="speed-presets">
+                        <button class="speed-btn" onclick="setSpeed(0.3)">Fast</button>
+                        <button class="speed-btn active" onclick="setSpeed(1)">Normal</button>
+                        <button class="speed-btn" onclick="setSpeed(2)">Slow</button>
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>Duration</span>
+                            <span class="control-value" id="durationValue">1s</span>
+                        </div>
+                        <input type="range" id="duration" min="0.1" max="5" step="0.1" value="1" oninput="updateAnimation()">
+                    </div>
+
+                    <div class="control-group">
+                        <div class="control-label">
+                            <span>Delay</span>
+                            <span class="control-value" id="delayValue">0s</span>
+                        </div>
+                        <input type="range" id="delay" min="0" max="2" step="0.1" value="0" oninput="updateAnimation()">
+                    </div>
+
+                    <div class="row-2">
+                        <div class="control-group">
+                            <div class="control-label"><span>Timing</span></div>
+                            <select id="timing" onchange="updateAnimation()">
+                                <option value="ease">ease</option>
+                                <option value="ease-in">ease-in</option>
+                                <option value="ease-out">ease-out</option>
+                                <option value="ease-in-out">ease-in-out</option>
+                                <option value="linear">linear</option>
+                                <option value="cubic-bezier(0.34, 1.56, 0.64, 1)">spring</option>
+                                <option value="cubic-bezier(0.68, -0.55, 0.265, 1.55)">elastic</option>
+                                <option value="cubic-bezier(0.175, 0.885, 0.32, 1.275)">bounce-out</option>
+                                <option value="cubic-bezier(0.5, 0, 0.1, 1)">snap</option>
+                                <option value="steps(4)">steps(4)</option>
+                                <option value="steps(8)">steps(8)</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label"><span>Iterations</span></div>
+                            <select id="iterations" onchange="updateAnimation()">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="infinite" selected>infinite</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row-2">
+                        <div class="control-group">
+                            <div class="control-label"><span>Direction</span></div>
+                            <select id="direction" onchange="updateAnimation()">
+                                <option value="normal">normal</option>
+                                <option value="reverse">reverse</option>
+                                <option value="alternate">alternate</option>
+                                <option value="alternate-reverse">alternate-reverse</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label"><span>Fill Mode</span></div>
+                            <select id="fillMode" onchange="updateAnimation()">
+                                <option value="none">none</option>
+                                <option value="forwards">forwards</option>
+                                <option value="backwards">backwards</option>
+                                <option value="both" selected>both</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <a href="https://aikemist.com">aikemist.com</a>
+            <span>Made by <a href="https://alkemist.no">Alkemist</a></span>
+        </footer>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Animation presets organized by category
+        const presets = {
+            entrance: {
+                'Fade In': {
+                    keyframes: `@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}`,
+                    markers: [0, 100]
+                },
+                'Slide Up': {
+                    keyframes: `@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}`,
+                    markers: [0, 100]
+                },
+                'Slide Down': {
+                    keyframes: `@keyframes slideDown {
+  0% { opacity: 0; transform: translateY(-30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}`,
+                    markers: [0, 100]
+                },
+                'Scale Up': {
+                    keyframes: `@keyframes scaleUp {
+  0% { opacity: 0; transform: scale(0.5); }
+  100% { opacity: 1; transform: scale(1); }
+}`,
+                    markers: [0, 100]
+                },
+                'Scale Down': {
+                    keyframes: `@keyframes scaleDown {
+  0% { opacity: 0; transform: scale(1.5); }
+  100% { opacity: 1; transform: scale(1); }
+}`,
+                    markers: [0, 100]
+                },
+                'Flip In': {
+                    keyframes: `@keyframes flipIn {
+  0% { opacity: 0; transform: perspective(400px) rotateY(90deg); }
+  100% { opacity: 1; transform: perspective(400px) rotateY(0); }
+}`,
+                    markers: [0, 100]
+                }
+            },
+            attention: {
+                'Pulse': {
+                    keyframes: `@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}`,
+                    markers: [0, 50, 100]
+                },
+                'Bounce': {
+                    keyframes: `@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}`,
+                    markers: [0, 50, 100]
+                },
+                'Shake': {
+                    keyframes: `@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}`,
+                    markers: [0, 25, 75, 100]
+                },
+                'Swing': {
+                    keyframes: `@keyframes swing {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(15deg); }
+  75% { transform: rotate(-15deg); }
+}`,
+                    markers: [0, 25, 75, 100]
+                },
+                'Wobble': {
+                    keyframes: `@keyframes wobble {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  15% { transform: translateX(-15px) rotate(-5deg); }
+  30% { transform: translateX(10px) rotate(3deg); }
+  45% { transform: translateX(-10px) rotate(-3deg); }
+  60% { transform: translateX(5px) rotate(2deg); }
+  75% { transform: translateX(-5px) rotate(-1deg); }
+}`,
+                    markers: [0, 15, 30, 45, 60, 75, 100]
+                },
+                'Jello': {
+                    keyframes: `@keyframes jello {
+  0%, 100% { transform: scale3d(1, 1, 1); }
+  30% { transform: scale3d(1.25, 0.75, 1); }
+  40% { transform: scale3d(0.75, 1.25, 1); }
+  50% { transform: scale3d(1.15, 0.85, 1); }
+  65% { transform: scale3d(0.95, 1.05, 1); }
+  75% { transform: scale3d(1.05, 0.95, 1); }
+}`,
+                    markers: [0, 30, 40, 50, 65, 75, 100]
+                },
+                'Heart Beat': {
+                    keyframes: `@keyframes heartBeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.3); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.3); }
+  70% { transform: scale(1); }
+}`,
+                    markers: [0, 14, 28, 42, 70, 100]
+                },
+                'Flash': {
+                    keyframes: `@keyframes flash {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}`,
+                    markers: [0, 25, 50, 75, 100]
+                },
+                'Rotate': {
+                    keyframes: `@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}`,
+                    markers: [0, 100]
+                }
+            },
+            exit: {
+                'Fade Out': {
+                    keyframes: `@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}`,
+                    markers: [0, 100]
+                },
+                'Slide Out Up': {
+                    keyframes: `@keyframes slideOutUp {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-30px); }
+}`,
+                    markers: [0, 100]
+                },
+                'Slide Out Down': {
+                    keyframes: `@keyframes slideOutDown {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(30px); }
+}`,
+                    markers: [0, 100]
+                },
+                'Zoom Out': {
+                    keyframes: `@keyframes zoomOut {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.5); }
+}`,
+                    markers: [0, 100]
+                }
+            }
+        };
+
+        let currentPreset = 'Pulse';
+        let currentCategory = 'attention';
+        let isPlaying = true;
+        let styleEl = null;
+        let animationFrame = null;
+        let animationStartTime = null;
+
+        function init() {
+            // Create preset buttons by category
+            Object.entries(presets.entrance).forEach(([name]) => {
+                createPresetButton('entrancePresets', name, 'entrance');
+            });
+            Object.entries(presets.attention).forEach(([name]) => {
+                createPresetButton('attentionPresets', name, 'attention');
+            });
+            Object.entries(presets.exit).forEach(([name]) => {
+                createPresetButton('exitPresets', name, 'exit');
+            });
+
+            // Shape options
+            document.querySelectorAll('#shapeOptions .option-btn').forEach(btn => {
+                btn.onclick = () => selectShape(btn.dataset.shape);
+            });
+
+            // Background options
+            document.querySelectorAll('#bgOptions .option-btn').forEach(btn => {
+                btn.onclick = () => selectBackground(btn.dataset.bg);
+            });
+
+            // Load from URL
+            loadFromURL();
+
+            // Initial update
+            updateAnimation();
+
+            // Theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.querySelector('.theme-toggle').textContent = '☀️';
+            }
+        }
+
+        function createPresetButton(containerId, name, category) {
+            const container = document.getElementById(containerId);
+            const btn = document.createElement('button');
+            btn.className = 'preset-btn' + (name === currentPreset && category === currentCategory ? ' active' : '');
+            btn.textContent = name;
+            btn.onclick = () => selectPreset(name, category);
+            container.appendChild(btn);
+        }
+
+        function selectPreset(name, category) {
+            currentPreset = name;
+            currentCategory = category;
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent === name);
+            });
+            updateAnimation();
+        }
+
+        function selectShape(shape) {
+            const obj = document.getElementById('previewObject');
+            obj.className = 'preview-object shape-' + shape + ' animated';
+            
+            // Update text content for text shape
+            if (shape === 'text') {
+                obj.textContent = 'Hello';
+            } else if (shape === 'button') {
+                obj.textContent = 'Click me';
+            } else {
+                obj.textContent = '';
+            }
+
+            document.querySelectorAll('#shapeOptions .option-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.shape === shape);
+            });
+
+            resetAnimation();
+        }
+
+        function selectBackground(bg) {
+            const area = document.getElementById('previewArea');
+            area.className = 'preview-area bg-' + bg;
+            
+            document.querySelectorAll('#bgOptions .option-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.bg === bg);
+            });
+        }
+
+        function updateAnimation() {
+            const duration = parseFloat(document.getElementById('duration').value);
+            const delay = parseFloat(document.getElementById('delay').value);
+            const timing = document.getElementById('timing').value;
+            const iterations = document.getElementById('iterations').value;
+            const direction = document.getElementById('direction').value;
+            const fillMode = document.getElementById('fillMode').value;
+
+            // Update value displays
+            document.getElementById('durationValue').textContent = duration + 's';
+            document.getElementById('delayValue').textContent = delay + 's';
+
+            const preset = presets[currentCategory][currentPreset];
+            const animName = currentPreset.replace(/\s+/g, '');
+
+            // Update keyframes
+            const keyframesCSS = preset.keyframes.replace(/@keyframes \w+/, `@keyframes ${animName}`);
+
+            // Build animation property
+            const animationCSS = `animation: ${animName} ${duration}s ${timing} ${delay}s ${iterations} ${direction} ${fillMode};`;
+
+            // Update style
+            if (styleEl) styleEl.remove();
+            styleEl = document.createElement('style');
+            styleEl.textContent = keyframesCSS + `
+.preview-object.animated {
+  ${animationCSS}
+  ${isPlaying ? '' : 'animation-play-state: paused;'}
+}`;
+            document.head.appendChild(styleEl);
+
+            // Update timeline markers
+            updateTimeline(preset.markers);
+
+            // Update code output
+            const fullCSS = keyframesCSS + `
+
+.element {
+  ${animationCSS}
+}`;
+            document.getElementById('codeOutput').textContent = fullCSS;
+
+            // Reset and start playhead animation
+            resetAnimation();
+        }
+
+        function updateTimeline(markers) {
+            const track = document.getElementById('timelineTrack');
+            // Keep progress and playhead
+            const progress = document.getElementById('timelineProgress');
+            const playhead = document.getElementById('timelinePlayhead');
+            track.innerHTML = '';
+            track.appendChild(progress);
+            track.appendChild(playhead);
+            
+            markers.forEach(pos => {
+                const marker = document.createElement('div');
+                marker.className = 'keyframe-marker';
+                marker.style.left = pos + '%';
+                marker.dataset.percent = pos + '%';
+                track.appendChild(marker);
+            });
+        }
+
+        function animatePlayhead() {
+            if (!isPlaying) return;
+            
+            const duration = parseFloat(document.getElementById('duration').value) * 1000;
+            const delay = parseFloat(document.getElementById('delay').value) * 1000;
+            const iterations = document.getElementById('iterations').value;
+            const direction = document.getElementById('direction').value;
+            
+            const now = performance.now();
+            if (!animationStartTime) animationStartTime = now;
+            
+            let elapsed = now - animationStartTime;
+            
+            // Handle delay
+            if (elapsed < delay) {
+                requestAnimationFrame(animatePlayhead);
+                return;
+            }
+            
+            elapsed -= delay;
+            
+            // Calculate progress
+            let progress = (elapsed % duration) / duration;
+            
+            // Handle direction
+            if (direction === 'reverse') {
+                progress = 1 - progress;
+            } else if (direction === 'alternate' || direction === 'alternate-reverse') {
+                const iteration = Math.floor(elapsed / duration);
+                if ((direction === 'alternate' && iteration % 2 === 1) ||
+                    (direction === 'alternate-reverse' && iteration % 2 === 0)) {
+                    progress = 1 - progress;
+                }
+            }
+            
+            // Update playhead position
+            document.getElementById('timelinePlayhead').style.left = (progress * 100) + '%';
+            document.getElementById('timelineProgress').style.width = (progress * 100) + '%';
+            
+            // Check if we should continue
+            if (iterations !== 'infinite') {
+                const totalDuration = duration * parseInt(iterations);
+                if (elapsed >= totalDuration) {
+                    return;
+                }
+            }
+            
+            animationFrame = requestAnimationFrame(animatePlayhead);
+        }
+
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            const obj = document.getElementById('previewObject');
+            obj.style.animationPlayState = isPlaying ? 'running' : 'paused';
+            document.getElementById('playIcon').textContent = isPlaying ? '⏸' : '▶';
+            document.getElementById('playText').textContent = isPlaying ? 'Pause' : 'Play';
+            document.getElementById('playBtn').classList.toggle('active', isPlaying);
+            
+            if (isPlaying) {
+                animationStartTime = null;
+                animatePlayhead();
+            } else if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+            }
+        }
+
+        function resetAnimation() {
+            const obj = document.getElementById('previewObject');
+            obj.style.animation = 'none';
+            obj.offsetHeight; // Force reflow
+            obj.style.animation = '';
+            if (!isPlaying) {
+                obj.style.animationPlayState = 'paused';
+            }
+            
+            // Reset playhead
+            animationStartTime = null;
+            document.getElementById('timelinePlayhead').style.left = '0%';
+            document.getElementById('timelineProgress').style.width = '0%';
+            
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+            }
+            if (isPlaying) {
+                animatePlayhead();
+            }
+        }
+
+        function copyCSS() {
+            const code = document.getElementById('codeOutput').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.textContent = '✓ Copied!';
+                btn.classList.add('copied');
+                showToast('✓ CSS copied to clipboard');
+                setTimeout(() => {
+                    btn.textContent = '📋 Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        function shareURL() {
+            const params = new URLSearchParams();
+            params.set('p', currentPreset);
+            params.set('c', currentCategory);
+            params.set('d', document.getElementById('duration').value);
+            params.set('dl', document.getElementById('delay').value);
+            params.set('t', document.getElementById('timing').value);
+            params.set('i', document.getElementById('iterations').value);
+            params.set('dir', document.getElementById('direction').value);
+            params.set('f', document.getElementById('fillMode').value);
+
+            const url = window.location.origin + window.location.pathname + '?' + params.toString();
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('🔗 Share URL copied to clipboard');
+            });
+        }
+
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('c') && params.has('p')) {
+                const cat = params.get('c');
+                const preset = params.get('p');
+                if (presets[cat] && presets[cat][preset]) {
+                    currentCategory = cat;
+                    currentPreset = preset;
+                }
+            }
+            if (params.has('d')) document.getElementById('duration').value = params.get('d');
+            if (params.has('dl')) document.getElementById('delay').value = params.get('dl');
+            if (params.has('t')) document.getElementById('timing').value = params.get('t');
+            if (params.has('i')) document.getElementById('iterations').value = params.get('i');
+            if (params.has('dir')) document.getElementById('direction').value = params.get('dir');
+            if (params.has('f')) document.getElementById('fillMode').value = params.get('f');
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            document.querySelector('.theme-toggle').textContent = next === 'dark' ? '☀️' : '🌙';
+        }
+
+        function setSpeed(speed) {
+            document.getElementById('duration').value = speed;
+            document.querySelectorAll('.speed-btn').forEach(btn => {
+                const btnSpeed = btn.textContent === 'Fast' ? 0.3 : btn.textContent === 'Slow' ? 2 : 1;
+                btn.classList.toggle('active', btnSpeed === speed);
+            });
+            updateAnimation();
+        }
+
+        function surpriseMe() {
+            // Pick random category and preset
+            const categories = Object.keys(presets);
+            const randomCat = categories[Math.floor(Math.random() * categories.length)];
+            const presetNames = Object.keys(presets[randomCat]);
+            const randomPreset = presetNames[Math.floor(Math.random() * presetNames.length)];
+            
+            // Random shape
+            const shapes = ['box', 'circle', 'text', 'button', 'card'];
+            const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+            selectShape(randomShape);
+            
+            // Random background
+            const bgs = ['light', 'dark', 'gradient', 'grid'];
+            const randomBg = bgs[Math.floor(Math.random() * bgs.length)];
+            selectBackground(randomBg);
+            
+            // Random duration (0.3 to 2s)
+            const randomDuration = (Math.random() * 1.7 + 0.3).toFixed(1);
+            document.getElementById('duration').value = randomDuration;
+            
+            // Random timing
+            const timings = ['ease', 'ease-in', 'ease-out', 'ease-in-out', 'linear', 'cubic-bezier(0.34, 1.56, 0.64, 1)', 'cubic-bezier(0.68, -0.55, 0.265, 1.55)', 'cubic-bezier(0.175, 0.885, 0.32, 1.275)', 'cubic-bezier(0.5, 0, 0.1, 1)'];
+            const randomTiming = timings[Math.floor(Math.random() * timings.length)];
+            document.getElementById('timing').value = randomTiming;
+            
+            // Update speed buttons
+            document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Select the preset
+            selectPreset(randomPreset, randomCat);
+            
+            showToast('🎲 ' + randomPreset + ' on ' + randomShape);
+        }
+
+        init();
+    </script>
+</body>
+</html>

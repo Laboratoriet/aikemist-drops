@@ -51,28 +51,64 @@
     }
     
     /* Theme Toggle */
-    .theme-toggle {
-      position: fixed;
-      top: 1.5rem;
-      right: 1.5rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 50%;
+        .theme-toggle {
+      position: relative;
       width: 44px;
       height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: border-color 0.2s;
-      z-index: 100;
+      transition: transform 0.2s ease, background 0.2s ease;
+      overflow: hidden;
     }
     
-    .theme-toggle:hover { border-color: var(--accent); }
-    .theme-icon { width: 20px; height: 20px; stroke: var(--text); stroke-width: 2; fill: none; }
-    .icon-sun { display: none; }
-    [data-theme="light"] .icon-sun { display: block; }
-    [data-theme="light"] .icon-moon { display: none; }
+    [data-theme="dark"] .theme-toggle {
+      background: rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    [data-theme="dark"] .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:active {
+      transform: scale(0.95);
+    }
+    
+    .theme-toggle-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .theme-toggle-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .theme-toggle-icon .sun-icon {
+      color: #facc15;
+    }
+    
+    .theme-toggle-icon .moon-icon {
+      color: #64748b;
+    }
+    
+    [data-theme="light"] .theme-toggle-icon {
+      transform: rotate(180deg);
+    }
     
     /* Header */
     header {
@@ -246,12 +282,88 @@
       opacity: 1;
     }
     
+    .palette-color-remove {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.6);
+      border: none;
+      color: white;
+      font-size: 12px;
+      line-height: 16px;
+      text-align: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.15s, background 0.15s;
+      z-index: 2;
+    }
+    
+    .palette-color:hover .palette-color-remove {
+      opacity: 1;
+    }
+    
+    .palette-color-remove:hover {
+      background: #ef4444;
+    }
+    
+    .palette-add {
+      min-width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-card);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      color: var(--text-muted);
+      font-size: 20px;
+      position: relative;
+    }
+    
+    .palette-add:hover {
+      background: var(--border);
+      color: var(--accent);
+    }
+    
+    .palette-add input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+    
     /* Controls Panel */
     .controls {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 1.5rem;
+    }
+    
+    .btn-upload {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 1.25rem;
+    }
+    
+    .btn-upload:hover {
+      background: #4f46e5;
+      transform: translateY(-1px);
     }
     
     .controls h3 {
@@ -462,9 +574,23 @@
   </style>
 </head>
 <body>
-  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
-    <svg class="theme-icon icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-    <svg class="theme-icon icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+    <div class="theme-toggle-icon">
+      <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2v2"></path>
+        <path d="M12 20v2"></path>
+        <path d="m4.93 4.93 1.41 1.41"></path>
+        <path d="m17.66 17.66 1.41 1.41"></path>
+        <path d="M2 12h2"></path>
+        <path d="M20 12h2"></path>
+        <path d="m6.34 17.66-1.41 1.41"></path>
+        <path d="m19.07 4.93-1.41 1.41"></path>
+      </svg>
+      <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+      </svg>
+    </div>
   </button>
 
   <div class="container">
@@ -495,6 +621,10 @@
       </div>
 
       <div class="controls">
+        <button class="btn-upload" id="changeImageBtn" onclick="document.getElementById('fileInput').click()">
+          📷 Change Image
+        </button>
+        
         <h3>Settings</h3>
         
         <div class="bg-toggle">
@@ -569,6 +699,7 @@
     // Init
     document.addEventListener('DOMContentLoaded', () => {
       renderGradient();
+      renderPalette();
       setupEventListeners();
     });
 
@@ -617,49 +748,70 @@
       const ctx = canvas.getContext('2d');
       const size = 100;
       canvas.width = canvas.height = size;
-      ctx.drawImage(img, 0, 0, size, size);
-      const data = ctx.getImageData(0, 0, size, size).data;
-
-      // Sample pixels and cluster
-      const pixels = [];
-      for (let i = 0; i < data.length; i += 16) {
-        if (data[i+3] > 128) pixels.push([data[i], data[i+1], data[i+2]]);
-      }
-
-      // Simple k-means
-      const k = 5;
-      let centroids = pixels.slice(0, k).map(p => [...p]);
       
-      for (let iter = 0; iter < 10; iter++) {
-        const clusters = Array(k).fill().map(() => []);
-        for (const p of pixels) {
-          let minD = Infinity, idx = 0;
-          for (let i = 0; i < k; i++) {
-            const d = Math.hypot(p[0]-centroids[i][0], p[1]-centroids[i][1], p[2]-centroids[i][2]);
-            if (d < minD) { minD = d; idx = i; }
-          }
-          clusters[idx].push(p);
+      try {
+        ctx.drawImage(img, 0, 0, size, size);
+        const data = ctx.getImageData(0, 0, size, size).data;
+
+        // Sample pixels - skip every 4th pixel for speed
+        const pixels = [];
+        for (let i = 0; i < data.length; i += 16) {
+          if (data[i+3] > 128) pixels.push([data[i], data[i+1], data[i+2]]);
         }
+
+        if (pixels.length < 5) {
+          console.error('Not enough pixels sampled');
+          loading.classList.remove('visible');
+          showToast('Could not extract colors');
+          return;
+        }
+
+        // Better k-means initialization: spread initial centroids
+        const k = 5;
+        let centroids = [];
+        const step = Math.floor(pixels.length / k);
         for (let i = 0; i < k; i++) {
-          if (clusters[i].length) {
-            centroids[i] = [
-              Math.round(clusters[i].reduce((s,p) => s+p[0], 0) / clusters[i].length),
-              Math.round(clusters[i].reduce((s,p) => s+p[1], 0) / clusters[i].length),
-              Math.round(clusters[i].reduce((s,p) => s+p[2], 0) / clusters[i].length)
-            ];
+          centroids.push([...pixels[Math.min(i * step, pixels.length - 1)]]);
+        }
+        
+        // K-means iterations
+        for (let iter = 0; iter < 15; iter++) {
+          const clusters = Array(k).fill().map(() => []);
+          for (const p of pixels) {
+            let minD = Infinity, idx = 0;
+            for (let i = 0; i < k; i++) {
+              const d = Math.hypot(p[0]-centroids[i][0], p[1]-centroids[i][1], p[2]-centroids[i][2]);
+              if (d < minD) { minD = d; idx = i; }
+            }
+            clusters[idx].push(p);
+          }
+          for (let i = 0; i < k; i++) {
+            if (clusters[i].length) {
+              centroids[i] = [
+                Math.round(clusters[i].reduce((s,p) => s+p[0], 0) / clusters[i].length),
+                Math.round(clusters[i].reduce((s,p) => s+p[1], 0) / clusters[i].length),
+                Math.round(clusters[i].reduce((s,p) => s+p[2], 0) / clusters[i].length)
+              ];
+            }
           }
         }
+
+        // Convert to hex and sort by luminance
+        state.colors = centroids
+          .map(c => '#' + c.map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2,'0')).join(''))
+          .sort((a,b) => getLuminance(b) - getLuminance(a));
+
+        loading.classList.remove('visible');
+        uploadOverlay.classList.add('hidden');
+        renderGradient();
+        renderPalette();
+        showToast('Extracted ' + state.colors.length + ' colors!');
+        
+      } catch (e) {
+        console.error('Color extraction failed:', e);
+        loading.classList.remove('visible');
+        showToast('Extraction failed - try another image');
       }
-
-      // Convert to hex and sort by luminance
-      state.colors = centroids
-        .map(c => '#' + c.map(v => v.toString(16).padStart(2,'0')).join(''))
-        .sort((a,b) => getLuminance(b) - getLuminance(a));
-
-      loading.classList.remove('visible');
-      uploadOverlay.classList.add('hidden');
-      renderGradient();
-      renderPalette();
     }
 
     function getLuminance(hex) {
@@ -713,9 +865,38 @@
     }
 
     function renderPalette() {
-      paletteStrip.innerHTML = state.colors.map(color => 
-        `<div class="palette-color" style="background:${color}" data-hex="${color.toUpperCase()}" onclick="copyColor('${color}')"></div>`
-      ).join('');
+      paletteStrip.innerHTML = state.colors.map((color, index) => 
+        `<div class="palette-color" style="background:${color}" data-hex="${color.toUpperCase()}" onclick="copyColor('${color}')">
+          <button class="palette-color-remove" onclick="event.stopPropagation(); removeColor(${index})" title="Remove color">×</button>
+        </div>`
+      ).join('') + `
+        <div class="palette-add" title="Add color">
+          <span>+</span>
+          <input type="color" value="#6366f1" onchange="addColor(this.value)">
+        </div>`;
+    }
+    
+    function addColor(color) {
+      // Don't add duplicates
+      if (state.colors.some(c => c.toLowerCase() === color.toLowerCase())) {
+        showToast('Color already exists');
+        return;
+      }
+      state.colors.push(color);
+      renderGradient();
+      renderPalette();
+      showToast('Added ' + color.toUpperCase());
+    }
+    
+    function removeColor(index) {
+      if (state.colors.length <= 1) {
+        showToast('Need at least one color');
+        return;
+      }
+      const removed = state.colors.splice(index, 1)[0];
+      renderGradient();
+      renderPalette();
+      showToast('Removed ' + removed.toUpperCase());
     }
 
     function copyColor(color) {
@@ -821,8 +1002,33 @@ ${state.colors.map((c, i) => `.blob-${i+1} { background: ${c}; width: ${200 + i*
     function toggleTheme() {
       const html = document.documentElement;
       const current = html.getAttribute('data-theme');
-      html.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+      const newTheme = current === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', newTheme);
+      updateThemeIcon();
+      localStorage.setItem('theme', newTheme);
     }
+    
+    function updateThemeIcon() {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      const sunIcon = document.querySelector('.sun-icon');
+      const moonIcon = document.querySelector('.moon-icon');
+      if (sunIcon) sunIcon.style.display = isLight ? 'none' : 'block';
+      if (moonIcon) moonIcon.style.display = isLight ? 'block' : 'none';
+    }
+    
+    // Apply saved theme on load
+    (function() {
+      const saved = localStorage.getItem('theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+      // Run after DOM ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', updateThemeIcon);
+      } else {
+        updateThemeIcon();
+      }
+    })();
   </script>
 </body>
 </html>

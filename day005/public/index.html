@@ -84,28 +84,64 @@
             font-weight: 300;
         }
 
-        .theme-toggle {
-            position: fixed;
-            top: 1.5rem;
-            right: 1.5rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            transition: all 0.2s;
-            z-index: 100;
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.05);
-            border-color: var(--text-muted);
-        }
+            .theme-toggle {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, background 0.2s ease;
+      overflow: hidden;
+    }
+    
+    [data-theme="dark"] .theme-toggle {
+      background: rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    [data-theme="dark"] .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:active {
+      transform: scale(0.95);
+    }
+    
+    .theme-toggle-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .theme-toggle-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .theme-toggle-icon .sun-icon {
+      color: #facc15;
+    }
+    
+    .theme-toggle-icon .moon-icon {
+      color: #64748b;
+    }
+    
+    [data-theme="dark"] .theme-toggle-icon {
+      transform: rotate(180deg);
+    }
 
         /* Cost Display */
         .cost-display {
@@ -612,9 +648,24 @@
     </style>
 </head>
 <body>
-    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
-        <span class="theme-icon">🌙</span>
-    </button>
+          <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+        <div class="theme-toggle-icon">
+          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="m4.93 4.93 1.41 1.41"></path>
+            <path d="m17.66 17.66 1.41 1.41"></path>
+            <path d="M2 12h2"></path>
+            <path d="M20 12h2"></path>
+            <path d="m6.34 17.66-1.41 1.41"></path>
+            <path d="m19.07 4.93-1.41 1.41"></path>
+          </svg>
+          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </div>
+      </button>
 
     <div class="container">
         <header>
@@ -706,341 +757,3 @@
             </div>
         </div>
 
-        <!-- Pro teaser -->
-        <div class="section pro-teaser">
-            <div class="pro-content">
-                <div class="pro-icon">⚡</div>
-                <div class="pro-text">
-                    <div class="pro-title">Want this in Slack?</div>
-                    <div class="pro-desc">Track meeting costs automatically. Coming soon.</div>
-                </div>
-                <button class="btn btn-secondary btn-notify" onclick="notifyMe()">Notify me</button>
-            </div>
-        </div>
-
-        <footer>
-            <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
-        </footer>
-    </div>
-
-    <script>
-        // Salary data (Norwegian market rates, hourly in NOK)
-        const roles = {
-            intern: { name: 'Intern', rate: 200, emoji: '🎓' },
-            junior: { name: 'Junior', rate: 450, emoji: '💻' },
-            mid: { name: 'Mid-level', rate: 650, emoji: '⚡' },
-            senior: { name: 'Senior', rate: 900, emoji: '🔥' },
-            lead: { name: 'Tech Lead', rate: 1100, emoji: '🎯' },
-            manager: { name: 'Manager', rate: 1200, emoji: '📊' },
-            director: { name: 'Director', rate: 1600, emoji: '🎪' },
-            vp: { name: 'VP', rate: 2200, emoji: '🏛️' },
-            csuite: { name: 'C-Suite', rate: 3500, emoji: '👑' }
-        };
-
-        const presets = {
-            standup: [
-                { role: 'senior', count: 2 },
-                { role: 'mid', count: 3 },
-                { role: 'junior', count: 2 },
-                { role: 'lead', count: 1 }
-            ],
-            planning: [
-                { role: 'senior', count: 3 },
-                { role: 'mid', count: 4 },
-                { role: 'lead', count: 1 },
-                { role: 'manager', count: 1 }
-            ],
-            allhands: [
-                { role: 'csuite', count: 2 },
-                { role: 'vp', count: 3 },
-                { role: 'director', count: 5 },
-                { role: 'manager', count: 8 },
-                { role: 'senior', count: 15 },
-                { role: 'mid', count: 20 },
-                { role: 'junior', count: 10 }
-            ],
-            '1on1': [
-                { role: 'manager', count: 1 },
-                { role: 'mid', count: 1 }
-            ],
-            exec: [
-                { role: 'csuite', count: 3 },
-                { role: 'vp', count: 2 }
-            ]
-        };
-
-        const verdicts = [
-            { maxMinutes: 5, emoji: '⚡', title: 'Speed demon!', subtitle: 'Quick and efficient. Respect.' },
-            { maxMinutes: 15, emoji: '✅', title: 'Perfectly reasonable', subtitle: 'Got in, got out. Well done.' },
-            { maxMinutes: 30, emoji: '📧', title: 'This could\'ve been an email', subtitle: 'But at least now you know the price.' },
-            { maxMinutes: 60, emoji: '😬', title: 'An hour of your lives', subtitle: 'That\'s a long time to sit in a room together.' },
-            { maxMinutes: 90, emoji: '💀', title: 'Meeting marathon', subtitle: 'Someone should check if everyone\'s still awake.' },
-            { maxMinutes: Infinity, emoji: '🔥', title: 'Corporate arson', subtitle: 'This meeting is actively destroying shareholder value.' }
-        ];
-
-        const alternatives = [
-            { threshold: 100, text: '☕ 10 fancy coffees' },
-            { threshold: 300, text: '🍕 Pizza for the team' },
-            { threshold: 500, text: '🎧 Nice headphones' },
-            { threshold: 1000, text: '💺 Ergonomic chair' },
-            { threshold: 2000, text: '🖥️ New monitor' },
-            { threshold: 5000, text: '🛫 Flight to Barcelona' },
-            { threshold: 10000, text: '💻 MacBook Pro' },
-            { threshold: 25000, text: '🚗 Used car' },
-            { threshold: 50000, text: '🏠 Month\'s rent in Oslo' },
-            { threshold: 100000, text: '🎓 Online degree' },
-            { threshold: 500000, text: '🏡 House deposit' }
-        ];
-
-        let attendees = [];
-        let isRunning = false;
-        let startTime = null;
-        let elapsedMs = 0;
-        let timerInterval = null;
-        let particleInterval = null;
-
-        // Theme
-        function toggleTheme() {
-            const html = document.documentElement;
-            const current = html.getAttribute('data-theme');
-            const next = current === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', next);
-            document.querySelector('.theme-icon').textContent = next === 'dark' ? '☀️' : '🌙';
-            localStorage.setItem('theme', next);
-        }
-
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 
-            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        document.querySelector('.theme-icon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-
-        // Presets
-        function loadPreset(presetKey) {
-            attendees = [];
-            const preset = presets[presetKey];
-            preset.forEach(item => {
-                const role = roles[item.role];
-                for (let i = 0; i < item.count; i++) {
-                    attendees.push({ ...role, roleKey: item.role, id: Date.now() + Math.random() });
-                }
-            });
-            renderAttendees();
-            updateRateDisplay();
-            resetMeeting();
-        }
-
-        // Attendees
-        function addAttendee() {
-            const select = document.getElementById('roleSelect');
-            const roleKey = select.value;
-            if (!roleKey) return;
-
-            const role = roles[roleKey];
-            attendees.push({ ...role, roleKey, id: Date.now() });
-            select.value = '';
-            renderAttendees();
-            updateRateDisplay();
-        }
-
-        function removeAttendee(id) {
-            attendees = attendees.filter(a => a.id !== id);
-            renderAttendees();
-            updateRateDisplay();
-        }
-
-        function renderAttendees() {
-            const list = document.getElementById('attendeeList');
-            const count = document.getElementById('attendeeCount');
-            
-            count.textContent = attendees.length;
-
-            if (attendees.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-emoji">🪑</div>
-                        <div class="empty-state-text">No one's here yet.<br>Add attendees or pick a preset above.</div>
-                    </div>
-                `;
-                return;
-            }
-
-            // Group by role
-            const grouped = {};
-            attendees.forEach(a => {
-                if (!grouped[a.roleKey]) {
-                    grouped[a.roleKey] = { ...a, count: 0 };
-                }
-                grouped[a.roleKey].count++;
-            });
-
-            list.innerHTML = Object.entries(grouped).map(([key, group]) => `
-                <div class="attendee-item">
-                    <div class="attendee-info">
-                        <span class="attendee-emoji">${group.emoji}</span>
-                        <span class="attendee-role">${group.name}${group.count > 1 ? ` ×${group.count}` : ''}</span>
-                        <span class="attendee-rate">${(group.rate * group.count).toLocaleString()} kr/hr</span>
-                    </div>
-                    <button class="btn-remove" onclick="removeRole('${key}')">×</button>
-                </div>
-            `).join('');
-        }
-
-        function removeRole(roleKey) {
-            attendees = attendees.filter(a => a.roleKey !== roleKey);
-            renderAttendees();
-            updateRateDisplay();
-        }
-
-        function getTotalHourlyRate() {
-            return attendees.reduce((sum, a) => sum + a.rate, 0);
-        }
-
-        function updateRateDisplay() {
-            const hourlyRate = getTotalHourlyRate();
-            const minuteRate = hourlyRate / 60;
-            document.getElementById('ratePerMinute').textContent = Math.round(minuteRate).toLocaleString();
-            document.getElementById('hourlyRate').textContent = hourlyRate.toLocaleString();
-        }
-
-        // Money particles
-        function spawnMoneyParticle() {
-            const display = document.getElementById('costDisplay');
-            const particle = document.createElement('div');
-            particle.className = 'money-particle';
-            particle.textContent = ['💸', '💰', '🔥', '📉'][Math.floor(Math.random() * 4)];
-            particle.style.left = `${20 + Math.random() * 60}%`;
-            particle.style.bottom = '40%';
-            display.appendChild(particle);
-            setTimeout(() => particle.remove(), 2000);
-        }
-
-        // Timer
-        function startMeeting() {
-            if (attendees.length === 0) {
-                alert('Add at least one attendee first!');
-                return;
-            }
-
-            isRunning = true;
-            startTime = Date.now() - elapsedMs;
-            document.getElementById('costDisplay').classList.add('running');
-            document.getElementById('startBtn').disabled = true;
-            document.getElementById('stopBtn').disabled = false;
-            document.getElementById('verdict').classList.remove('show');
-
-            timerInterval = setInterval(updateTimer, 100);
-            particleInterval = setInterval(spawnMoneyParticle, 800);
-        }
-
-        function stopMeeting() {
-            isRunning = false;
-            clearInterval(timerInterval);
-            clearInterval(particleInterval);
-            document.getElementById('costDisplay').classList.remove('running');
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('stopBtn').disabled = true;
-
-            showVerdict();
-        }
-
-        function resetMeeting() {
-            isRunning = false;
-            clearInterval(timerInterval);
-            clearInterval(particleInterval);
-            elapsedMs = 0;
-            startTime = null;
-            document.getElementById('costDisplay').classList.remove('running');
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('stopBtn').disabled = true;
-            document.getElementById('totalCost').textContent = '0';
-            document.getElementById('duration').textContent = '00:00:00';
-            document.getElementById('verdict').classList.remove('show');
-        }
-
-        function updateTimer() {
-            elapsedMs = Date.now() - startTime;
-            
-            // Update duration display
-            const totalSeconds = Math.floor(elapsedMs / 1000);
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const seconds = totalSeconds % 60;
-            document.getElementById('duration').textContent = 
-                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-            // Update cost
-            const hoursElapsed = elapsedMs / 3600000;
-            const cost = getTotalHourlyRate() * hoursElapsed;
-            document.getElementById('totalCost').textContent = Math.round(cost).toLocaleString();
-        }
-
-        function showVerdict() {
-            const minutes = elapsedMs / 60000;
-            const hours = elapsedMs / 3600000;
-            const cost = getTotalHourlyRate() * hours;
-            const minuteRate = getTotalHourlyRate() / 60;
-
-            // Find verdict
-            const verdict = verdicts.find(v => minutes <= v.maxMinutes);
-            document.getElementById('verdictEmoji').textContent = verdict.emoji;
-            document.getElementById('verdictTitle').textContent = verdict.title;
-            document.getElementById('verdictSubtitle').textContent = verdict.subtitle;
-
-            // Stats
-            const totalMinutes = Math.floor(minutes);
-            const totalSeconds = Math.floor((elapsedMs % 60000) / 1000);
-            document.getElementById('finalCost').textContent = Math.round(cost).toLocaleString() + ' kr';
-            document.getElementById('finalDuration').textContent = 
-                totalMinutes > 0 ? `${totalMinutes}m ${totalSeconds}s` : `${totalSeconds}s`;
-            document.getElementById('finalRate').textContent = Math.round(minuteRate) + ' kr/min';
-
-            // Alternatives
-            const applicable = alternatives.filter(a => cost >= a.threshold);
-            const altList = document.getElementById('alternativesList');
-            if (applicable.length > 0) {
-                // Show top 3-4 most relevant
-                const shown = applicable.slice(-4);
-                altList.innerHTML = shown.map(a => 
-                    `<div class="alternative-item">${a.text}</div>`
-                ).join('');
-                document.getElementById('alternatives').style.display = 'block';
-            } else {
-                document.getElementById('alternatives').style.display = 'none';
-            }
-
-            document.getElementById('verdict').classList.add('show');
-        }
-
-        // Share
-        function shareResult() {
-            const minutes = Math.floor(elapsedMs / 60000);
-            const hours = elapsedMs / 3600000;
-            const cost = getTotalHourlyRate() * hours;
-            
-            const text = `💸 Our ${attendees.length}-person meeting just cost ${Math.round(cost).toLocaleString()} kr in ${minutes} minutes.\n\nFind out your meeting's damage: https://day005.aikemist.com`;
-            
-            if (navigator.share) {
-                navigator.share({ text });
-            } else {
-                navigator.clipboard.writeText(text);
-                alert('Copied to clipboard!');
-            }
-        }
-
-        // Notify me
-        function notifyMe() {
-            const email = prompt('Enter your email to get notified when the Slack app launches:');
-            if (email && email.includes('@')) {
-                // In production, this would POST to an API
-                localStorage.setItem('notify_email', email);
-                alert('Thanks! We\'ll let you know when it\'s ready. 🚀');
-            }
-        }
-
-        // Initialize
-        renderAttendees();
-        updateRateDisplay();
-    </script>
-</body>
-</html>

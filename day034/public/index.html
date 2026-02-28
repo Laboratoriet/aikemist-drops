@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Button Generator — CSS Button Builder | aikemist.com</title>
+    <meta name="description" content="Create beautiful CSS buttons visually. Multiple styles, sizes, states, and effects. Copy CSS instantly.">
+    <meta property="og:title" content="Button Generator — CSS Button Builder">
+    <meta property="og:description" content="Create beautiful CSS buttons visually. Multiple styles, sizes, states, and effects.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://day034.aikemist.com">
+    <meta property="og:image" content="https://day034.aikemist.com/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Button Generator — CSS Button Builder">
+    <meta name="twitter:description" content="Create beautiful CSS buttons visually. Multiple styles, sizes, states, and effects.">
+    <meta name="twitter:image" content="https://day034.aikemist.com/og-image.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #fafafa;
+            --bg-secondary: #ffffff;
+            --text: #1a1a1a;
+            --text-secondary: #666;
+            --border: #e5e5e5;
+            --border-hover: #ccc;
+            --accent: #3b82f6;
+            --code-bg: #f4f4f5;
+        }
+        
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --bg-secondary: #141414;
+            --text: #fafafa;
+            --text-secondary: #a1a1a1;
+            --border: #2a2a2a;
+            --border-hover: #3a3a3a;
+            --code-bg: #1a1a1a;
+        }
+        
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+            transition: background 0.2s, color 0.2s;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            border-radius: 8px;
+        }
+        
+        .logo-text {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .header-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.875rem;
+            transition: all 0.15s;
+        }
+        
+        .header-btn:hover {
+            border-color: var(--border-hover);
+            background: var(--bg);
+        }
+        
+        /* Main Layout */
+        .main {
+            display: grid;
+            grid-template-columns: 320px 1fr 360px;
+            min-height: calc(100vh - 60px - 50px);
+        }
+        
+        @media (max-width: 1200px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Panel Styles */
+        .panel {
+            padding: 1.5rem;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+        }
+        
+        .panel:last-child {
+            border-right: none;
+        }
+        
+        .panel-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+        
+        /* Controls */
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .preset-btn {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            cursor: pointer;
+            color: var(--text);
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        
+        .preset-btn:hover {
+            border-color: var(--accent);
+        }
+        
+        .preset-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: white;
+        }
+        
+        .style-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .radius-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+        
+        /* Color Picker */
+        .color-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .color-input {
+            width: 40px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            padding: 0;
+        }
+        
+        .color-input::-webkit-color-swatch-wrapper {
+            padding: 2px;
+        }
+        
+        .color-input::-webkit-color-swatch {
+            border-radius: 4px;
+            border: none;
+        }
+        
+        .hex-input {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8125rem;
+        }
+        
+        .color-presets {
+            display: flex;
+            gap: 0.375rem;
+            flex-wrap: wrap;
+        }
+        
+        .color-swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.1s;
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-swatch.active {
+            border-color: var(--text);
+        }
+        
+        /* Slider */
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .slider-value {
+            min-width: 40px;
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Toggle */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+        
+        .toggle-label {
+            font-size: 0.875rem;
+        }
+        
+        .toggle {
+            width: 44px;
+            height: 24px;
+            background: var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.2s;
+        }
+        
+        .toggle.active {
+            background: var(--accent);
+        }
+        
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+        }
+        
+        .toggle.active::after {
+            transform: translateX(20px);
+        }
+        
+        /* Preview Panel */
+        .preview-panel {
+            display: flex;
+            flex-direction: column;
+            background: var(--bg);
+        }
+        
+        .preview-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            padding: 2rem;
+            min-height: 400px;
+        }
+        
+        .preview-bg-light {
+            background: #ffffff;
+        }
+        
+        .preview-bg-dark {
+            background: #1a1a1a;
+        }
+        
+        .preview-bg-gradient {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        
+        .preview-bg-checker {
+            background-image: 
+                linear-gradient(45deg, #ccc 25%, transparent 25%), 
+                linear-gradient(-45deg, #ccc 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #ccc 75%), 
+                linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            background-color: #fff;
+        }
+        
+        .preview-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Removed old state-labels - now using state-preview-group */
+        
+        .preview-controls {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .bg-btn {
+            padding: 0.375rem 0.75rem;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: var(--text);
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        
+        .bg-btn:hover {
+            border-color: var(--border-hover);
+        }
+        
+        .bg-btn.active {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        /* Generated Button */
+        .gen-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5em;
+            font-family: 'Jost', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 2px solid transparent;
+            text-decoration: none;
+        }
+        
+        /* Code Panel */
+        .code-panel {
+            background: var(--bg-secondary);
+        }
+        
+        .code-block {
+            background: var(--code-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .code-lang {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+        
+        .copy-btn {
+            padding: 0.25rem 0.75rem;
+            border: 1px solid var(--border);
+            background: transparent;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: var(--text);
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        
+        .copy-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        .copy-btn.copied {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        
+        .code-content {
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .code-content pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        /* Syntax highlighting */
+        .code-prop { color: #9333ea; }
+        .code-value { color: #2563eb; }
+        .code-string { color: #16a34a; }
+        .code-comment { color: #9ca3af; font-style: italic; }
+        
+        [data-theme="dark"] .code-prop { color: #c084fc; }
+        [data-theme="dark"] .code-value { color: #60a5fa; }
+        [data-theme="dark"] .code-string { color: #4ade80; }
+        
+        /* Footer */
+        .footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+        
+        .footer a {
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text);
+            color: var(--bg);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .panel {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            
+            .preview-area {
+                min-height: 300px;
+            }
+        }
+
+/* State Preview Labels */
+        .state-preview-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .state-preview-label {
+            font-size: 0.625rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="https://aikemist.com" class="logo">
+            <div class="logo-icon"></div>
+            <span class="logo-text">Button Generator</span>
+        </a>
+        <div class="header-actions">
+            <button class="header-btn" onclick="randomize()">🎲 Random</button>
+            <button class="header-btn" onclick="shareURL()">Share</button>
+            <button class="header-btn" onclick="toggleTheme()">
+                <span id="theme-icon">🌙</span>
+            </button>
+        </div>
+    </header>
+    
+    <main class="main">
+        <!-- Controls Panel -->
+        <div class="panel">
+            <div class="panel-title">Button Settings</div>
+            
+            <div class="section">
+                <div class="section-title">Style</div>
+                <div class="style-grid" id="style-btns">
+                    <button class="preset-btn active" data-style="solid">Solid</button>
+                    <button class="preset-btn" data-style="outline">Outline</button>
+                    <button class="preset-btn" data-style="ghost">Ghost</button>
+                    <button class="preset-btn" data-style="soft">Soft</button>
+                    <button class="preset-btn" data-style="gradient">Gradient</button>
+                    <button class="preset-btn" data-style="3d">3D</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Size</div>
+                <div class="size-grid" id="size-btns">
+                    <button class="preset-btn" data-size="xs">XS</button>
+                    <button class="preset-btn" data-size="sm">SM</button>
+                    <button class="preset-btn active" data-size="md">MD</button>
+                    <button class="preset-btn" data-size="lg">LG</button>
+                    <button class="preset-btn" data-size="xl">XL</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Border Radius</div>
+                <div class="radius-grid" id="radius-btns">
+                    <button class="preset-btn" data-radius="0">None</button>
+                    <button class="preset-btn" data-radius="4">SM</button>
+                    <button class="preset-btn active" data-radius="8">MD</button>
+                    <button class="preset-btn" data-radius="9999">Full</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Color</div>
+                <div class="color-row">
+                    <input type="color" class="color-input" id="color-picker" value="#3b82f6">
+                    <input type="text" class="hex-input" id="color-hex" value="#3b82f6">
+                </div>
+                <div class="color-presets" id="color-presets"></div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Text Color</div>
+                <div class="color-row">
+                    <input type="color" class="color-input" id="text-color-picker" value="#ffffff">
+                    <input type="text" class="hex-input" id="text-color-hex" value="#ffffff">
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Button Text</div>
+                <input type="text" class="hex-input" id="button-text" value="Get Started" style="width: 100%;">
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Effects</div>
+                <div class="toggle-row">
+                    <span class="toggle-label">Shadow</span>
+                    <div class="toggle" id="shadow-toggle" onclick="toggleShadow()"></div>
+                </div>
+                <div class="toggle-row">
+                    <span class="toggle-label">Icon (→)</span>
+                    <div class="toggle" id="icon-toggle" onclick="toggleIcon()"></div>
+                </div>
+                <div class="toggle-row">
+                    <span class="toggle-label">Full Width</span>
+                    <div class="toggle" id="fullwidth-toggle" onclick="toggleFullWidth()"></div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Hover Scale</div>
+                <div class="slider-row">
+                    <input type="range" class="slider" id="scale-slider" min="100" max="110" value="102">
+                    <span class="slider-value" id="scale-value">1.02</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Preview Panel -->
+        <div class="panel preview-panel">
+            <div class="panel-title">Preview</div>
+            <div class="preview-area preview-bg-light" id="preview-area">
+                <div class="state-preview-group">
+                    <span class="state-preview-label">Default</span>
+                    <button class="gen-btn" id="btn-default">Get Started</button>
+                </div>
+                <div class="preview-buttons">
+                    <div class="state-preview-group">
+                        <span class="state-preview-label">Hover</span>
+                        <button class="gen-btn" id="btn-hover">Get Started</button>
+                    </div>
+                    <div class="state-preview-group">
+                        <span class="state-preview-label">Active</span>
+                        <button class="gen-btn" id="btn-active">Get Started</button>
+                    </div>
+                    <div class="state-preview-group">
+                        <span class="state-preview-label">Disabled</span>
+                        <button class="gen-btn" id="btn-disabled" disabled>Get Started</button>
+                    </div>
+                </div>
+            </div>
+            <div class="preview-controls">
+                <button class="bg-btn active" data-bg="light">Light</button>
+                <button class="bg-btn" data-bg="dark">Dark</button>
+                <button class="bg-btn" data-bg="gradient">Gradient</button>
+                <button class="bg-btn" data-bg="checker">Checker</button>
+            </div>
+        </div>
+        
+        <!-- Code Panel -->
+        <div class="panel code-panel">
+            <div class="panel-title">CSS Output</div>
+            
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-lang">CSS</span>
+                    <button class="copy-btn" id="copy-btn" onclick="copyCSS()">Copy</button>
+                </div>
+                <div class="code-content">
+                    <pre id="css-output"></pre>
+                </div>
+            </div>
+            
+<!-- Pro features removed per design guidelines -->
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <a href="https://aikemist.com">aikemist.com</a>
+        <span>·</span>
+        <span>Made by <a href="https://alkemist.no">Alkemist</a></span>
+    </footer>
+    
+    <div class="toast" id="toast">Copied!</div>
+    
+    <script>
+        // State
+        const state = {
+            style: 'solid',
+            size: 'md',
+            radius: 8,
+            color: '#3b82f6',
+            textColor: '#ffffff',
+            text: 'Get Started',
+            shadow: false,
+            icon: false,
+            fullWidth: false,
+            hoverScale: 1.02
+        };
+        
+        // Color presets
+        const colorPresets = [
+            '#3b82f6', // Blue
+            '#8b5cf6', // Purple
+            '#ec4899', // Pink
+            '#ef4444', // Red
+            '#f97316', // Orange
+            '#eab308', // Yellow
+            '#22c55e', // Green
+            '#14b8a6', // Teal
+            '#06b6d4', // Cyan
+            '#1a1a1a', // Black
+        ];
+        
+        // Size configs
+        const sizeConfigs = {
+            xs: { padding: '0.375rem 0.75rem', fontSize: '0.75rem' },
+            sm: { padding: '0.5rem 1rem', fontSize: '0.8125rem' },
+            md: { padding: '0.625rem 1.25rem', fontSize: '0.875rem' },
+            lg: { padding: '0.75rem 1.5rem', fontSize: '1rem' },
+            xl: { padding: '1rem 2rem', fontSize: '1.125rem' }
+        };
+        
+        // Init
+        function init() {
+            loadFromURL();
+            renderColorPresets();
+            setupListeners();
+            updatePreview();
+        }
+        
+        function renderColorPresets() {
+            const container = document.getElementById('color-presets');
+            container.innerHTML = colorPresets.map(c => 
+                `<div class="color-swatch ${state.color === c ? 'active' : ''}" 
+                     style="background: ${c}" 
+                     data-color="${c}"
+                     onclick="setColor('${c}')"></div>`
+            ).join('');
+        }
+        
+        function setupListeners() {
+            // Style buttons
+            document.querySelectorAll('#style-btns .preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#style-btns .preset-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.style = btn.dataset.style;
+                    updatePreview();
+                });
+            });
+            
+            // Size buttons
+            document.querySelectorAll('#size-btns .preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#size-btns .preset-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.size = btn.dataset.size;
+                    updatePreview();
+                });
+            });
+            
+            // Radius buttons
+            document.querySelectorAll('#radius-btns .preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('#radius-btns .preset-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.radius = parseInt(btn.dataset.radius);
+                    updatePreview();
+                });
+            });
+            
+            // Color picker
+            document.getElementById('color-picker').addEventListener('input', (e) => {
+                state.color = e.target.value;
+                document.getElementById('color-hex').value = e.target.value;
+                renderColorPresets();
+                updatePreview();
+            });
+            
+            document.getElementById('color-hex').addEventListener('input', (e) => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+                    state.color = e.target.value;
+                    document.getElementById('color-picker').value = e.target.value;
+                    renderColorPresets();
+                    updatePreview();
+                }
+            });
+            
+            // Text color
+            document.getElementById('text-color-picker').addEventListener('input', (e) => {
+                state.textColor = e.target.value;
+                document.getElementById('text-color-hex').value = e.target.value;
+                updatePreview();
+            });
+            
+            document.getElementById('text-color-hex').addEventListener('input', (e) => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+                    state.textColor = e.target.value;
+                    document.getElementById('text-color-picker').value = e.target.value;
+                    updatePreview();
+                }
+            });
+            
+            // Button text
+            document.getElementById('button-text').addEventListener('input', (e) => {
+                state.text = e.target.value || 'Button';
+                updatePreview();
+            });
+            
+            // Scale slider
+            document.getElementById('scale-slider').addEventListener('input', (e) => {
+                state.hoverScale = parseInt(e.target.value) / 100;
+                document.getElementById('scale-value').textContent = state.hoverScale.toFixed(2);
+                updatePreview();
+            });
+            
+            // Background buttons
+            document.querySelectorAll('.bg-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.bg-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const preview = document.getElementById('preview-area');
+                    preview.className = 'preview-area preview-bg-' + btn.dataset.bg;
+                });
+            });
+        }
+        
+        function setColor(color) {
+            state.color = color;
+            document.getElementById('color-picker').value = color;
+            document.getElementById('color-hex').value = color;
+            renderColorPresets();
+            updatePreview();
+        }
+        
+        function toggleShadow() {
+            state.shadow = !state.shadow;
+            document.getElementById('shadow-toggle').classList.toggle('active', state.shadow);
+            updatePreview();
+        }
+        
+        function toggleIcon() {
+            state.icon = !state.icon;
+            document.getElementById('icon-toggle').classList.toggle('active', state.icon);
+            updatePreview();
+        }
+        
+        function toggleFullWidth() {
+            state.fullWidth = !state.fullWidth;
+            document.getElementById('fullwidth-toggle').classList.toggle('active', state.fullWidth);
+            updatePreview();
+        }
+        
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+        
+        function adjustBrightness(hex, percent) {
+            const rgb = hexToRgb(hex);
+            const adjust = (c) => Math.min(255, Math.max(0, Math.round(c * (1 + percent / 100))));
+            return `#${adjust(rgb.r).toString(16).padStart(2, '0')}${adjust(rgb.g).toString(16).padStart(2, '0')}${adjust(rgb.b).toString(16).padStart(2, '0')}`;
+        }
+        
+        function getComputedStyles() {
+            const size = sizeConfigs[state.size];
+            const rgb = hexToRgb(state.color);
+            
+            let styles = {
+                default: {},
+                hover: {},
+                active: {},
+                disabled: {}
+            };
+            
+            // Base styles
+            styles.default = {
+                padding: size.padding,
+                fontSize: size.fontSize,
+                borderRadius: state.radius === 9999 ? '9999px' : `${state.radius}px`,
+                fontWeight: '500',
+                fontFamily: "'Jost', sans-serif",
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5em',
+                textDecoration: 'none',
+                width: state.fullWidth ? '100%' : 'auto'
+            };
+            
+            // Style-specific
+            switch (state.style) {
+                case 'solid':
+                    styles.default.background = state.color;
+                    styles.default.color = state.textColor;
+                    styles.default.border = '2px solid transparent';
+                    styles.hover.background = adjustBrightness(state.color, -10);
+                    styles.active.background = adjustBrightness(state.color, -20);
+                    break;
+                    
+                case 'outline':
+                    styles.default.background = 'transparent';
+                    styles.default.color = state.color;
+                    styles.default.border = `2px solid ${state.color}`;
+                    styles.hover.background = state.color;
+                    styles.hover.color = state.textColor;
+                    styles.active.background = adjustBrightness(state.color, -10);
+                    break;
+                    
+                case 'ghost':
+                    styles.default.background = 'transparent';
+                    styles.default.color = state.color;
+                    styles.default.border = '2px solid transparent';
+                    styles.hover.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`;
+                    styles.active.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`;
+                    break;
+                    
+                case 'soft':
+                    styles.default.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)`;
+                    styles.default.color = state.color;
+                    styles.default.border = '2px solid transparent';
+                    styles.hover.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.25)`;
+                    styles.active.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35)`;
+                    break;
+                    
+                case 'gradient':
+                    const gradientEnd = adjustBrightness(state.color, -30);
+                    styles.default.background = `linear-gradient(135deg, ${state.color}, ${gradientEnd})`;
+                    styles.default.color = state.textColor;
+                    styles.default.border = '2px solid transparent';
+                    styles.hover.filter = 'brightness(1.1)';
+                    styles.active.filter = 'brightness(0.95)';
+                    break;
+                    
+                case '3d':
+                    const darkerColor = adjustBrightness(state.color, -30);
+                    styles.default.background = state.color;
+                    styles.default.color = state.textColor;
+                    styles.default.border = '2px solid transparent';
+                    styles.default.boxShadow = `0 4px 0 ${darkerColor}`;
+                    styles.default.transform = 'translateY(0)';
+                    styles.hover.transform = 'translateY(-2px)';
+                    styles.hover.boxShadow = `0 6px 0 ${darkerColor}`;
+                    styles.active.transform = 'translateY(2px)';
+                    styles.active.boxShadow = `0 2px 0 ${darkerColor}`;
+                    break;
+            }
+            
+            // Shadow
+            if (state.shadow && state.style !== '3d') {
+                styles.default.boxShadow = `0 4px 14px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)`;
+            }
+            
+            // Hover scale
+            if (state.hoverScale !== 1) {
+                styles.hover.transform = `scale(${state.hoverScale})`;
+            }
+            
+            // Disabled
+            styles.disabled = { ...styles.default };
+            styles.disabled.opacity = '0.5';
+            styles.disabled.cursor = 'not-allowed';
+            
+            return styles;
+        }
+        
+        function applyStyles(el, styles) {
+            Object.entries(styles).forEach(([prop, value]) => {
+                el.style[prop] = value;
+            });
+        }
+        
+        function updatePreview() {
+            const computed = getComputedStyles();
+            const text = state.text + (state.icon ? ' →' : '');
+            
+            const btnDefault = document.getElementById('btn-default');
+            const btnHover = document.getElementById('btn-hover');
+            const btnActive = document.getElementById('btn-active');
+            const btnDisabled = document.getElementById('btn-disabled');
+            
+            // Reset styles
+            [btnDefault, btnHover, btnActive, btnDisabled].forEach(btn => {
+                btn.removeAttribute('style');
+                btn.textContent = text;
+            });
+            
+            // Apply default
+            applyStyles(btnDefault, computed.default);
+            
+            // Apply hover (show hover state)
+            applyStyles(btnHover, { ...computed.default, ...computed.hover });
+            
+            // Apply active (show active state)
+            applyStyles(btnActive, { ...computed.default, ...computed.active });
+            
+            // Apply disabled
+            applyStyles(btnDisabled, computed.disabled);
+            
+            // Generate CSS
+            generateCSS(computed);
+            
+            // Update URL
+            updateURL();
+        }
+        
+        function generateCSS(computed) {
+            const cssLines = [];
+            
+            cssLines.push('<span class="code-comment">/* Button styles */</span>');
+            cssLines.push('.btn {');
+            
+            Object.entries(computed.default).forEach(([prop, value]) => {
+                const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase();
+                cssLines.push(`  <span class="code-prop">${cssProp}</span>: <span class="code-value">${value}</span>;`);
+            });
+            
+            cssLines.push('}');
+            cssLines.push('');
+            
+            // Hover
+            if (Object.keys(computed.hover).length > 0) {
+                cssLines.push('.btn<span class="code-prop">:hover</span> {');
+                Object.entries(computed.hover).forEach(([prop, value]) => {
+                    const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase();
+                    cssLines.push(`  <span class="code-prop">${cssProp}</span>: <span class="code-value">${value}</span>;`);
+                });
+                cssLines.push('}');
+                cssLines.push('');
+            }
+            
+            // Active
+            if (Object.keys(computed.active).length > 0) {
+                cssLines.push('.btn<span class="code-prop">:active</span> {');
+                Object.entries(computed.active).forEach(([prop, value]) => {
+                    const cssProp = prop.replace(/([A-Z])/g, '-$1').toLowerCase();
+                    cssLines.push(`  <span class="code-prop">${cssProp}</span>: <span class="code-value">${value}</span>;`);
+                });
+                cssLines.push('}');
+                cssLines.push('');
+            }
+            
+            // Disabled
+            cssLines.push('.btn<span class="code-prop">:disabled</span> {');
+            cssLines.push(`  <span class="code-prop">opacity</span>: <span class="code-value">0.5</span>;`);
+            cssLines.push(`  <span class="code-prop">cursor</span>: <span class="code-value">not-allowed</span>;`);
+            cssLines.push('}');
+            
+            document.getElementById('css-output').innerHTML = cssLines.join('\n');
+        }
+        
+        function copyCSS() {
+            const cssEl = document.getElementById('css-output');
+            const css = cssEl.textContent;
+            
+            navigator.clipboard.writeText(css).then(() => {
+                const btn = document.getElementById('copy-btn');
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 1500);
+            });
+        }
+        
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        // URL state
+        function updateURL() {
+            const params = new URLSearchParams();
+            params.set('s', state.style);
+            params.set('sz', state.size);
+            params.set('r', state.radius);
+            params.set('c', state.color.replace('#', ''));
+            params.set('tc', state.textColor.replace('#', ''));
+            params.set('t', state.text);
+            if (state.shadow) params.set('sh', '1');
+            if (state.icon) params.set('i', '1');
+            if (state.fullWidth) params.set('fw', '1');
+            if (state.hoverScale !== 1.02) params.set('hs', state.hoverScale);
+            
+            history.replaceState(null, '', '?' + params.toString());
+        }
+        
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            
+            if (params.has('s')) state.style = params.get('s');
+            if (params.has('sz')) state.size = params.get('sz');
+            if (params.has('r')) state.radius = parseInt(params.get('r'));
+            if (params.has('c')) state.color = '#' + params.get('c');
+            if (params.has('tc')) state.textColor = '#' + params.get('tc');
+            if (params.has('t')) state.text = params.get('t');
+            if (params.has('sh')) state.shadow = params.get('sh') === '1';
+            if (params.has('i')) state.icon = params.get('i') === '1';
+            if (params.has('fw')) state.fullWidth = params.get('fw') === '1';
+            if (params.has('hs')) state.hoverScale = parseFloat(params.get('hs'));
+            
+            // Update UI
+            document.querySelectorAll('#style-btns .preset-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.style === state.style);
+            });
+            document.querySelectorAll('#size-btns .preset-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.size === state.size);
+            });
+            document.querySelectorAll('#radius-btns .preset-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.radius) === state.radius);
+            });
+            document.getElementById('color-picker').value = state.color;
+            document.getElementById('color-hex').value = state.color;
+            document.getElementById('text-color-picker').value = state.textColor;
+            document.getElementById('text-color-hex').value = state.textColor;
+            document.getElementById('button-text').value = state.text;
+            document.getElementById('shadow-toggle').classList.toggle('active', state.shadow);
+            document.getElementById('icon-toggle').classList.toggle('active', state.icon);
+            document.getElementById('fullwidth-toggle').classList.toggle('active', state.fullWidth);
+            document.getElementById('scale-slider').value = state.hoverScale * 100;
+            document.getElementById('scale-value').textContent = state.hoverScale.toFixed(2);
+        }
+        
+        function shareURL() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                showToast('Link copied!');
+            });
+        }
+        
+        function randomize() {
+            const styles = ['solid', 'outline', 'ghost', 'soft', 'gradient', '3d'];
+            const sizes = ['xs', 'sm', 'md', 'lg', 'xl'];
+            const radii = [0, 4, 8, 9999];
+            const texts = ['Get Started', 'Sign Up', 'Learn More', 'Buy Now', 'Subscribe', 'Download', 'Try Free', 'Join Us'];
+            
+            state.style = styles[Math.floor(Math.random() * styles.length)];
+            state.size = sizes[Math.floor(Math.random() * sizes.length)];
+            state.radius = radii[Math.floor(Math.random() * radii.length)];
+            state.color = colorPresets[Math.floor(Math.random() * colorPresets.length)];
+            state.text = texts[Math.floor(Math.random() * texts.length)];
+            state.shadow = Math.random() > 0.5;
+            state.icon = Math.random() > 0.6;
+            state.hoverScale = 1 + (Math.random() * 0.1);
+            
+            // Update UI
+            document.querySelectorAll('#style-btns .preset-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.style === state.style);
+            });
+            document.querySelectorAll('#size-btns .preset-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.size === state.size);
+            });
+            document.querySelectorAll('#radius-btns .preset-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.radius) === state.radius);
+            });
+            document.getElementById('color-picker').value = state.color;
+            document.getElementById('color-hex').value = state.color;
+            document.getElementById('button-text').value = state.text;
+            document.getElementById('shadow-toggle').classList.toggle('active', state.shadow);
+            document.getElementById('icon-toggle').classList.toggle('active', state.icon);
+            document.getElementById('scale-slider').value = state.hoverScale * 100;
+            document.getElementById('scale-value').textContent = state.hoverScale.toFixed(2);
+            
+            renderColorPresets();
+            updatePreview();
+            showToast('Random button!');
+        }
+        
+        // Theme
+        function toggleTheme() {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            document.body.setAttribute('data-theme', isDark ? '' : 'dark');
+            document.getElementById('theme-icon').textContent = isDark ? '🌙' : '☀️';
+        }
+        
+        // Check system preference
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.setAttribute('data-theme', 'dark');
+            document.getElementById('theme-icon').textContent = '☀️';
+        }
+        
+        init();
+    </script>
+</body>
+</html>

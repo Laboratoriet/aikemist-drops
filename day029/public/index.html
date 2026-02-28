@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Grid Generator | Alkemist</title>
+    <meta name="description" content="Build CSS Grid layouts visually. Create complex grids with drag-and-drop, export clean CSS code.">
+    <meta property="og:title" content="CSS Grid Generator | Alkemist">
+    <meta property="og:description" content="Build CSS Grid layouts visually. Export clean CSS code.">
+    <meta property="og:image" content="https://day029.aikemist.com/og.png">
+    <meta property="og:url" content="https://day029.aikemist.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #0a0a0a;
+            --bg-subtle: #111;
+            --bg-card: #161616;
+            --border: #2a2a2a;
+            --text: #f5f5f5;
+            --text-muted: #888;
+            --accent: #7c3aed;
+            --accent-hover: #8b5cf6;
+            --success: #10b981;
+            --font: 'Jost', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+        
+        [data-theme="light"] {
+            --bg: #fafafa;
+            --bg-subtle: #f0f0f0;
+            --bg-card: #fff;
+            --border: #e0e0e0;
+            --text: #1a1a1a;
+            --text-muted: #666;
+        }
+        
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: #fff;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .header-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: all 0.15s;
+        }
+        
+        .header-btn:hover {
+            border-color: var(--accent);
+        }
+        
+        .header-btn.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.125rem;
+            transition: all 0.15s;
+        }
+        
+        .theme-toggle:hover {
+            border-color: var(--accent);
+        }
+        
+        /* Main Layout */
+        .main {
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            min-height: calc(100vh - 57px);
+        }
+        
+        @media (max-width: 1100px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            padding: 1.25rem;
+            border-right: 1px solid var(--border);
+            background: var(--bg-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 1100px) {
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem;
+        }
+        
+        .control-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+        
+        .control-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .control-input {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-card);
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 0.8125rem;
+            text-align: center;
+        }
+        
+        .control-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .unit-label {
+            padding: 0.5rem 0.625rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Presets */
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .preset-btn {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-card);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        
+        .preset-btn:hover {
+            border-color: var(--accent);
+            background: var(--bg-subtle);
+        }
+        
+        .preset-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        /* Grid Canvas */
+        .canvas-area {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            min-height: 400px;
+        }
+        
+        .grid-container {
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 4/3;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            display: grid;
+            transition: all 0.3s ease;
+        }
+        
+        .grid-cell {
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: #fff;
+            font-weight: 500;
+            opacity: 0.9;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+            min-height: 40px;
+        }
+        
+        .grid-cell:hover {
+            opacity: 1;
+            transform: scale(1.02);
+        }
+        
+        .grid-cell.selected {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+        
+        /* Named areas get different colors */
+        .grid-cell[data-area="header"] { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .grid-cell[data-area="sidebar"] { background: linear-gradient(135deg, #10b981, #059669); }
+        .grid-cell[data-area="main"] { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        .grid-cell[data-area="footer"] { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .grid-cell[data-area="nav"] { background: linear-gradient(135deg, #ec4899, #be185d); }
+        .grid-cell[data-area="aside"] { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+        
+        /* Code Panel */
+        .code-panel {
+            border-left: 1px solid var(--border);
+            background: var(--bg-subtle);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @media (max-width: 1100px) {
+            .code-panel {
+                border-left: none;
+                border-top: 1px solid var(--border);
+            }
+        }
+        
+        .code-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .code-title {
+            font-weight: 600;
+            font-size: 0.9375rem;
+        }
+        
+        .copy-btn {
+            padding: 0.375rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.15s;
+        }
+        
+        .copy-btn:hover {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        .copy-btn.copied {
+            border-color: var(--success);
+            background: var(--success);
+            color: #fff;
+        }
+        
+        .code-content {
+            flex: 1;
+            padding: 1rem 1.25rem;
+            overflow: auto;
+        }
+        
+        .code-content pre {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .code-content .selector { color: #f59e0b; }
+        .code-content .property { color: var(--accent); }
+        .code-content .value { color: var(--success); }
+        .code-content .comment { color: var(--text-muted); }
+        
+        /* Footer */
+        .footer {
+            grid-column: 1 / -1;
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.8125rem;
+        }
+        
+        .footer a {
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            color: var(--accent);
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 0.75rem 1.25rem;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.25rem;
+            padding: 0.5rem;
+            background: var(--bg);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: var(--font);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .tab:hover {
+            color: var(--text);
+        }
+        
+        .tab.active {
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        /* Track list */
+        .track-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+        
+        .track-item {
+            display: flex;
+            gap: 0.375rem;
+            align-items: center;
+        }
+        
+        .track-input {
+            flex: 1;
+            padding: 0.375rem 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--bg-card);
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 0.75rem;
+        }
+        
+        .track-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .track-btn {
+            width: 24px;
+            height: 24px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--bg-card);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        
+        .track-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+        
+        .track-btn.add {
+            color: var(--success);
+        }
+        
+        .track-btn.remove {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="https://aikemist.com" class="logo">
+            <div class="logo-icon">A</div>
+            <span>CSS Grid Generator</span>
+        </a>
+        <div class="header-actions">
+            <button class="header-btn" onclick="shareUrl()">🔗 Share</button>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <aside class="sidebar">
+            <div class="control-group">
+                <span class="control-label">Layout Presets</span>
+                <div class="presets">
+                    <button class="preset-btn active" data-preset="simple">Simple</button>
+                    <button class="preset-btn" data-preset="holy-grail">Holy Grail</button>
+                    <button class="preset-btn" data-preset="dashboard">Dashboard</button>
+                    <button class="preset-btn" data-preset="gallery">Gallery</button>
+                    <button class="preset-btn" data-preset="sidebar">Sidebar</button>
+                    <button class="preset-btn" data-preset="cards">Cards</button>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label">Columns</span>
+                <div id="columns-list" class="track-list">
+                    <!-- Generated -->
+                </div>
+                <button class="track-btn add" onclick="addColumn()" style="width: 100%; margin-top: 0.375rem;">+ Add Column</button>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label">Rows</span>
+                <div id="rows-list" class="track-list">
+                    <!-- Generated -->
+                </div>
+                <button class="track-btn add" onclick="addRow()" style="width: 100%; margin-top: 0.375rem;">+ Add Row</button>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label">Gap</span>
+                <div class="control-row">
+                    <input type="number" class="control-input" id="gap-input" value="16" min="0" max="100">
+                    <span class="unit-label">px</span>
+                </div>
+            </div>
+            
+            <div class="control-group" style="margin-top: auto; padding: 1rem; background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 10px;">
+                <span style="display: inline-block; padding: 0.2rem 0.5rem; background: var(--accent); color: #fff; font-size: 0.625rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; border-radius: 3px; margin-bottom: 0.5rem;">Pro</span>
+                <p style="font-size: 0.8125rem; font-weight: 500; margin-bottom: 0.25rem;">Advanced Features</p>
+                <p style="font-size: 0.6875rem; color: var(--text-muted);">Drag-to-draw areas, Figma export, responsive breakpoints</p>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label">Container</span>
+                <div class="control-row">
+                    <select class="control-input" id="justify-items" style="text-align: left;">
+                        <option value="stretch">stretch</option>
+                        <option value="start">start</option>
+                        <option value="center">center</option>
+                        <option value="end">end</option>
+                    </select>
+                </div>
+                <div class="control-row">
+                    <select class="control-input" id="align-items" style="text-align: left;">
+                        <option value="stretch">stretch</option>
+                        <option value="start">start</option>
+                        <option value="center">center</option>
+                        <option value="end">end</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+
+        <section class="canvas-area">
+            <div class="grid-container" id="grid-container">
+                <!-- Generated cells -->
+            </div>
+        </section>
+
+        <aside class="code-panel">
+            <div class="code-header">
+                <span class="code-title">CSS Output</span>
+                <button class="copy-btn" onclick="copyCode()">
+                    <span>📋</span> Copy
+                </button>
+            </div>
+            <div class="code-content">
+                <pre id="code-output"></pre>
+            </div>
+        </aside>
+    </main>
+
+    <footer class="footer">
+        <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+    
+    <div class="toast" id="toast">Copied!</div>
+
+    <script>
+        // State
+        let state = {
+            columns: ['1fr', '1fr', '1fr'],
+            rows: ['1fr', '1fr'],
+            gap: 16,
+            justifyItems: 'stretch',
+            alignItems: 'stretch',
+            areas: null // For named grid areas
+        };
+        
+        // Presets
+        const presets = {
+            simple: {
+                columns: ['1fr', '1fr', '1fr'],
+                rows: ['1fr', '1fr'],
+                gap: 16,
+                areas: null
+            },
+            'holy-grail': {
+                columns: ['200px', '1fr', '200px'],
+                rows: ['auto', '1fr', 'auto'],
+                gap: 16,
+                areas: [
+                    ['header', 'header', 'header'],
+                    ['nav', 'main', 'aside'],
+                    ['footer', 'footer', 'footer']
+                ]
+            },
+            dashboard: {
+                columns: ['250px', '1fr', '1fr'],
+                rows: ['60px', '1fr', '1fr'],
+                gap: 16,
+                areas: [
+                    ['sidebar', 'header', 'header'],
+                    ['sidebar', 'main', 'main'],
+                    ['sidebar', 'main', 'main']
+                ]
+            },
+            gallery: {
+                columns: ['1fr', '1fr', '1fr', '1fr'],
+                rows: ['1fr', '1fr', '1fr'],
+                gap: 12,
+                areas: null
+            },
+            sidebar: {
+                columns: ['280px', '1fr'],
+                rows: ['1fr'],
+                gap: 0,
+                areas: [
+                    ['sidebar', 'main']
+                ]
+            },
+            cards: {
+                columns: ['repeat(3, 1fr)'],
+                rows: ['auto'],
+                gap: 24,
+                areas: null
+            }
+        };
+        
+        // Render column inputs
+        function renderColumns() {
+            const container = document.getElementById('columns-list');
+            container.innerHTML = state.columns.map((col, i) => `
+                <div class="track-item">
+                    <input type="text" class="track-input" value="${col}" 
+                           onchange="updateColumn(${i}, this.value)" 
+                           placeholder="1fr">
+                    ${state.columns.length > 1 ? `<button class="track-btn remove" onclick="removeColumn(${i})">×</button>` : ''}
+                </div>
+            `).join('');
+        }
+        
+        // Render row inputs
+        function renderRows() {
+            const container = document.getElementById('rows-list');
+            container.innerHTML = state.rows.map((row, i) => `
+                <div class="track-item">
+                    <input type="text" class="track-input" value="${row}" 
+                           onchange="updateRow(${i}, this.value)" 
+                           placeholder="1fr">
+                    ${state.rows.length > 1 ? `<button class="track-btn remove" onclick="removeRow(${i})">×</button>` : ''}
+                </div>
+            `).join('');
+        }
+        
+        // Update functions
+        function updateColumn(index, value) {
+            state.columns[index] = value || '1fr';
+            state.areas = null;
+            updateGrid();
+        }
+        
+        function updateRow(index, value) {
+            state.rows[index] = value || '1fr';
+            state.areas = null;
+            updateGrid();
+        }
+        
+        function addColumn() {
+            state.columns.push('1fr');
+            state.areas = null;
+            renderColumns();
+            updateGrid();
+        }
+        
+        function removeColumn(index) {
+            if (state.columns.length > 1) {
+                state.columns.splice(index, 1);
+                state.areas = null;
+                renderColumns();
+                updateGrid();
+            }
+        }
+        
+        function addRow() {
+            state.rows.push('1fr');
+            state.areas = null;
+            renderRows();
+            updateGrid();
+        }
+        
+        function removeRow(index) {
+            if (state.rows.length > 1) {
+                state.rows.splice(index, 1);
+                state.areas = null;
+                renderRows();
+                updateGrid();
+            }
+        }
+        
+        // Get effective column count (handle repeat())
+        function getEffectiveColumns() {
+            let count = 0;
+            state.columns.forEach(col => {
+                const repeatMatch = col.match(/repeat\((\d+)/);
+                if (repeatMatch) {
+                    count += parseInt(repeatMatch[1]);
+                } else {
+                    count += 1;
+                }
+            });
+            return count;
+        }
+        
+        // Render grid preview
+        function renderGridPreview() {
+            const container = document.getElementById('grid-container');
+            const colCount = getEffectiveColumns();
+            const rowCount = state.rows.length;
+            const cellCount = colCount * rowCount;
+            
+            // Apply grid styles
+            container.style.gridTemplateColumns = state.columns.join(' ');
+            container.style.gridTemplateRows = state.rows.join(' ');
+            container.style.gap = state.gap + 'px';
+            container.style.justifyItems = state.justifyItems;
+            container.style.alignItems = state.alignItems;
+            
+            // Generate cells
+            if (state.areas) {
+                // Named areas mode
+                const areaNames = new Set();
+                state.areas.flat().forEach(a => areaNames.add(a));
+                
+                container.style.gridTemplateAreas = state.areas.map(row => `"${row.join(' ')}"`).join(' ');
+                
+                container.innerHTML = Array.from(areaNames).map(area => `
+                    <div class="grid-cell" data-area="${area}" style="grid-area: ${area};">
+                        ${area}
+                    </div>
+                `).join('');
+            } else {
+                // Simple numbered cells
+                container.style.gridTemplateAreas = '';
+                container.innerHTML = Array.from({ length: cellCount }, (_, i) => `
+                    <div class="grid-cell">${i + 1}</div>
+                `).join('');
+            }
+        }
+        
+        // Generate CSS code
+        function generateCode() {
+            let css = `<span class="selector">.container</span> {\n`;
+            css += `  <span class="property">display</span>: <span class="value">grid</span>;\n`;
+            css += `  <span class="property">grid-template-columns</span>: <span class="value">${state.columns.join(' ')}</span>;\n`;
+            css += `  <span class="property">grid-template-rows</span>: <span class="value">${state.rows.join(' ')}</span>;\n`;
+            css += `  <span class="property">gap</span>: <span class="value">${state.gap}px</span>;\n`;
+            
+            if (state.justifyItems !== 'stretch') {
+                css += `  <span class="property">justify-items</span>: <span class="value">${state.justifyItems}</span>;\n`;
+            }
+            if (state.alignItems !== 'stretch') {
+                css += `  <span class="property">align-items</span>: <span class="value">${state.alignItems}</span>;\n`;
+            }
+            
+            if (state.areas) {
+                css += `  <span class="property">grid-template-areas</span>:\n`;
+                state.areas.forEach(row => {
+                    css += `    <span class="value">"${row.join(' ')}"</span>\n`;
+                });
+                css = css.trimEnd() + `;\n`;
+            }
+            
+            css += `}\n`;
+            
+            // Add child selectors for named areas
+            if (state.areas) {
+                const areaNames = new Set();
+                state.areas.flat().forEach(a => areaNames.add(a));
+                
+                css += `\n<span class="comment">/* Grid areas */</span>\n`;
+                areaNames.forEach(area => {
+                    css += `<span class="selector">.${area}</span> { <span class="property">grid-area</span>: <span class="value">${area}</span>; }\n`;
+                });
+            }
+            
+            document.getElementById('code-output').innerHTML = css;
+        }
+        
+        // Copy code
+        function copyCode() {
+            let plainCss = `.container {\n`;
+            plainCss += `  display: grid;\n`;
+            plainCss += `  grid-template-columns: ${state.columns.join(' ')};\n`;
+            plainCss += `  grid-template-rows: ${state.rows.join(' ')};\n`;
+            plainCss += `  gap: ${state.gap}px;\n`;
+            
+            if (state.justifyItems !== 'stretch') {
+                plainCss += `  justify-items: ${state.justifyItems};\n`;
+            }
+            if (state.alignItems !== 'stretch') {
+                plainCss += `  align-items: ${state.alignItems};\n`;
+            }
+            
+            if (state.areas) {
+                plainCss += `  grid-template-areas:\n`;
+                state.areas.forEach(row => {
+                    plainCss += `    "${row.join(' ')}"\n`;
+                });
+                plainCss = plainCss.trimEnd() + `;\n`;
+            }
+            
+            plainCss += `}\n`;
+            
+            if (state.areas) {
+                const areaNames = new Set();
+                state.areas.flat().forEach(a => areaNames.add(a));
+                plainCss += `\n/* Grid areas */\n`;
+                areaNames.forEach(area => {
+                    plainCss += `.${area} { grid-area: ${area}; }\n`;
+                });
+            }
+            
+            navigator.clipboard.writeText(plainCss);
+            const btn = document.querySelector('.copy-btn');
+            btn.classList.add('copied');
+            btn.innerHTML = '<span>✓</span> Copied!';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.innerHTML = '<span>📋</span> Copy';
+            }, 2000);
+        }
+        
+        // Update grid
+        function updateGrid() {
+            renderGridPreview();
+            generateCode();
+        }
+        
+        // Apply preset
+        function applyPreset(name) {
+            const preset = presets[name];
+            if (!preset) return;
+            
+            state.columns = [...preset.columns];
+            state.rows = [...preset.rows];
+            state.gap = preset.gap;
+            state.areas = preset.areas ? preset.areas.map(row => [...row]) : null;
+            
+            document.getElementById('gap-input').value = state.gap;
+            
+            renderColumns();
+            renderRows();
+            updateGrid();
+            
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.preset === name);
+            });
+        }
+        
+        // Share URL
+        function shareUrl() {
+            const params = new URLSearchParams({
+                c: state.columns.join(','),
+                r: state.rows.join(','),
+                g: state.gap,
+                ji: state.justifyItems,
+                ai: state.alignItems
+            });
+            if (state.areas) {
+                params.set('a', state.areas.map(row => row.join(',')).join(';'));
+            }
+            const url = `${window.location.origin}${window.location.pathname}?${params}`;
+            navigator.clipboard.writeText(url);
+            showToast('Link copied!');
+        }
+        
+        // Toast
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            document.querySelector('.theme-icon').textContent = next === 'light' ? '☀️' : '🌙';
+            localStorage.setItem('theme', next);
+        }
+        
+        // Initialize
+        function init() {
+            // Load theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.querySelector('.theme-icon').textContent = savedTheme === 'light' ? '☀️' : '🌙';
+            
+            // Load from URL
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('c')) {
+                state.columns = params.get('c').split(',');
+                state.rows = params.get('r')?.split(',') || ['1fr'];
+                state.gap = parseInt(params.get('g')) || 16;
+                state.justifyItems = params.get('ji') || 'stretch';
+                state.alignItems = params.get('ai') || 'stretch';
+                
+                if (params.has('a')) {
+                    state.areas = params.get('a').split(';').map(row => row.split(','));
+                }
+                
+                document.getElementById('gap-input').value = state.gap;
+                document.getElementById('justify-items').value = state.justifyItems;
+                document.getElementById('align-items').value = state.alignItems;
+            }
+            
+            // Event listeners
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+            });
+            
+            document.getElementById('gap-input').addEventListener('input', (e) => {
+                state.gap = parseInt(e.target.value) || 0;
+                updateGrid();
+            });
+            
+            document.getElementById('justify-items').addEventListener('change', (e) => {
+                state.justifyItems = e.target.value;
+                updateGrid();
+            });
+            
+            document.getElementById('align-items').addEventListener('change', (e) => {
+                state.alignItems = e.target.value;
+                updateGrid();
+            });
+            
+            renderColumns();
+            renderRows();
+            updateGrid();
+        }
+        
+        init();
+    </script>
+</body>
+</html>

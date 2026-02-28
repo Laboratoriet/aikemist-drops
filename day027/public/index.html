@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spacing Scale Calculator | Alkemist</title>
+    <meta name="description" content="Generate consistent spacing scales for your design system. Export to CSS, Tailwind, SCSS, or JSON.">
+    <meta property="og:title" content="Spacing Scale Calculator | Alkemist">
+    <meta property="og:description" content="Generate consistent spacing scales for your design system.">
+    <meta property="og:image" content="https://day027.aikemist.com/og.png">
+    <meta property="og:url" content="https://day027.aikemist.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #0a0a0a;
+            --bg-subtle: #111;
+            --bg-card: #161616;
+            --border: #2a2a2a;
+            --text: #f5f5f5;
+            --text-muted: #888;
+            --accent: #7c3aed;
+            --accent-hover: #8b5cf6;
+            --success: #10b981;
+            --font: 'Jost', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+        
+        [data-theme="light"] {
+            --bg: #fafafa;
+            --bg-subtle: #f0f0f0;
+            --bg-card: #fff;
+            --border: #e0e0e0;
+            --text: #1a1a1a;
+            --text-muted: #666;
+        }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+        
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.2s;
+        }
+        
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            background: var(--bg-subtle);
+        }
+        
+        /* Main Layout */
+        .main {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            min-height: calc(100vh - 73px);
+        }
+        
+        @media (max-width: 900px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Controls Sidebar */
+        .controls {
+            padding: 1.5rem;
+            border-right: 1px solid var(--border);
+            background: var(--bg-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: sticky;
+            top: 73px;
+            height: calc(100vh - 73px);
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 900px) {
+            .controls {
+                position: relative;
+                top: 0;
+                height: auto;
+            }
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .control-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+        
+        /* Presets */
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .preset-btn {
+            padding: 0.625rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        
+        .preset-btn:hover {
+            border-color: var(--accent);
+            background: var(--bg-subtle);
+        }
+        
+        .preset-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        /* Sliders */
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .slider-value {
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            appearance: none;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2px solid var(--bg);
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+        
+        /* Number Input */
+        .number-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .number-input input {
+            flex: 1;
+            padding: 0.625rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 0.875rem;
+        }
+        
+        .number-input input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .unit-select {
+            padding: 0.625rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+        
+        .unit-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        /* Format Buttons */
+        .format-btns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .format-btn {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-card);
+            color: var(--text-muted);
+            font-family: var(--mono);
+            font-size: 0.6875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .format-btn:hover {
+            border-color: var(--text-muted);
+            color: var(--text);
+        }
+        
+        .format-btn.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        /* Share Button */
+        .share-btn {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.15s;
+        }
+        
+        .share-btn:hover {
+            border-color: var(--accent);
+            background: var(--bg-subtle);
+        }
+        
+        /* Preview Area */
+        .preview-area {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9375rem;
+        }
+        
+        /* Scale Preview */
+        .scale-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .scale-item {
+            display: grid;
+            grid-template-columns: 80px 1fr auto;
+            gap: 1rem;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+        
+        .scale-item:hover {
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }
+        
+        .scale-name {
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--accent);
+        }
+        
+        .scale-visual {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .scale-bar {
+            height: 24px;
+            background: linear-gradient(90deg, var(--accent), #a855f7);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scale-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+        }
+        
+        .scale-item:hover .scale-bar {
+            filter: brightness(1.15);
+        }
+        
+        .scale-value {
+            font-family: var(--mono);
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            min-width: 70px;
+            text-align: right;
+        }
+        
+        /* Code Output */
+        .code-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .code-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .code-title {
+            font-weight: 500;
+            font-size: 0.9375rem;
+        }
+        
+        .copy-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: all 0.15s;
+        }
+        
+        .copy-btn:hover {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        .copy-btn.copied {
+            border-color: var(--success);
+            background: var(--success);
+            color: #fff;
+        }
+        
+        .code-content {
+            padding: 1.25rem;
+            overflow-x: auto;
+        }
+        
+        .code-content pre {
+            font-family: var(--mono);
+            font-size: 0.8125rem;
+            line-height: 1.7;
+            white-space: pre;
+            color: var(--text);
+        }
+        
+        .code-content .comment {
+            color: var(--text-muted);
+        }
+        
+        .code-content .property {
+            color: #7c3aed;
+        }
+        
+        .code-content .value {
+            color: #10b981;
+        }
+        
+        /* Pro Teaser */
+        .pro-teaser {
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 12px;
+        }
+        
+        .pro-badge {
+            display: inline-block;
+            padding: 0.25rem 0.625rem;
+            background: var(--accent);
+            color: #fff;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 4px;
+            margin-bottom: 0.75rem;
+        }
+        
+        .pro-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .pro-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        
+        .pro-feature {
+            padding: 0.375rem 0.75rem;
+            background: var(--bg);
+            border-radius: 20px;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+        
+        /* Footer */
+        .footer {
+            padding: 2rem;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+        
+        .footer a {
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            color: var(--accent);
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 0.875rem 1.5rem;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 8px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* Reference Section */
+        .reference-section {
+            margin-top: 1rem;
+        }
+        
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .reference-card {
+            padding: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+        
+        .reference-card h4 {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            margin-bottom: 0.625rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        
+        .reference-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+        
+        .reference-card li {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--text);
+        }
+        
+        /* Use Case Preview */
+        .usecase-section {
+            margin-top: 1rem;
+        }
+        
+        .usecase-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .usecase-tab {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-card);
+            color: var(--text-muted);
+            font-family: var(--font);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .usecase-tab:hover {
+            border-color: var(--text-muted);
+            color: var(--text);
+        }
+        
+        .usecase-tab.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        .usecase-preview {
+            padding: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+        
+        /* Card Use Case */
+        .usecase-card {
+            width: 100%;
+            max-width: 320px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .usecase-card-image {
+            height: 120px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+        }
+        
+        .usecase-card-content {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .usecase-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .usecase-card p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        .usecase-card-btn {
+            padding: 0.625rem 1rem;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-family: var(--font);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        /* Form Use Case */
+        .usecase-form {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .usecase-form label {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .usecase-form input {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-subtle);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.875rem;
+        }
+        
+        .usecase-form button {
+            padding: 0.75rem 1.5rem;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: var(--font);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* List Use Case */
+        .usecase-list {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-subtle);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .usecase-list-item {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .usecase-list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .usecase-list-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+        
+        .usecase-list-text {
+            flex: 1;
+        }
+        
+        .usecase-list-text strong {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .usecase-list-text span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        /* Spacing annotations */
+        .spacing-annotation {
+            position: absolute;
+            background: rgba(124, 58, 237, 0.2);
+            border: 1px dashed var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-size: 0.625rem;
+            color: var(--accent);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="https://aikemist.com" class="logo">
+            <div class="logo-icon">A</div>
+            <span>Spacing Scale Calculator</span>
+        </a>
+        <div class="header-actions">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <aside class="controls">
+            <div class="control-group">
+                <span class="control-label">Scale Type</span>
+                <div class="presets">
+                    <button class="preset-btn active" data-preset="linear4">Linear 4</button>
+                    <button class="preset-btn" data-preset="linear8">Linear 8</button>
+                    <button class="preset-btn" data-preset="tailwind">Tailwind</button>
+                    <button class="preset-btn" data-preset="material">Material</button>
+                    <button class="preset-btn" data-preset="fibonacci">Fibonacci</button>
+                    <button class="preset-btn" data-preset="golden">Golden</button>
+                    <button class="preset-btn" data-preset="bootstrap">Bootstrap</button>
+                    <button class="preset-btn" data-preset="custom">Custom</button>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="control-label">Base Size</span>
+                        <span class="slider-value" id="base-value">4px</span>
+                    </div>
+                    <input type="range" id="base-size" min="2" max="16" value="4" step="1">
+                </div>
+            </div>
+            
+            <div class="control-group" id="multiplier-group">
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="control-label">Multiplier</span>
+                        <span class="slider-value" id="multiplier-value">1.5</span>
+                    </div>
+                    <input type="range" id="multiplier" min="1.1" max="2" value="1.5" step="0.05">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="control-label">Steps</span>
+                        <span class="slider-value" id="steps-value">10</span>
+                    </div>
+                    <input type="range" id="steps" min="5" max="20" value="10" step="1">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label">Output Unit</span>
+                <div class="number-input">
+                    <select class="unit-select" id="unit">
+                        <option value="px">px</option>
+                        <option value="rem" selected>rem</option>
+                        <option value="em">em</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <span class="control-label">Export Format</span>
+                <div class="format-btns">
+                    <button class="format-btn active" data-format="css">CSS</button>
+                    <button class="format-btn" data-format="tailwind">TW</button>
+                    <button class="format-btn" data-format="scss">SCSS</button>
+                    <button class="format-btn" data-format="json">JSON</button>
+                </div>
+            </div>
+            
+            <button class="share-btn" onclick="shareUrl()">
+                <span>🔗</span> Copy Share Link
+            </button>
+        </aside>
+
+        <section class="preview-area">
+            <div>
+                <h1 class="section-title">Spacing Scale</h1>
+                <p class="section-subtitle">Consistent spacing creates visual harmony. Pick a system or build your own.</p>
+            </div>
+            
+            <div class="scale-container" id="scale-preview">
+                <!-- Generated dynamically -->
+            </div>
+            
+            <div class="code-section">
+                <div class="code-header">
+                    <span class="code-title">Code Output</span>
+                    <button class="copy-btn" onclick="copyCode()">
+                        <span>📋</span> Copy
+                    </button>
+                </div>
+                <div class="code-content">
+                    <pre id="code-output"></pre>
+                </div>
+            </div>
+            
+            <!-- Use Case Preview -->
+            <div class="usecase-section">
+                <h3 class="section-title" style="font-size: 1.125rem;">Live Preview</h3>
+                <p class="section-subtitle" style="margin-bottom: 1rem;">See your spacing scale applied to real UI patterns.</p>
+                
+                <div class="usecase-tabs">
+                    <button class="usecase-tab active" data-usecase="card">Card</button>
+                    <button class="usecase-tab" data-usecase="form">Form</button>
+                    <button class="usecase-tab" data-usecase="list">List</button>
+                </div>
+                
+                <div class="usecase-preview" id="usecase-preview">
+                    <!-- Generated dynamically -->
+                </div>
+            </div>
+            
+            <div class="reference-section">
+                <h3 class="section-title" style="font-size: 1.125rem;">Common Spacing Systems</h3>
+                <div class="reference-grid">
+                    <div class="reference-card">
+                        <h4>Linear (4px base)</h4>
+                        <ul>
+                            <li>4 · 8 · 12 · 16 · 20 · 24...</li>
+                            <li>Simple, predictable</li>
+                            <li>Used by: iOS, many apps</li>
+                        </ul>
+                    </div>
+                    <div class="reference-card">
+                        <h4>Linear (8px base)</h4>
+                        <ul>
+                            <li>8 · 16 · 24 · 32 · 40 · 48...</li>
+                            <li>Bolder spacing jumps</li>
+                            <li>Used by: Material Design</li>
+                        </ul>
+                    </div>
+                    <div class="reference-card">
+                        <h4>Tailwind CSS</h4>
+                        <ul>
+                            <li>0 · 1 · 2 · 4 · 6 · 8 · 12...</li>
+                            <li>0.25rem base (4px)</li>
+                            <li>Flexible for web</li>
+                        </ul>
+                    </div>
+                    <div class="reference-card">
+                        <h4>Golden Ratio</h4>
+                        <ul>
+                            <li>× 1.618 each step</li>
+                            <li>Organic, natural feel</li>
+                            <li>Common in design</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pro-teaser">
+                <span class="pro-badge">Pro</span>
+                <h3 class="pro-title">Design System Export</h3>
+                <p class="section-subtitle">Export to Figma, generate fluid spacing, and integrate with your full design system.</p>
+                <div class="pro-features">
+                    <span class="pro-feature">Figma plugin</span>
+                    <span class="pro-feature">Fluid clamp()</span>
+                    <span class="pro-feature">Tokens export</span>
+                    <span class="pro-feature">Team sharing</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+    
+    <div class="toast" id="toast">Copied!</div>
+
+    <script>
+        // State
+        let state = {
+            preset: 'linear4',
+            baseSize: 4,
+            multiplier: 1.5,
+            steps: 10,
+            unit: 'rem',
+            format: 'css'
+        };
+        
+        // Preset configurations
+        const presets = {
+            linear4: { baseSize: 4, multiplier: null, type: 'linear', step: 4 },
+            linear8: { baseSize: 8, multiplier: null, type: 'linear', step: 8 },
+            tailwind: { baseSize: 4, multiplier: null, type: 'tailwind' },
+            material: { baseSize: 8, multiplier: null, type: 'material' },
+            fibonacci: { baseSize: 4, multiplier: null, type: 'fibonacci' },
+            golden: { baseSize: 4, multiplier: 1.618, type: 'ratio' },
+            bootstrap: { baseSize: 4, multiplier: null, type: 'bootstrap' },
+            custom: { baseSize: 4, multiplier: 1.5, type: 'ratio' }
+        };
+        
+        // Generate scale based on type
+        function generateScale() {
+            const preset = presets[state.preset];
+            let scale = [];
+            const steps = state.steps;
+            
+            switch (preset.type) {
+                case 'linear':
+                    for (let i = 0; i < steps; i++) {
+                        scale.push({
+                            name: `space-${i + 1}`,
+                            px: state.baseSize * (i + 1)
+                        });
+                    }
+                    break;
+                    
+                case 'tailwind':
+                    const twValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36];
+                    for (let i = 0; i < Math.min(steps, twValues.length); i++) {
+                        scale.push({
+                            name: `space-${twValues[i]}`,
+                            px: twValues[i] * state.baseSize
+                        });
+                    }
+                    break;
+                    
+                case 'material':
+                    for (let i = 0; i < steps; i++) {
+                        scale.push({
+                            name: `space-${(i + 1) * state.baseSize}`,
+                            px: (i + 1) * state.baseSize
+                        });
+                    }
+                    break;
+                    
+                case 'fibonacci':
+                    const fib = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610];
+                    for (let i = 0; i < Math.min(steps, fib.length); i++) {
+                        scale.push({
+                            name: `space-${i + 1}`,
+                            px: fib[i] * state.baseSize
+                        });
+                    }
+                    break;
+                    
+                case 'bootstrap':
+                    const bsMultipliers = [0, 0.25, 0.5, 1, 1.5, 3, 4, 5, 6, 8, 10, 12];
+                    for (let i = 0; i < Math.min(steps, bsMultipliers.length); i++) {
+                        scale.push({
+                            name: `space-${i}`,
+                            px: bsMultipliers[i] * 16 // Bootstrap uses 1rem = 16px
+                        });
+                    }
+                    break;
+                    
+                case 'ratio':
+                    for (let i = 0; i < steps; i++) {
+                        scale.push({
+                            name: `space-${i + 1}`,
+                            px: Math.round(state.baseSize * Math.pow(state.multiplier, i))
+                        });
+                    }
+                    break;
+            }
+            
+            return scale;
+        }
+        
+        // Convert px to selected unit
+        function convertUnit(px) {
+            switch (state.unit) {
+                case 'rem': return `${(px / 16).toFixed(3).replace(/\.?0+$/, '')}rem`;
+                case 'em': return `${(px / 16).toFixed(3).replace(/\.?0+$/, '')}em`;
+                default: return `${px}px`;
+            }
+        }
+        
+        // Render scale preview
+        function renderPreview() {
+            const scale = generateScale();
+            const container = document.getElementById('scale-preview');
+            const maxPx = Math.max(...scale.map(s => s.px), 1);
+            
+            container.innerHTML = scale.map(item => `
+                <div class="scale-item">
+                    <span class="scale-name">${item.name}</span>
+                    <div class="scale-visual">
+                        <div class="scale-bar" style="width: ${Math.max(4, (item.px / maxPx) * 200)}px"></div>
+                    </div>
+                    <span class="scale-value">${convertUnit(item.px)}</span>
+                </div>
+            `).join('');
+        }
+        
+        // Generate code output
+        function generateCode() {
+            const scale = generateScale();
+            let code = '';
+            
+            switch (state.format) {
+                case 'css':
+                    code = `<span class="comment">/* Spacing Scale - ${state.preset} */</span>\n`;
+                    code += `:root {\n`;
+                    scale.forEach(item => {
+                        code += `  <span class="property">--${item.name}</span>: <span class="value">${convertUnit(item.px)}</span>;\n`;
+                    });
+                    code += `}`;
+                    break;
+                    
+                case 'tailwind':
+                    code = `<span class="comment">// tailwind.config.js</span>\n`;
+                    code += `module.exports = {\n`;
+                    code += `  theme: {\n`;
+                    code += `    spacing: {\n`;
+                    scale.forEach((item, i) => {
+                        const key = item.name.replace('space-', '');
+                        code += `      <span class="property">'${key}'</span>: <span class="value">'${convertUnit(item.px)}'</span>${i < scale.length - 1 ? ',' : ''}\n`;
+                    });
+                    code += `    }\n`;
+                    code += `  }\n`;
+                    code += `}`;
+                    break;
+                    
+                case 'scss':
+                    code = `<span class="comment">// Spacing Scale - ${state.preset}</span>\n`;
+                    scale.forEach(item => {
+                        code += `<span class="property">$${item.name}</span>: <span class="value">${convertUnit(item.px)}</span>;\n`;
+                    });
+                    code += `\n<span class="comment">// Map for loops</span>\n`;
+                    code += `$spacing: (\n`;
+                    scale.forEach((item, i) => {
+                        const key = item.name.replace('space-', '');
+                        code += `  <span class="property">'${key}'</span>: <span class="value">${convertUnit(item.px)}</span>${i < scale.length - 1 ? ',' : ''}\n`;
+                    });
+                    code += `);`;
+                    break;
+                    
+                case 'json':
+                    const jsonObj = {};
+                    scale.forEach(item => {
+                        jsonObj[item.name] = convertUnit(item.px);
+                    });
+                    code = JSON.stringify({ spacing: jsonObj }, null, 2)
+                        .replace(/"([^"]+)":/g, '<span class="property">"$1"</span>:')
+                        .replace(/: "([^"]+)"/g, ': <span class="value">"$1"</span>');
+                    break;
+            }
+            
+            document.getElementById('code-output').innerHTML = code;
+        }
+        
+        // Copy code
+        function copyCode() {
+            const scale = generateScale();
+            let plainCode = '';
+            
+            switch (state.format) {
+                case 'css':
+                    plainCode = `/* Spacing Scale - ${state.preset} */\n:root {\n`;
+                    scale.forEach(item => {
+                        plainCode += `  --${item.name}: ${convertUnit(item.px)};\n`;
+                    });
+                    plainCode += `}`;
+                    break;
+                    
+                case 'tailwind':
+                    plainCode = `// tailwind.config.js\nmodule.exports = {\n  theme: {\n    spacing: {\n`;
+                    scale.forEach((item, i) => {
+                        const key = item.name.replace('space-', '');
+                        plainCode += `      '${key}': '${convertUnit(item.px)}'${i < scale.length - 1 ? ',' : ''}\n`;
+                    });
+                    plainCode += `    }\n  }\n}`;
+                    break;
+                    
+                case 'scss':
+                    scale.forEach(item => {
+                        plainCode += `$${item.name}: ${convertUnit(item.px)};\n`;
+                    });
+                    plainCode += `\n$spacing: (\n`;
+                    scale.forEach((item, i) => {
+                        const key = item.name.replace('space-', '');
+                        plainCode += `  '${key}': ${convertUnit(item.px)}${i < scale.length - 1 ? ',' : ''}\n`;
+                    });
+                    plainCode += `);`;
+                    break;
+                    
+                case 'json':
+                    const jsonObj = {};
+                    scale.forEach(item => {
+                        jsonObj[item.name] = convertUnit(item.px);
+                    });
+                    plainCode = JSON.stringify({ spacing: jsonObj }, null, 2);
+                    break;
+            }
+            
+            navigator.clipboard.writeText(plainCode);
+            const btn = document.querySelector('.copy-btn');
+            btn.classList.add('copied');
+            btn.innerHTML = '<span>✓</span> Copied!';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.innerHTML = '<span>📋</span> Copy';
+            }, 2000);
+        }
+        
+        // Share URL
+        function shareUrl() {
+            const params = new URLSearchParams({
+                p: state.preset,
+                b: state.baseSize,
+                m: state.multiplier,
+                s: state.steps,
+                u: state.unit,
+                f: state.format
+            });
+            const url = `${window.location.origin}${window.location.pathname}?${params}`;
+            navigator.clipboard.writeText(url);
+            showToast('Link copied!');
+        }
+        
+        // Toast
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            document.querySelector('.theme-icon').textContent = next === 'light' ? '☀️' : '🌙';
+            localStorage.setItem('theme', next);
+        }
+        
+        // Current use case
+        let currentUsecase = 'card';
+        
+        // Render use case preview
+        function renderUsecase() {
+            const scale = generateScale();
+            const container = document.getElementById('usecase-preview');
+            
+            // Get spacing values (use indices 2, 3, 4, 5 from scale for variety)
+            const s1 = scale[1]?.px || 8;
+            const s2 = scale[2]?.px || 12;
+            const s3 = scale[3]?.px || 16;
+            const s4 = scale[4]?.px || 24;
+            const s5 = scale[5]?.px || 32;
+            
+            switch (currentUsecase) {
+                case 'card':
+                    container.innerHTML = `
+                        <div class="usecase-card">
+                            <div class="usecase-card-image"></div>
+                            <div class="usecase-card-content" style="padding: ${s4}px; gap: ${s2}px;">
+                                <h4>Card Title</h4>
+                                <p>This card demonstrates your spacing scale applied to real UI.</p>
+                                <button class="usecase-card-btn" style="margin-top: ${s1}px;">Action</button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'form':
+                    container.innerHTML = `
+                        <form class="usecase-form" style="gap: ${s3}px;" onsubmit="return false;">
+                            <div style="display: flex; flex-direction: column; gap: ${s1}px;">
+                                <label>Email address</label>
+                                <input type="email" placeholder="you@example.com">
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: ${s1}px;">
+                                <label>Password</label>
+                                <input type="password" placeholder="••••••••">
+                            </div>
+                            <button style="margin-top: ${s2}px;">Sign in</button>
+                        </form>
+                    `;
+                    break;
+                    
+                case 'list':
+                    container.innerHTML = `
+                        <div class="usecase-list">
+                            <div class="usecase-list-item" style="padding: ${s3}px; gap: ${s2}px;">
+                                <div class="usecase-list-icon"></div>
+                                <div class="usecase-list-text">
+                                    <strong>List Item One</strong>
+                                    <span>Supporting text here</span>
+                                </div>
+                            </div>
+                            <div class="usecase-list-item" style="padding: ${s3}px; gap: ${s2}px;">
+                                <div class="usecase-list-icon"></div>
+                                <div class="usecase-list-text">
+                                    <strong>List Item Two</strong>
+                                    <span>More supporting text</span>
+                                </div>
+                            </div>
+                            <div class="usecase-list-item" style="padding: ${s3}px; gap: ${s2}px;">
+                                <div class="usecase-list-icon"></div>
+                                <div class="usecase-list-text">
+                                    <strong>List Item Three</strong>
+                                    <span>Even more text</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+        }
+        
+        // Update UI
+        function updateUI() {
+            renderPreview();
+            generateCode();
+            renderUsecase();
+            
+            // Update slider values
+            document.getElementById('base-value').textContent = `${state.baseSize}px`;
+            document.getElementById('multiplier-value').textContent = state.multiplier.toFixed(2);
+            document.getElementById('steps-value').textContent = state.steps;
+            
+            // Show/hide multiplier based on preset
+            const showMultiplier = presets[state.preset].type === 'ratio';
+            document.getElementById('multiplier-group').style.display = showMultiplier ? 'block' : 'none';
+        }
+        
+        // Initialize
+        function init() {
+            // Load theme
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.querySelector('.theme-icon').textContent = savedTheme === 'light' ? '☀️' : '🌙';
+            
+            // Load from URL
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('p')) state.preset = params.get('p');
+            if (params.has('b')) state.baseSize = parseInt(params.get('b'));
+            if (params.has('m')) state.multiplier = parseFloat(params.get('m'));
+            if (params.has('s')) state.steps = parseInt(params.get('s'));
+            if (params.has('u')) state.unit = params.get('u');
+            if (params.has('f')) state.format = params.get('f');
+            
+            // Sync UI
+            document.getElementById('base-size').value = state.baseSize;
+            document.getElementById('multiplier').value = state.multiplier;
+            document.getElementById('steps').value = state.steps;
+            document.getElementById('unit').value = state.unit;
+            
+            // Preset buttons
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.preset === state.preset);
+            });
+            
+            // Format buttons
+            document.querySelectorAll('.format-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.format === state.format);
+            });
+            
+            // Event listeners
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    state.preset = btn.dataset.preset;
+                    const preset = presets[state.preset];
+                    state.baseSize = preset.baseSize;
+                    if (preset.multiplier) state.multiplier = preset.multiplier;
+                    
+                    document.getElementById('base-size').value = state.baseSize;
+                    if (preset.multiplier) document.getElementById('multiplier').value = state.multiplier;
+                    
+                    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    updateUI();
+                });
+            });
+            
+            document.querySelectorAll('.format-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    state.format = btn.dataset.format;
+                    document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    generateCode();
+                });
+            });
+            
+            document.getElementById('base-size').addEventListener('input', (e) => {
+                state.baseSize = parseInt(e.target.value);
+                updateUI();
+            });
+            
+            document.getElementById('multiplier').addEventListener('input', (e) => {
+                state.multiplier = parseFloat(e.target.value);
+                updateUI();
+            });
+            
+            document.getElementById('steps').addEventListener('input', (e) => {
+                state.steps = parseInt(e.target.value);
+                updateUI();
+            });
+            
+            document.getElementById('unit').addEventListener('change', (e) => {
+                state.unit = e.target.value;
+                updateUI();
+            });
+            
+            // Use case tabs
+            document.querySelectorAll('.usecase-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    currentUsecase = tab.dataset.usecase;
+                    document.querySelectorAll('.usecase-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    renderUsecase();
+                });
+            });
+            
+            updateUI();
+        }
+        
+        init();
+    </script>
+</body>
+</html>

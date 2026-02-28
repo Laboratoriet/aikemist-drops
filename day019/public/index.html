@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clip-Path Generator | Day 019 | Alkemist</title>
+    <meta name="description" content="Create CSS clip-path shapes visually. Drag points, pick presets, export code. Free tool by Alkemist.">
+    <meta property="og:title" content="Clip-Path Generator by Alkemist">
+    <meta property="og:description" content="Create CSS clip-path shapes visually. Drag points, pick presets, export code.">
+    <meta property="og:image" content="https://day019.aikemist.com/og.png">
+    <meta property="og:url" content="https://day019.aikemist.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✂️</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --text: #1a1a1a;
+            --text-secondary: #666666;
+            --border: #e5e5e5;
+            --accent: #6366f1;
+            --accent-hover: #4f46e5;
+            --point-color: #6366f1;
+            --point-border: #ffffff;
+            --preview-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --bg-secondary: #141414;
+            --text: #f5f5f5;
+            --text-secondary: #888888;
+            --border: #2a2a2a;
+            --point-border: #0a0a0a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .logo-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+            .theme-toggle {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, background 0.2s ease;
+      overflow: hidden;
+    }
+    
+    [data-theme="dark"] .theme-toggle {
+      background: rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    [data-theme="dark"] .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:active {
+      transform: scale(0.95);
+    }
+    
+    .theme-toggle-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .theme-toggle-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .theme-toggle-icon .sun-icon {
+      color: #facc15;
+    }
+    
+    .theme-toggle-icon .moon-icon {
+      color: #64748b;
+    }
+    
+    [data-theme="dark"] .theme-toggle-icon {
+      transform: rotate(180deg);
+    }
+
+        /* Main Layout */
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            min-height: calc(100vh - 120px);
+        }
+
+        @media (max-width: 900px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Preview Area */
+        .preview-section {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .preview-container {
+            flex: 1;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+        }
+
+        .preview-wrapper {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        .preview-element {
+            width: 100%;
+            height: 100%;
+            background: var(--preview-bg);
+            transition: clip-path 0.1s ease-out;
+        }
+
+        .preview-element.image {
+            background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=600&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Point Overlay */
+        .point-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .point {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: var(--point-color);
+            border: 3px solid var(--point-border);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: grab;
+            pointer-events: all;
+            transition: transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .point:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .point:active, .point.dragging {
+            cursor: grabbing;
+            transform: translate(-50%, -50%) scale(1.3);
+        }
+
+        .point-label {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--accent);
+            background: var(--bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        /* Path Lines */
+        .path-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .path-lines line {
+            stroke: var(--accent);
+            stroke-width: 1.5;
+            stroke-dasharray: 4 4;
+            opacity: 0.5;
+        }
+
+        /* Controls Panel */
+        .controls-section {
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 900px) {
+            .controls-section {
+                border-left: none;
+                border-top: 1px solid var(--border);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .header {
+                padding: 1rem;
+            }
+            .preview-section {
+                padding: 1rem;
+            }
+            .controls-section {
+                padding: 1rem;
+            }
+            .shape-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .preset-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .preview-modes {
+                flex-wrap: wrap;
+            }
+            h1 {
+                font-size: 1.25rem;
+            }
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        /* Shape Types */
+        .shape-types {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .shape-btn {
+            padding: 0.75rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            color: var(--text);
+        }
+
+        .shape-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .shape-btn.active {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .shape-btn svg {
+            width: 32px;
+            height: 32px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+
+        .shape-btn span {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Presets */
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+        }
+
+        .preset-btn {
+            aspect-ratio: 1;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .preset-btn svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .preset-btn .shape {
+            fill: var(--accent);
+        }
+
+        /* Preview Mode */
+        .preview-modes {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 0.6rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: var(--text);
+            font-family: inherit;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .mode-btn.active {
+            border-color: var(--accent);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Code Output */
+        .code-output {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .copy-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .copy-btn.copied {
+            background: #10b981;
+        }
+
+        .code-content {
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: var(--text);
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .code-content .property {
+            color: #a855f7;
+        }
+
+        .code-content .value {
+            color: #6366f1;
+        }
+
+        /* Add Point Button */
+        .add-point-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .add-point-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Point List */
+        .point-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .point-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .point-item-number {
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .point-item-coords {
+            flex: 1;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+        }
+
+        .point-item-delete {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .point-item-delete:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Pro Teaser */
+        .pro-teaser {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .pro-teaser-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pro-teaser-title span {
+            color: var(--accent);
+        }
+
+        .pro-teaser ul {
+            list-style: none;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .pro-teaser li {
+            padding: 0.25rem 0;
+            padding-left: 1.25rem;
+            position: relative;
+        }
+
+        .pro-teaser li::before {
+            content: '✦';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .footer a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer a:hover {
+            color: var(--accent);
+        }
+
+        /* Share Button */
+        .share-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-family: inherit;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .share-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .share-btn.copied {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        /* Inset/Circle/Ellipse specific controls */
+        .shape-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .control-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .control-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-input input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .control-input input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+        }
+
+        .control-input .value-display {
+            min-width: 45px;
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="https://aikemist.com" class="logo">
+            <div class="logo-icon">✂️</div>
+            <span class="logo-text">Clip-Path Generator</span>
+        </a>
+        <div class="header-actions">
+                  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+        <div class="theme-toggle-icon">
+          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2"></path>
+            <path d="M12 20v2"></path>
+            <path d="m4.93 4.93 1.41 1.41"></path>
+            <path d="m17.66 17.66 1.41 1.41"></path>
+            <path d="M2 12h2"></path>
+            <path d="M20 12h2"></path>
+            <path d="m6.34 17.66-1.41 1.41"></path>
+            <path d="m19.07 4.93-1.41 1.41"></path>
+          </svg>
+          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </div>
+      </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="preview-section">
+            <div class="preview-container">
+                <div class="preview-wrapper">
+                    <div class="preview-element" id="previewElement"></div>
+                    <svg class="path-lines" id="pathLines"></svg>
+                    <div class="point-overlay" id="pointOverlay"></div>
+                </div>
+            </div>
+        </section>
+
+        <aside class="controls-section">
+            <div>
+                <h3 class="section-title">Shape Type</h3>
+                <div class="shape-types" id="shapeTypes">
+                    <button class="shape-btn active" data-shape="polygon">
+                        <svg viewBox="0 0 32 32">
+                            <polygon points="16,4 28,28 4,28" />
+                        </svg>
+                        <span>Polygon</span>
+                    </button>
+                    <button class="shape-btn" data-shape="circle">
+                        <svg viewBox="0 0 32 32">
+                            <circle cx="16" cy="16" r="12" />
+                        </svg>
+                        <span>Circle</span>
+                    </button>
+                    <button class="shape-btn" data-shape="ellipse">
+                        <svg viewBox="0 0 32 32">
+                            <ellipse cx="16" cy="16" rx="14" ry="8" />
+                        </svg>
+                        <span>Ellipse</span>
+                    </button>
+                    <button class="shape-btn" data-shape="inset">
+                        <svg viewBox="0 0 32 32">
+                            <rect x="6" y="6" width="20" height="20" rx="2" />
+                        </svg>
+                        <span>Inset</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="polygonControls">
+                <h3 class="section-title">Presets</h3>
+                <div class="presets-grid" id="presetGrid">
+                    <!-- Presets populated by JS -->
+                </div>
+            </div>
+
+            <div id="circleControls" style="display: none;">
+                <h3 class="section-title">Circle Settings</h3>
+                <div class="shape-controls">
+                    <div class="control-row">
+                        <label class="control-label">Radius</label>
+                        <div class="control-input">
+                            <input type="range" id="circleRadius" min="10" max="70" value="50">
+                            <span class="value-display" id="circleRadiusValue">50%</span>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <label class="control-label">Center X</label>
+                        <div class="control-input">
+                            <input type="range" id="circleCenterX" min="0" max="100" value="50">
+                            <span class="value-display" id="circleCenterXValue">50%</span>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <label class="control-label">Center Y</label>
+                        <div class="control-input">
+                            <input type="range" id="circleCenterY" min="0" max="100" value="50">
+                            <span class="value-display" id="circleCenterYValue">50%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="ellipseControls" style="display: none;">
+                <h3 class="section-title">Ellipse Settings</h3>
+                <div class="shape-controls">
+                    <div class="control-row">
+                        <label class="control-label">Width</label>
+                        <div class="control-input">
+                            <input type="range" id="ellipseWidth" min="10" max="70" value="50">
+                            <span class="value-display" id="ellipseWidthValue">50%</span>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <label class="control-label">Height</label>
+                        <div class="control-input">
+                            <input type="range" id="ellipseHeight" min="10" max="70" value="30">
+                            <span class="value-display" id="ellipseHeightValue">30%</span>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <label class="control-label">Center X</label>
+                        <div class="control-input">
+                            <input type="range" id="ellipseCenterX" min="0" max="100" value="50">
+                            <span class="value-display" id="ellipseCenterXValue">50%</span>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <label class="control-label">Center Y</label>
+                        <div class="control-input">
+                            <input type="range" id="ellipseCenterY" min="0" max="100" value="50">
+                            <span class="value-display" id="ellipseCenterYValue">50%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="insetControls" style="display: none;">
+                <h3 class="section-title">Inset Settings</h3>
+                <div class="shape-controls">
+                    <div class="control-row">
+                        <label class="control-label">Top</label>
+                        <div class="control-input">
+                            <input type="range" id="insetTop" min="0" max="45" value="10">
+                            <span class="value-display" id="insetTopValue">10%</span>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <label class="control-label">Right</label>
+                        <div class="control-input">
+                            <input type="range" id="insetRight" min="0" max="45" value="10">
+                            <span class="value-display" id="insetRightValue">10%</span>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <label class="control-label">Bottom</label>
+                        <div class="control-input">
+                            <input type="range" id="insetBottom" min="0" max="45" value="10">
+                            <span class="value-display" id="insetBottomValue">10%</span>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <label class="control-label">Left</label>
+                        <div class="control-input">
+                            <input type="range" id="insetLeft" min="0" max="45" value="10">
+                            <span class="value-display" id="insetLeftValue">10%</span>
+                        </div>
+                    </div>
+                    <div class="control-row">
+                        <label class="control-label">Border Radius</label>
+                        <div class="control-input">
+                            <input type="range" id="insetRadius" min="0" max="50" value="0">
+                            <span class="value-display" id="insetRadiusValue">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pointListSection">
+                <h3 class="section-title">Points</h3>
+                <div class="point-list" id="pointList"></div>
+                <button class="add-point-btn" id="addPointBtn">
+                    <span>+</span> Add Point
+                </button>
+            </div>
+
+            <div>
+                <h3 class="section-title">Preview Mode</h3>
+                <div class="preview-modes">
+                    <button class="mode-btn active" data-mode="gradient">Gradient</button>
+                    <button class="mode-btn" data-mode="image">Image</button>
+                </div>
+            </div>
+
+            <div class="code-output">
+                <div class="code-header">
+                    <span class="code-label">CSS</span>
+                    <button class="copy-btn" id="copyBtn">Copy</button>
+                </div>
+                <div class="code-content" id="codeOutput">
+                    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+                </div>
+            </div>
+
+            <button class="share-btn" id="shareBtn">
+                🔗 Share URL
+            </button>
+
+                <ul>
+                    <li>SVG path export</li>
+                    <li>Animation keyframes</li>
+                    <li>Custom image upload</li>
+                    <li>Figma plugin</li>
+                </ul>
+            </div>
+        </aside>
+    </main>
+
+    <footer class="footer">
+        <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+
+    <script>
+        // State
+        let state = {
+            shapeType: 'polygon',
+            points: [
+                { x: 50, y: 0 },
+                { x: 100, y: 100 },
+                { x: 0, y: 100 }
+            ],
+            circle: { radius: 50, centerX: 50, centerY: 50 },
+            ellipse: { width: 50, height: 30, centerX: 50, centerY: 50 },
+            inset: { top: 10, right: 10, bottom: 10, left: 10, radius: 0 },
+            previewMode: 'gradient'
+        };
+
+        // Polygon presets
+        const presets = [
+            { name: 'Triangle', points: [{ x: 50, y: 0 }, { x: 100, y: 100 }, { x: 0, y: 100 }] },
+            { name: 'Square', points: [{ x: 0, y: 0 }, { x: 100, y: 0 }, { x: 100, y: 100 }, { x: 0, y: 100 }] },
+            { name: 'Pentagon', points: [{ x: 50, y: 0 }, { x: 100, y: 38 }, { x: 81, y: 100 }, { x: 19, y: 100 }, { x: 0, y: 38 }] },
+            { name: 'Hexagon', points: [{ x: 50, y: 0 }, { x: 100, y: 25 }, { x: 100, y: 75 }, { x: 50, y: 100 }, { x: 0, y: 75 }, { x: 0, y: 25 }] },
+            { name: 'Chevron', points: [{ x: 0, y: 0 }, { x: 50, y: 25 }, { x: 100, y: 0 }, { x: 100, y: 75 }, { x: 50, y: 100 }, { x: 0, y: 75 }] },
+            { name: 'Arrow', points: [{ x: 0, y: 40 }, { x: 60, y: 40 }, { x: 60, y: 0 }, { x: 100, y: 50 }, { x: 60, y: 100 }, { x: 60, y: 60 }, { x: 0, y: 60 }] },
+            { name: 'Star', points: [{ x: 50, y: 0 }, { x: 61, y: 35 }, { x: 98, y: 35 }, { x: 68, y: 57 }, { x: 79, y: 91 }, { x: 50, y: 70 }, { x: 21, y: 91 }, { x: 32, y: 57 }, { x: 2, y: 35 }, { x: 39, y: 35 }] },
+            { name: 'Cross', points: [{ x: 35, y: 0 }, { x: 65, y: 0 }, { x: 65, y: 35 }, { x: 100, y: 35 }, { x: 100, y: 65 }, { x: 65, y: 65 }, { x: 65, y: 100 }, { x: 35, y: 100 }, { x: 35, y: 65 }, { x: 0, y: 65 }, { x: 0, y: 35 }, { x: 35, y: 35 }] }
+        ];
+
+        // Elements
+        const previewElement = document.getElementById('previewElement');
+        const pointOverlay = document.getElementById('pointOverlay');
+        const pathLines = document.getElementById('pathLines');
+        const codeOutput = document.getElementById('codeOutput');
+        const copyBtn = document.getElementById('copyBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const presetGrid = document.getElementById('presetGrid');
+        const pointList = document.getElementById('pointList');
+        const addPointBtn = document.getElementById('addPointBtn');
+
+        // Shape type controls
+        const polygonControls = document.getElementById('polygonControls');
+        const circleControls = document.getElementById('circleControls');
+        const ellipseControls = document.getElementById('ellipseControls');
+        const insetControls = document.getElementById('insetControls');
+        const pointListSection = document.getElementById('pointListSection');
+
+        // Initialize presets
+        function initPresets() {
+            presets.forEach((preset, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'preset-btn';
+                btn.title = preset.name;
+                
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('viewBox', '0 0 40 40');
+                
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                const scaledPoints = preset.points.map(p => `${p.x * 0.4},${p.y * 0.4}`).join(' ');
+                polygon.setAttribute('points', scaledPoints);
+                polygon.classList.add('shape');
+                
+                svg.appendChild(polygon);
+                btn.appendChild(svg);
+                
+                btn.addEventListener('click', () => {
+                    state.points = JSON.parse(JSON.stringify(preset.points));
+                    render();
+                });
+                
+                presetGrid.appendChild(btn);
+            });
+        }
+
+        // Theme
+        function initTheme() {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.setAttribute('data-theme', 'dark');
+                themeToggle.textContent = '☀️';
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            document.body.setAttribute('data-theme', isDark ? '' : 'dark');
+            themeToggle.textContent = isDark ? '🌙' : '☀️';
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        });
+
+        // Shape type selection
+        document.getElementById('shapeTypes').addEventListener('click', (e) => {
+            const btn = e.target.closest('.shape-btn');
+            if (!btn) return;
+            
+            document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            state.shapeType = btn.dataset.shape;
+            updateShapeControls();
+            render();
+        });
+
+        function updateShapeControls() {
+            polygonControls.style.display = state.shapeType === 'polygon' ? '' : 'none';
+            pointListSection.style.display = state.shapeType === 'polygon' ? '' : 'none';
+            circleControls.style.display = state.shapeType === 'circle' ? '' : 'none';
+            ellipseControls.style.display = state.shapeType === 'ellipse' ? '' : 'none';
+            insetControls.style.display = state.shapeType === 'inset' ? '' : 'none';
+        }
+
+        // Circle controls
+        ['circleRadius', 'circleCenterX', 'circleCenterY'].forEach(id => {
+            const input = document.getElementById(id);
+            const display = document.getElementById(id + 'Value');
+            input.addEventListener('input', () => {
+                const prop = id.replace('circle', '').toLowerCase();
+                state.circle[prop === 'centerx' ? 'centerX' : prop === 'centery' ? 'centerY' : prop] = parseInt(input.value);
+                display.textContent = input.value + '%';
+                render();
+            });
+        });
+
+        // Ellipse controls
+        ['ellipseWidth', 'ellipseHeight', 'ellipseCenterX', 'ellipseCenterY'].forEach(id => {
+            const input = document.getElementById(id);
+            const display = document.getElementById(id + 'Value');
+            input.addEventListener('input', () => {
+                const prop = id.replace('ellipse', '').toLowerCase();
+                state.ellipse[prop === 'centerx' ? 'centerX' : prop === 'centery' ? 'centerY' : prop] = parseInt(input.value);
+                display.textContent = input.value + '%';
+                render();
+            });
+        });
+
+        // Inset controls
+        ['insetTop', 'insetRight', 'insetBottom', 'insetLeft', 'insetRadius'].forEach(id => {
+            const input = document.getElementById(id);
+            const display = document.getElementById(id + 'Value');
+            input.addEventListener('input', () => {
+                const prop = id.replace('inset', '').toLowerCase();
+                state.inset[prop] = parseInt(input.value);
+                display.textContent = input.value + '%';
+                render();
+            });
+        });
+
+        // Preview mode
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.previewMode = btn.dataset.mode;
+                previewElement.classList.toggle('image', state.previewMode === 'image');
+            });
+        });
+
+        // Generate clip-path CSS
+        function getClipPath() {
+            switch (state.shapeType) {
+                case 'polygon':
+                    const points = state.points.map(p => `${p.x}% ${p.y}%`).join(', ');
+                    return `polygon(${points})`;
+                case 'circle':
+                    return `circle(${state.circle.radius}% at ${state.circle.centerX}% ${state.circle.centerY}%)`;
+                case 'ellipse':
+                    return `ellipse(${state.ellipse.width}% ${state.ellipse.height}% at ${state.ellipse.centerX}% ${state.ellipse.centerY}%)`;
+                case 'inset':
+                    const { top, right, bottom, left, radius } = state.inset;
+                    if (radius > 0) {
+                        return `inset(${top}% ${right}% ${bottom}% ${left}% round ${radius}%)`;
+                    }
+                    return `inset(${top}% ${right}% ${bottom}% ${left}%)`;
+            }
+        }
+
+        // Render points and path
+        function renderPoints() {
+            pointOverlay.innerHTML = '';
+            pathLines.innerHTML = '';
+            
+            if (state.shapeType !== 'polygon') return;
+
+            // Draw path lines
+            if (state.points.length > 1) {
+                const svgNS = 'http://www.w3.org/2000/svg';
+                for (let i = 0; i < state.points.length; i++) {
+                    const p1 = state.points[i];
+                    const p2 = state.points[(i + 1) % state.points.length];
+                    
+                    const line = document.createElementNS(svgNS, 'line');
+                    line.setAttribute('x1', p1.x + '%');
+                    line.setAttribute('y1', p1.y + '%');
+                    line.setAttribute('x2', p2.x + '%');
+                    line.setAttribute('y2', p2.y + '%');
+                    pathLines.appendChild(line);
+                }
+            }
+
+            // Draw points
+            state.points.forEach((point, index) => {
+                const el = document.createElement('div');
+                el.className = 'point';
+                el.style.left = point.x + '%';
+                el.style.top = point.y + '%';
+                el.dataset.index = index;
+                
+                // Make draggable
+                el.addEventListener('mousedown', startDrag);
+                el.addEventListener('touchstart', startDrag, { passive: false });
+                
+                pointOverlay.appendChild(el);
+            });
+        }
+
+        // Render point list
+        function renderPointList() {
+            pointList.innerHTML = '';
+            
+            if (state.shapeType !== 'polygon') return;
+
+            state.points.forEach((point, index) => {
+                const item = document.createElement('div');
+                item.className = 'point-item';
+                item.innerHTML = `
+                    <span class="point-item-number">${index + 1}</span>
+                    <span class="point-item-coords">${point.x}%, ${point.y}%</span>
+                    <button class="point-item-delete" data-index="${index}">✕</button>
+                `;
+                pointList.appendChild(item);
+            });
+
+            // Delete handlers
+            pointList.querySelectorAll('.point-item-delete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (state.points.length > 3) {
+                        state.points.splice(parseInt(btn.dataset.index), 1);
+                        render();
+                    }
+                });
+            });
+        }
+
+        // Add point
+        addPointBtn.addEventListener('click', () => {
+            // Add point in center
+            state.points.push({ x: 50, y: 50 });
+            render();
+        });
+
+        // Drag handling
+        let draggingIndex = null;
+        let previewRect = null;
+
+        function startDrag(e) {
+            e.preventDefault();
+            draggingIndex = parseInt(e.target.dataset.index);
+            e.target.classList.add('dragging');
+            previewRect = document.querySelector('.preview-wrapper').getBoundingClientRect();
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('touchend', endDrag);
+        }
+
+        function drag(e) {
+            if (draggingIndex === null) return;
+            e.preventDefault();
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            let x = ((clientX - previewRect.left) / previewRect.width) * 100;
+            let y = ((clientY - previewRect.top) / previewRect.height) * 100;
+            
+            // Clamp
+            x = Math.max(0, Math.min(100, Math.round(x)));
+            y = Math.max(0, Math.min(100, Math.round(y)));
+            
+            state.points[draggingIndex] = { x, y };
+            render();
+        }
+
+        function endDrag() {
+            if (draggingIndex !== null) {
+                const point = pointOverlay.querySelector(`[data-index="${draggingIndex}"]`);
+                if (point) point.classList.remove('dragging');
+            }
+            draggingIndex = null;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', endDrag);
+            document.removeEventListener('touchmove', drag);
+            document.removeEventListener('touchend', endDrag);
+            updateURL();
+        }
+
+        // Update code output
+        function updateCode() {
+            const clipPath = getClipPath();
+            codeOutput.innerHTML = `<span class="property">clip-path:</span> <span class="value">${clipPath}</span>;`;
+        }
+
+        // Apply clip-path
+        function applyClipPath() {
+            previewElement.style.clipPath = getClipPath();
+        }
+
+        // Main render
+        function render() {
+            renderPoints();
+            renderPointList();
+            updateCode();
+            applyClipPath();
+        }
+
+        // Copy CSS
+        copyBtn.addEventListener('click', () => {
+            const css = `clip-path: ${getClipPath()};`;
+            navigator.clipboard.writeText(css);
+            copyBtn.textContent = 'Copied!';
+            copyBtn.classList.add('copied');
+            setTimeout(() => {
+                copyBtn.textContent = 'Copy';
+                copyBtn.classList.remove('copied');
+            }, 2000);
+        });
+
+        // Share URL
+        function updateURL() {
+            const params = new URLSearchParams();
+            params.set('type', state.shapeType);
+            
+            if (state.shapeType === 'polygon') {
+                params.set('points', state.points.map(p => `${p.x},${p.y}`).join('_'));
+            } else if (state.shapeType === 'circle') {
+                params.set('r', state.circle.radius);
+                params.set('cx', state.circle.centerX);
+                params.set('cy', state.circle.centerY);
+            } else if (state.shapeType === 'ellipse') {
+                params.set('w', state.ellipse.width);
+                params.set('h', state.ellipse.height);
+                params.set('cx', state.ellipse.centerX);
+                params.set('cy', state.ellipse.centerY);
+            } else if (state.shapeType === 'inset') {
+                params.set('t', state.inset.top);
+                params.set('r', state.inset.right);
+                params.set('b', state.inset.bottom);
+                params.set('l', state.inset.left);
+                params.set('br', state.inset.radius);
+            }
+            
+            const url = `${location.origin}${location.pathname}?${params.toString()}`;
+            history.replaceState(null, '', url);
+        }
+
+        function loadFromURL() {
+            const params = new URLSearchParams(location.search);
+            
+            if (params.has('type')) {
+                state.shapeType = params.get('type');
+                document.querySelectorAll('.shape-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.shape === state.shapeType);
+                });
+                updateShapeControls();
+            }
+            
+            if (params.has('points')) {
+                state.points = params.get('points').split('_').map(p => {
+                    const [x, y] = p.split(',').map(Number);
+                    return { x, y };
+                });
+            }
+            
+            if (params.has('r') && state.shapeType === 'circle') {
+                state.circle.radius = parseInt(params.get('r'));
+                state.circle.centerX = parseInt(params.get('cx') || 50);
+                state.circle.centerY = parseInt(params.get('cy') || 50);
+                document.getElementById('circleRadius').value = state.circle.radius;
+                document.getElementById('circleCenterX').value = state.circle.centerX;
+                document.getElementById('circleCenterY').value = state.circle.centerY;
+                document.getElementById('circleRadiusValue').textContent = state.circle.radius + '%';
+                document.getElementById('circleCenterXValue').textContent = state.circle.centerX + '%';
+                document.getElementById('circleCenterYValue').textContent = state.circle.centerY + '%';
+            }
+            
+            if (params.has('w') && state.shapeType === 'ellipse') {
+                state.ellipse.width = parseInt(params.get('w'));
+                state.ellipse.height = parseInt(params.get('h') || 30);
+                state.ellipse.centerX = parseInt(params.get('cx') || 50);
+                state.ellipse.centerY = parseInt(params.get('cy') || 50);
+                document.getElementById('ellipseWidth').value = state.ellipse.width;
+                document.getElementById('ellipseHeight').value = state.ellipse.height;
+                document.getElementById('ellipseCenterX').value = state.ellipse.centerX;
+                document.getElementById('ellipseCenterY').value = state.ellipse.centerY;
+                document.getElementById('ellipseWidthValue').textContent = state.ellipse.width + '%';
+                document.getElementById('ellipseHeightValue').textContent = state.ellipse.height + '%';
+                document.getElementById('ellipseCenterXValue').textContent = state.ellipse.centerX + '%';
+                document.getElementById('ellipseCenterYValue').textContent = state.ellipse.centerY + '%';
+            }
+            
+            if (params.has('t') && state.shapeType === 'inset') {
+                state.inset.top = parseInt(params.get('t'));
+                state.inset.right = parseInt(params.get('r'));
+                state.inset.bottom = parseInt(params.get('b'));
+                state.inset.left = parseInt(params.get('l'));
+                state.inset.radius = parseInt(params.get('br') || 0);
+                document.getElementById('insetTop').value = state.inset.top;
+                document.getElementById('insetRight').value = state.inset.right;
+                document.getElementById('insetBottom').value = state.inset.bottom;
+                document.getElementById('insetLeft').value = state.inset.left;
+                document.getElementById('insetRadius').value = state.inset.radius;
+                document.getElementById('insetTopValue').textContent = state.inset.top + '%';
+                document.getElementById('insetRightValue').textContent = state.inset.right + '%';
+                document.getElementById('insetBottomValue').textContent = state.inset.bottom + '%';
+                document.getElementById('insetLeftValue').textContent = state.inset.left + '%';
+                document.getElementById('insetRadiusValue').textContent = state.inset.radius + '%';
+            }
+        }
+
+        shareBtn.addEventListener('click', () => {
+            updateURL();
+            navigator.clipboard.writeText(location.href);
+            shareBtn.textContent = '✓ Copied!';
+            shareBtn.classList.add('copied');
+            setTimeout(() => {
+                shareBtn.textContent = '🔗 Share URL';
+                shareBtn.classList.remove('copied');
+            }, 2000);
+        });
+
+        // Init
+        initTheme();
+        initPresets();
+        loadFromURL();
+        render();
+    </script>
+</body>
+</html>

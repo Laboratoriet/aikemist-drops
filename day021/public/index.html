@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Filter Generator — Alkemist</title>
+    <meta name="description" content="Create CSS filter effects visually. Blur, brightness, contrast, grayscale, and more. Free filter generator by Alkemist.">
+    <meta property="og:title" content="CSS Filter Generator — Alkemist">
+    <meta property="og:description" content="Create CSS filter effects visually. Blur, brightness, contrast, grayscale, and more.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://day021.aikemist.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --text: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e5e5e5;
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --text: #f5f5f5;
+            --text-muted: #a3a3a3;
+            --border: #262626;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Jost', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899, #f59e0b);
+            border-radius: 8px;
+        }
+
+        .logo-text {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+            .theme-toggle {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, background 0.2s ease;
+      overflow: hidden;
+    }
+    
+    [data-theme="dark"] .theme-toggle {
+      background: rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    [data-theme="dark"] .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .theme-toggle:active {
+      transform: scale(0.95);
+    }
+    
+    .theme-toggle-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .theme-toggle-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .theme-toggle-icon .sun-icon {
+      color: #facc15;
+    }
+    
+    .theme-toggle-icon .moon-icon {
+      color: #64748b;
+    }
+    
+    [data-theme="dark"] .theme-toggle-icon {
+      transform: rotate(180deg);
+    }
+
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 0;
+            min-height: calc(100vh - 65px);
+        }
+
+        @media (max-width: 900px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .preview-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            background: var(--bg);
+        }
+
+        .preview-container {
+            position: relative;
+            max-width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+        }
+
+        .preview-image {
+            display: block;
+            max-width: 100%;
+            max-height: 60vh;
+            object-fit: contain;
+        }
+
+        .upload-area {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .upload-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .upload-btn input {
+            display: none;
+        }
+
+        .sample-images {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .sample-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .sample-thumb:hover,
+        .sample-thumb.active {
+            border-color: var(--accent);
+        }
+
+        .controls {
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: calc(100vh - 65px);
+        }
+
+        @media (max-width: 900px) {
+            .controls {
+                border-left: none;
+                border-top: 1px solid var(--border);
+                max-height: none;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 0.75rem;
+                text-align: center;
+            }
+            .controls {
+                padding: 1rem;
+            }
+            .preview-area {
+                padding: 1rem;
+            }
+            .presets-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .images-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .actions {
+                flex-direction: column;
+            }
+            h1 {
+                font-size: 1.25rem;
+            }
+        }
+
+        .control-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .control-section h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .preset-btn {
+            padding: 0.5rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .preset-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .filter-group {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-group:last-child {
+            border-bottom: none;
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .filter-value {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            border: none;
+        }
+
+        .reset-filter {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.75rem;
+            padding: 0.25rem;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .reset-filter:hover {
+            opacity: 1;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        .export-section {
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .css-output {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: var(--text);
+            margin-bottom: 0.75rem;
+            word-break: break-all;
+            line-height: 1.5;
+        }
+
+        .copy-toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text);
+            color: var(--bg);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .copy-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .footer a {
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .pro-teaser {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .pro-teaser h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pro-teaser ul {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .pro-teaser li::before {
+            content: '✦ ';
+            color: var(--accent);
+        }
+
+        .compare-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .compare-toggle label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .compare-slider {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+
+        .compare-original {
+            position: absolute;
+            inset: 0;
+            clip-path: inset(0 50% 0 0);
+        }
+
+        .compare-original img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .compare-handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            background: white;
+            cursor: ew-resize;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .compare-handle::before {
+            content: '◀ ▶';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.625rem;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <a href="https://aikemist.com" class="logo">
+            <div class="logo-icon"></div>
+            <span class="logo-text">CSS Filter Generator</span>
+        </a>
+        <div class="header-actions">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"/>
+                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="preview-area">
+            <div class="preview-container" id="previewContainer">
+                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80" 
+                     alt="Preview" 
+                     class="preview-image" 
+                     id="previewImage">
+            </div>
+            
+            <div class="upload-area">
+                <label class="upload-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                    Upload
+                    <input type="file" accept="image/*" id="uploadInput">
+                </label>
+                <div class="sample-images">
+                    <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=100&q=60" 
+                         alt="Mountain" class="sample-thumb active" data-full="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=60" 
+                         alt="Portrait" class="sample-thumb" data-full="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&q=80">
+                    <img src="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=100&q=60" 
+                         alt="Ocean" class="sample-thumb" data-full="https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80">
+                    <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=100&q=60" 
+                         alt="Forest" class="sample-thumb" data-full="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80">
+                </div>
+            </div>
+        </div>
+
+        <aside class="controls">
+            <div class="control-section">
+                <h3>Presets</h3>
+                <div class="presets">
+                    <button class="preset-btn active" data-preset="none">None</button>
+                    <button class="preset-btn" data-preset="vintage">Vintage</button>
+                    <button class="preset-btn" data-preset="dramatic">Dramatic</button>
+                    <button class="preset-btn" data-preset="warm">Warm</button>
+                    <button class="preset-btn" data-preset="cool">Cool</button>
+                    <button class="preset-btn" data-preset="noir">Noir</button>
+                    <button class="preset-btn" data-preset="faded">Faded</button>
+                    <button class="preset-btn" data-preset="vivid">Vivid</button>
+                    <button class="preset-btn" data-preset="muted">Muted</button>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>Filters</h3>
+                
+                <div class="filter-group">
+                    <div class="filter-header">
+                        <span class="filter-name">Blur</span>
+                        <span class="filter-value" id="blurValue">0px</span>
+                    </div>
+                    <input type="range" id="blur" min="0" max="20" value="0" step="0.5">
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-header">
+                        <span class="filter-name">Brightness</span>
+                        <span class="filter-value" id="brightnessValue">100%</span>
+                    </div>
+                    <input type="range" id="brightness" min="0" max="200" value="100">
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-header">
+                        <span class="filter-name">Contrast</span>
+                        <span class="filter-value" id="contrastValue">100%</span>
+                    </div>
+                    <input type="range" id="contrast" min="0" max="200" value="100">
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-header">
+                        <span class="filter-name">Saturate</span>
+                        <span class="filter-value" id="saturateValue">100%</span>
+                    </div>
+                    <input type="range" id="saturate" min="0" max="200" value="100">
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-header">
+                        <span class="filter-name">Grayscale</span>
+                        <span class="filter-value" id="grayscaleValue">0%</span>
+                    </div>
+                    <input type="range" id="grayscale" min="0" max="100" value="0">
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-header">
+                        <span class="filter-name">Sepia</span>
+                        <span class="filter-value" id="sepiaValue">0%</span>
+                    </div>
+                    <input type="range" id="sepia" min="0" max="100" value="0">
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-header">
+                        <span class="filter-name">Hue Rotate</span>
+                        <span class="filter-value" id="hueRotateValue">0°</span>
+                    </div>
+                    <input type="range" id="hueRotate" min="0" max="360" value="0">
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-header">
+                        <span class="filter-name">Invert</span>
+                        <span class="filter-value" id="invertValue">0%</span>
+                    </div>
+                    <input type="range" id="invert" min="0" max="100" value="0">
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-header">
+                        <span class="filter-name">Opacity</span>
+                        <span class="filter-value" id="opacityValue">100%</span>
+                    </div>
+                    <input type="range" id="opacity" min="0" max="100" value="100">
+                </div>
+            </div>
+
+            <div class="control-section">
+                <button class="btn btn-secondary btn-block" id="resetBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/>
+                        <path d="M3 3v5h5"/>
+                    </svg>
+                    Reset All
+                </button>
+            </div>
+
+            <div class="control-section export-section">
+                <h3>Export</h3>
+                <div class="css-output" id="cssOutput">filter: none;</div>
+                <div class="btn-group" style="margin-bottom: 0.75rem;">
+                    <button class="btn btn-primary" id="copyCss">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                        </svg>
+                        Copy CSS
+                    </button>
+                    <button class="btn btn-secondary" id="shareLink">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="18" cy="5" r="3"/>
+                            <circle cx="6" cy="12" r="3"/>
+                            <circle cx="18" cy="19" r="3"/>
+                            <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
+                        </svg>
+                        Share
+                    </button>
+                </div>
+            </div>
+
+        </aside>
+    </main>
+
+    <footer class="footer">
+        <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+
+    <div class="copy-toast" id="copyToast">Copied!</div>
+
+    <script>
+        // State
+        const defaults = {
+            blur: 0,
+            brightness: 100,
+            contrast: 100,
+            saturate: 100,
+            grayscale: 0,
+            sepia: 0,
+            hueRotate: 0,
+            invert: 0,
+            opacity: 100
+        };
+
+        let state = { ...defaults };
+
+        // Presets
+        const presets = {
+            none: { ...defaults },
+            vintage: { blur: 0, brightness: 110, contrast: 85, saturate: 75, grayscale: 0, sepia: 30, hueRotate: 0, invert: 0, opacity: 100 },
+            dramatic: { blur: 0, brightness: 90, contrast: 150, saturate: 120, grayscale: 0, sepia: 0, hueRotate: 0, invert: 0, opacity: 100 },
+            warm: { blur: 0, brightness: 105, contrast: 105, saturate: 110, grayscale: 0, sepia: 15, hueRotate: 350, invert: 0, opacity: 100 },
+            cool: { blur: 0, brightness: 100, contrast: 105, saturate: 90, grayscale: 0, sepia: 0, hueRotate: 180, invert: 0, opacity: 100 },
+            noir: { blur: 0, brightness: 100, contrast: 120, saturate: 0, grayscale: 100, sepia: 0, hueRotate: 0, invert: 0, opacity: 100 },
+            faded: { blur: 0, brightness: 110, contrast: 90, saturate: 80, grayscale: 10, sepia: 10, hueRotate: 0, invert: 0, opacity: 100 },
+            vivid: { blur: 0, brightness: 105, contrast: 115, saturate: 150, grayscale: 0, sepia: 0, hueRotate: 0, invert: 0, opacity: 100 },
+            muted: { blur: 0, brightness: 105, contrast: 95, saturate: 60, grayscale: 0, sepia: 5, hueRotate: 0, invert: 0, opacity: 100 }
+        };
+
+        // Elements
+        const previewImage = document.getElementById('previewImage');
+        const cssOutput = document.getElementById('cssOutput');
+
+        // Generate CSS filter string
+        function generateFilterCSS() {
+            const filters = [];
+            
+            if (state.blur !== 0) filters.push(`blur(${state.blur}px)`);
+            if (state.brightness !== 100) filters.push(`brightness(${state.brightness}%)`);
+            if (state.contrast !== 100) filters.push(`contrast(${state.contrast}%)`);
+            if (state.saturate !== 100) filters.push(`saturate(${state.saturate}%)`);
+            if (state.grayscale !== 0) filters.push(`grayscale(${state.grayscale}%)`);
+            if (state.sepia !== 0) filters.push(`sepia(${state.sepia}%)`);
+            if (state.hueRotate !== 0) filters.push(`hue-rotate(${state.hueRotate}deg)`);
+            if (state.invert !== 0) filters.push(`invert(${state.invert}%)`);
+            if (state.opacity !== 100) filters.push(`opacity(${state.opacity}%)`);
+
+            return filters.length > 0 ? filters.join(' ') : 'none';
+        }
+
+        // Update preview and output
+        function updatePreview() {
+            const filterCSS = generateFilterCSS();
+            previewImage.style.filter = filterCSS;
+            cssOutput.textContent = `filter: ${filterCSS};`;
+            updateURL();
+        }
+
+        // Update UI from state
+        function updateUI() {
+            document.getElementById('blur').value = state.blur;
+            document.getElementById('blurValue').textContent = `${state.blur}px`;
+            
+            document.getElementById('brightness').value = state.brightness;
+            document.getElementById('brightnessValue').textContent = `${state.brightness}%`;
+            
+            document.getElementById('contrast').value = state.contrast;
+            document.getElementById('contrastValue').textContent = `${state.contrast}%`;
+            
+            document.getElementById('saturate').value = state.saturate;
+            document.getElementById('saturateValue').textContent = `${state.saturate}%`;
+            
+            document.getElementById('grayscale').value = state.grayscale;
+            document.getElementById('grayscaleValue').textContent = `${state.grayscale}%`;
+            
+            document.getElementById('sepia').value = state.sepia;
+            document.getElementById('sepiaValue').textContent = `${state.sepia}%`;
+            
+            document.getElementById('hueRotate').value = state.hueRotate;
+            document.getElementById('hueRotateValue').textContent = `${state.hueRotate}°`;
+            
+            document.getElementById('invert').value = state.invert;
+            document.getElementById('invertValue').textContent = `${state.invert}%`;
+            
+            document.getElementById('opacity').value = state.opacity;
+            document.getElementById('opacityValue').textContent = `${state.opacity}%`;
+
+            updatePreview();
+        }
+
+        // Filter input handlers
+        const filterInputs = ['blur', 'brightness', 'contrast', 'saturate', 'grayscale', 'sepia', 'hueRotate', 'invert', 'opacity'];
+        
+        filterInputs.forEach(filter => {
+            document.getElementById(filter).addEventListener('input', (e) => {
+                state[filter] = parseFloat(e.target.value);
+                
+                const valueEl = document.getElementById(filter + 'Value');
+                if (filter === 'blur') {
+                    valueEl.textContent = `${state[filter]}px`;
+                } else if (filter === 'hueRotate') {
+                    valueEl.textContent = `${state[filter]}°`;
+                } else {
+                    valueEl.textContent = `${state[filter]}%`;
+                }
+                
+                // Clear preset selection
+                document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+                
+                updatePreview();
+            });
+        });
+
+        // Preset handlers
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const presetName = btn.dataset.preset;
+                state = { ...presets[presetName] };
+                
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                updateUI();
+            });
+        });
+
+        // Reset handler
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            state = { ...defaults };
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-preset="none"]').classList.add('active');
+            updateUI();
+        });
+
+        // Sample image handlers
+        document.querySelectorAll('.sample-thumb').forEach(thumb => {
+            thumb.addEventListener('click', () => {
+                document.querySelectorAll('.sample-thumb').forEach(t => t.classList.remove('active'));
+                thumb.classList.add('active');
+                previewImage.src = thumb.dataset.full;
+            });
+        });
+
+        // Upload handler
+        document.getElementById('uploadInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImage.src = e.target.result;
+                    document.querySelectorAll('.sample-thumb').forEach(t => t.classList.remove('active'));
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Copy CSS
+        document.getElementById('copyCss').addEventListener('click', () => {
+            navigator.clipboard.writeText(cssOutput.textContent);
+            showToast('CSS copied!');
+        });
+
+        // Share link
+        document.getElementById('shareLink').addEventListener('click', () => {
+            const url = new URL(window.location.href);
+            url.search = '';
+            url.searchParams.set('bl', state.blur);
+            url.searchParams.set('br', state.brightness);
+            url.searchParams.set('co', state.contrast);
+            url.searchParams.set('sa', state.saturate);
+            url.searchParams.set('gr', state.grayscale);
+            url.searchParams.set('se', state.sepia);
+            url.searchParams.set('hu', state.hueRotate);
+            url.searchParams.set('in', state.invert);
+            url.searchParams.set('op', state.opacity);
+            
+            navigator.clipboard.writeText(url.toString());
+            showToast('Link copied!');
+        });
+
+        function updateURL() {
+            const url = new URL(window.location.href);
+            url.searchParams.set('bl', state.blur);
+            url.searchParams.set('br', state.brightness);
+            url.searchParams.set('co', state.contrast);
+            url.searchParams.set('sa', state.saturate);
+            url.searchParams.set('gr', state.grayscale);
+            url.searchParams.set('se', state.sepia);
+            url.searchParams.set('hu', state.hueRotate);
+            url.searchParams.set('in', state.invert);
+            url.searchParams.set('op', state.opacity);
+            history.replaceState(null, '', url.toString());
+        }
+
+        // Toast
+        function showToast(message) {
+            const toast = document.getElementById('copyToast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isDark = document.body.hasAttribute('data-theme');
+            if (isDark) {
+                document.body.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // Load theme
+        if (localStorage.getItem('theme') === 'dark' || 
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.body.setAttribute('data-theme', 'dark');
+        }
+
+        // Load state from URL
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            
+            if (params.has('bl')) state.blur = parseFloat(params.get('bl'));
+            if (params.has('br')) state.brightness = parseFloat(params.get('br'));
+            if (params.has('co')) state.contrast = parseFloat(params.get('co'));
+            if (params.has('sa')) state.saturate = parseFloat(params.get('sa'));
+            if (params.has('gr')) state.grayscale = parseFloat(params.get('gr'));
+            if (params.has('se')) state.sepia = parseFloat(params.get('se'));
+            if (params.has('hu')) state.hueRotate = parseFloat(params.get('hu'));
+            if (params.has('in')) state.invert = parseFloat(params.get('in'));
+            if (params.has('op')) state.opacity = parseFloat(params.get('op'));
+
+            // Check if matches a preset
+            const matchingPreset = Object.entries(presets).find(([name, preset]) => {
+                return Object.keys(preset).every(key => preset[key] === state[key]);
+            });
+            
+            if (matchingPreset) {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector(`[data-preset="${matchingPreset[0]}"]`).classList.add('active');
+            } else {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            }
+        }
+
+        // Initialize
+        loadFromURL();
+        updateUI();
+    </script>
+</body>
+</html>
