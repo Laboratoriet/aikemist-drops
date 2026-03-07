@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Unit Converter — Alkemist</title>
+  <meta name="description" content="Convert between CSS units instantly. px, rem, em, %, vw, vh with configurable base size.">
+  <meta property="og:title" content="CSS Unit Converter — Alkemist">
+  <meta property="og:description" content="Convert between CSS units instantly. px, rem, em, %, vw, vh.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://day037.aikemist.com">
+  <meta property="og:image" content="https://day037.aikemist.com/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://day037.aikemist.com/og-image.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text: #0a0a0a;
+      --text-secondary: #666666;
+      --border: #e0e0e0;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --card-bg: #ffffff;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --bg-secondary: #141414;
+      --text: #ffffff;
+      --text-secondary: #999999;
+      --border: #2a2a2a;
+      --card-bg: #141414;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+    
+    .logo svg {
+      width: 32px;
+      height: 32px;
+    }
+    
+    .logo span {
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .icon-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .icon-btn:hover {
+      background: var(--border);
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .config-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    @media (max-width: 640px) {
+      .config-row {
+        flex-direction: column;
+      }
+    }
+    
+    .base-config {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      flex: 1;
+    }
+    
+    .base-config label {
+      font-weight: 500;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    
+    .base-config input {
+      width: 70px;
+      padding: 0.5rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+    
+    .base-config .unit {
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .converter-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .input-section {
+      margin-bottom: 1.5rem;
+    }
+    
+    .input-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    .input-field {
+      flex: 1;
+      position: relative;
+    }
+    
+    .input-field input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      padding-right: 4rem;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+      transition: border-color 0.2s;
+    }
+    
+    .input-field input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    .input-field .unit-label {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+    }
+    
+    .unit-select {
+      width: 100px;
+      padding: 1rem;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    
+    .unit-select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    .results-section h3 {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+    
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.75rem;
+    }
+    
+    .result-item {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .result-item:hover {
+      background: var(--border);
+    }
+    
+    .result-item.copied {
+      background: var(--accent);
+    }
+    
+    .result-item.copied .result-value,
+    .result-item.copied .result-unit {
+      color: white;
+    }
+    
+    .result-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+    
+    .result-unit {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    
+    .preview-section {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .preview-section h3 {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+    
+    .size-preview {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: 10px;
+    }
+    
+    .size-bar {
+      height: 24px;
+      background: var(--accent);
+      border-radius: 4px;
+      transition: width 0.2s;
+      min-width: 4px;
+      max-width: 100%;
+    }
+    
+    .size-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    
+    .presets-section {
+      margin-top: 2rem;
+    }
+    
+    .presets-section h3 {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+    
+    .presets-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    .preset-btn {
+      padding: 0.5rem 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .preset-btn:hover {
+      background: var(--border);
+      border-color: var(--accent);
+    }
+    
+    .reference-section {
+      margin-top: 2rem;
+      padding: 1.25rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    
+    .reference-section h3 {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+    
+    .reference-table {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.5rem 1.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .reference-table dt {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      color: var(--accent);
+    }
+    
+    .reference-table dd {
+      color: var(--text-secondary);
+    }
+    
+    footer {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    
+    footer a:hover {
+      color: var(--text);
+    }
+    
+    @media (max-width: 640px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      h1 {
+        font-size: 1.75rem;
+      }
+      
+      .base-config {
+        flex-wrap: wrap;
+      }
+      
+      .base-config .hint {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 0.5rem;
+      }
+      
+      .input-row {
+        flex-direction: column;
+      }
+      
+      .unit-select {
+        width: 100%;
+      }
+      
+      .results-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="https://aikemist.com" class="logo">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#6366f1"/>
+              <stop offset="100%" style="stop-color:#8b5cf6"/>
+            </linearGradient>
+          </defs>
+          <rect width="100" height="100" rx="20" fill="url(#logoGrad)"/>
+          <path d="M30 70L50 30L70 70" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="50" cy="58" r="6" fill="white"/>
+        </svg>
+        <span>Alkemist</span>
+      </a>
+      <div class="header-actions">
+        <button class="icon-btn" id="themeToggle" title="Toggle theme">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+    
+    <h1>CSS Unit Converter</h1>
+    <p class="subtitle">Convert between px, rem, em, and viewport units instantly.</p>
+    
+    <div class="config-row">
+      <div class="base-config">
+        <label for="baseSize">Base font size:</label>
+        <input type="number" id="baseSize" value="16" min="1" max="100">
+        <span class="unit">px</span>
+      </div>
+      <div class="base-config">
+        <label for="viewportWidth">Viewport:</label>
+        <input type="number" id="viewportWidth" value="1920" min="320" max="3840">
+        <span class="unit">×</span>
+        <input type="number" id="viewportHeight" value="1080" min="320" max="2160">
+        <span class="unit">px</span>
+      </div>
+    </div>
+    
+    <div class="converter-card">
+      <div class="input-section">
+        <div class="input-row">
+          <div class="input-field">
+            <input type="number" id="inputValue" value="16" step="any">
+          </div>
+          <select class="unit-select" id="inputUnit">
+            <option value="px" selected>px</option>
+            <option value="rem">rem</option>
+            <option value="em">em</option>
+            <option value="pt">pt</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="results-section">
+        <h3>Converted Values (click to copy)</h3>
+        <div class="results-grid" id="results"></div>
+      </div>
+      
+      <div class="preview-section">
+        <h3>Visual Preview</h3>
+        <div class="size-preview">
+          <div class="size-bar" id="sizeBar"></div>
+          <span class="size-label" id="sizeLabel">16px</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="presets-section">
+      <h3>Common Values</h3>
+      <div class="presets-grid" id="presets"></div>
+    </div>
+    
+    <div class="reference-section">
+      <h3>Unit Reference</h3>
+      <dl class="reference-table">
+        <dt>px</dt>
+        <dd>Absolute pixel unit</dd>
+        <dt>rem</dt>
+        <dd>Relative to root font-size (html)</dd>
+        <dt>em</dt>
+        <dd>Relative to parent font-size</dd>
+        <dt>pt</dt>
+        <dd>Point (1pt = 1/72 inch, 1px ≈ 0.75pt)</dd>
+        <dt>%</dt>
+        <dd>Percentage of parent element</dd>
+        <dt>vw/vh</dt>
+        <dd>1% of viewport width/height</dd>
+      </dl>
+    </div>
+    
+    <footer>
+      <a href="https://aikemist.com">aikemist.com</a>
+      <span>·</span>
+      <span>Made by</span>
+      <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+  </div>
+  
+  <script>
+    // State
+    let baseSize = 16;
+    let viewportWidth = 1920;
+    let viewportHeight = 1080;
+    let inputValue = 16;
+    let inputUnit = 'px';
+    
+    // Common presets
+    const presets = [
+      { value: 8, unit: 'px' },
+      { value: 12, unit: 'px' },
+      { value: 14, unit: 'px' },
+      { value: 16, unit: 'px' },
+      { value: 18, unit: 'px' },
+      { value: 20, unit: 'px' },
+      { value: 24, unit: 'px' },
+      { value: 32, unit: 'px' },
+      { value: 48, unit: 'px' },
+      { value: 64, unit: 'px' },
+      { value: 0.5, unit: 'rem' },
+      { value: 0.75, unit: 'rem' },
+      { value: 1, unit: 'rem' },
+      { value: 1.25, unit: 'rem' },
+      { value: 1.5, unit: 'rem' },
+      { value: 2, unit: 'rem' },
+    ];
+    
+    // DOM elements
+    const baseSizeInput = document.getElementById('baseSize');
+    const inputValueEl = document.getElementById('inputValue');
+    const inputUnitEl = document.getElementById('inputUnit');
+    const resultsEl = document.getElementById('results');
+    const presetsEl = document.getElementById('presets');
+    
+    // Theme
+    let darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (darkMode) document.documentElement.setAttribute('data-theme', 'dark');
+    
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      darkMode = !darkMode;
+      document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    });
+    
+    // Convert to pixels first (base unit)
+    function toPx(value, unit) {
+      switch (unit) {
+        case 'px': return value;
+        case 'rem': return value * baseSize;
+        case 'em': return value * baseSize;
+        case 'pt': return value * (4/3); // 1pt = 1.333px
+        default: return value;
+      }
+    }
+    
+    // Convert from pixels to target unit
+    function fromPx(px, unit) {
+      switch (unit) {
+        case 'px': return px;
+        case 'rem': return px / baseSize;
+        case 'em': return px / baseSize;
+        case 'pt': return px * 0.75;
+        case '%': return (px / baseSize) * 100;
+        case 'vw': return (px / viewportWidth) * 100;
+        case 'vh': return (px / viewportHeight) * 100;
+        default: return px;
+      }
+    }
+    
+    // Format number nicely
+    function formatNumber(num) {
+      if (Number.isInteger(num)) return num.toString();
+      // Remove trailing zeros
+      const fixed = num.toFixed(4);
+      return parseFloat(fixed).toString();
+    }
+    
+    // Render results
+    function render() {
+      const px = toPx(inputValue, inputUnit);
+      
+      const units = [
+        { unit: 'px', label: 'Pixels' },
+        { unit: 'rem', label: 'Root EM' },
+        { unit: 'em', label: 'EM' },
+        { unit: 'pt', label: 'Points' },
+        { unit: '%', label: 'Percent' },
+        { unit: 'vw', label: 'Viewport W' },
+        { unit: 'vh', label: 'Viewport H' },
+      ];
+      
+      resultsEl.innerHTML = units.map(u => {
+        const value = fromPx(px, u.unit);
+        const formatted = formatNumber(value);
+        const display = u.unit === '%' || u.unit === 'vw' || u.unit === 'vh' ? `${formatted}${u.unit}` : `${formatted}${u.unit}`;
+        return `
+          <div class="result-item" data-value="${display}" title="Click to copy">
+            <span class="result-value">${formatted}</span>
+            <span class="result-unit">${u.label}</span>
+          </div>
+        `;
+      }).join('');
+      
+      // Update size preview
+      const maxWidth = 300;
+      const barWidth = Math.min(px, maxWidth);
+      document.getElementById('sizeBar').style.width = barWidth + 'px';
+      document.getElementById('sizeLabel').textContent = formatNumber(px) + 'px';
+    }
+    
+    // Render presets
+    function renderPresets() {
+      presetsEl.innerHTML = presets.map(p => 
+        `<button class="preset-btn" data-value="${p.value}" data-unit="${p.unit}">${p.value}${p.unit}</button>`
+      ).join('');
+    }
+    
+    // Events
+    baseSizeInput.addEventListener('input', (e) => {
+      baseSize = parseFloat(e.target.value) || 16;
+      render();
+    });
+    
+    document.getElementById('viewportWidth').addEventListener('input', (e) => {
+      viewportWidth = parseInt(e.target.value) || 1920;
+      render();
+    });
+    
+    document.getElementById('viewportHeight').addEventListener('input', (e) => {
+      viewportHeight = parseInt(e.target.value) || 1080;
+      render();
+    });
+    
+    inputValueEl.addEventListener('input', (e) => {
+      inputValue = parseFloat(e.target.value) || 0;
+      render();
+    });
+    
+    inputUnitEl.addEventListener('change', (e) => {
+      inputUnit = e.target.value;
+      render();
+    });
+    
+    // Copy result on click
+    resultsEl.addEventListener('click', (e) => {
+      const item = e.target.closest('.result-item');
+      if (!item) return;
+      
+      const value = item.dataset.value;
+      navigator.clipboard.writeText(value);
+      
+      item.classList.add('copied');
+      setTimeout(() => item.classList.remove('copied'), 500);
+    });
+    
+    // Preset click
+    presetsEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('.preset-btn');
+      if (!btn) return;
+      
+      inputValue = parseFloat(btn.dataset.value);
+      inputUnit = btn.dataset.unit;
+      
+      inputValueEl.value = inputValue;
+      inputUnitEl.value = inputUnit;
+      
+      render();
+    });
+    
+    // Init
+    renderPresets();
+    render();
+  </script>
+</body>
+</html>

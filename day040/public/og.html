@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1200px;
+      height: 630px;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      padding: 60px;
+    }
+    .icon {
+      font-size: 80px;
+      margin-bottom: 30px;
+    }
+    h1 {
+      font-size: 64px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      font-size: 28px;
+      color: #888;
+      margin-bottom: 50px;
+    }
+    .demo {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+    .color-box {
+      width: 100px;
+      height: 100px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .ratio {
+      font-size: 48px;
+      font-weight: 700;
+      color: #22c55e;
+    }
+    .wcag {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    .badge {
+      background: rgba(34, 197, 94, 0.2);
+      border: 2px solid #22c55e;
+      color: #22c55e;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .badge.fail {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+    .brand {
+      position: absolute;
+      bottom: 40px;
+      right: 50px;
+      font-size: 24px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="icon">✓</div>
+  <h1>Contrast Checker</h1>
+  <div class="subtitle">WCAG 2.1 Accessibility Tool</div>
+  <div class="demo">
+    <div class="color-box" style="background: #000; color: #fff;">Aa</div>
+    <div class="ratio">21:1</div>
+    <div class="color-box" style="background: #fff; color: #000;">Aa</div>
+  </div>
+  <div class="wcag">
+    <span class="badge">AA ✓</span>
+    <span class="badge">AAA ✓</span>
+  </div>
+  <div class="brand">aikemist.com</div>
+</body>
+</html>

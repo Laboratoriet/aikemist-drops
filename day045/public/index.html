@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UUID Generator — aikemist.com</title>
+  <meta name="description" content="Generate UUIDs instantly. Multiple formats, bulk generation, and validation.">
+  <meta property="og:title" content="UUID Generator">
+  <meta property="og:description" content="Generate random UUIDs instantly. v4, v7, bulk generation, and more.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://day045.aikemist.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔑</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --border: #e5e5e5;
+      --text: #171717;
+      --text-muted: #737373;
+      --accent: #0ea5e9;
+      --accent-hover: #0284c7;
+      --success: #22c55e;
+      --error: #ef4444;
+      --field-bg: #f5f5f5;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --surface: #171717;
+      --border: #262626;
+      --text: #fafafa;
+      --text-muted: #a3a3a3;
+      --accent: #38bdf8;
+      --accent-hover: #7dd3fc;
+      --field-bg: #1a1a1a;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      cursor: pointer;
+      font-size: 1.25rem;
+      z-index: 100;
+    }
+    
+    /* Main UUID Display */
+    .uuid-main {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .uuid-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      padding: 1rem;
+      background: var(--field-bg);
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      word-break: break-all;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    
+    .uuid-display:hover {
+      border-color: var(--accent);
+    }
+    
+    .uuid-display.copied {
+      border-color: var(--success);
+      background: rgba(34, 197, 94, 0.1);
+    }
+    
+    .uuid-display.generating {
+      animation: flash 0.15s ease-out;
+    }
+    
+    @keyframes flash {
+      0% { opacity: 0.5; transform: scale(0.98); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    
+    .main-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background: var(--field-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-secondary:hover {
+      border-color: var(--accent);
+    }
+    
+    /* Options */
+    .options {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .options h2 {
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    
+    .option-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .option-row:last-child {
+      border-bottom: none;
+    }
+    
+    .option-label {
+      font-size: 0.95rem;
+    }
+    
+    .option-control {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .option-btn {
+      padding: 0.4rem 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      background: var(--field-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    
+    .option-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    .option-btn:hover:not(.active) {
+      border-color: var(--accent);
+    }
+    
+    select {
+      padding: 0.4rem 0.75rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      background: var(--field-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      cursor: pointer;
+    }
+    
+    /* History */
+    .history-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .section-header h2 {
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin: 0;
+    }
+    
+    .clear-btn {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .clear-btn:hover {
+      border-color: var(--error);
+      color: var(--error);
+    }
+    
+    .history-section h2 {
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .history-empty {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 1rem;
+    }
+    
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.75rem;
+      background: var(--field-bg);
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      animation: slideIn 0.2s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .history-item:hover {
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+    }
+    
+    .history-time {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-family: 'Jost', sans-serif;
+    }
+    
+    .history-item:hover .history-time {
+      color: rgba(255,255,255,0.7);
+    }
+    
+    /* Bulk Generation */
+    .bulk-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .bulk-section h2 {
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    
+    .bulk-controls {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .bulk-controls input {
+      width: 80px;
+      padding: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-align: center;
+      background: var(--field-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+    }
+    
+    .bulk-output {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      line-height: 1.8;
+      background: var(--field-bg);
+      border-radius: 8px;
+      padding: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+    }
+    
+    .bulk-output.show {
+      display: block;
+    }
+    
+    .bulk-output div {
+      padding: 0.25rem 0;
+      cursor: pointer;
+      border-radius: 4px;
+      padding-left: 0.5rem;
+    }
+    
+    .bulk-output div:hover {
+      background: var(--accent);
+      color: white;
+    }
+    
+    /* Validator */
+    .validator {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .validator h2 {
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    
+    .validator input {
+      width: 100%;
+      padding: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      background: var(--field-bg);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+    }
+    
+    .validator input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    .validation-result {
+      font-size: 0.9rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+    }
+    
+    .validation-result.valid {
+      color: var(--success);
+      background: rgba(34, 197, 94, 0.1);
+    }
+    
+    .validation-result.invalid {
+      color: var(--error);
+      background: rgba(239, 68, 68, 0.1);
+    }
+    
+    /* Shortcuts */
+    .shortcuts {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    
+    .shortcut {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    
+    .shortcut kbd {
+      background: var(--field-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.15rem 0.4rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      color: var(--accent);
+    }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 1000;
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
+    @media (max-width: 600px) {
+      .uuid-display {
+        font-size: 0.9rem;
+        padding: 0.75rem;
+      }
+      
+      .main-actions {
+        flex-direction: column;
+      }
+      
+      .main-actions .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .option-control {
+        flex-wrap: wrap;
+      }
+      
+      .history-item {
+        font-size: 0.75rem;
+      }
+      
+      .bulk-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .bulk-controls input {
+        width: 100%;
+      }
+      
+      .shortcuts {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+  
+  <div class="container">
+    <header>
+      <h1>UUID Generator</h1>
+      <p class="subtitle">Unique IDs in a click</p>
+    </header>
+    
+    <section class="uuid-main">
+      <div class="uuid-display" id="uuidDisplay" onclick="copyUuid()" title="Click to copy">
+        xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+      </div>
+      <div class="main-actions">
+        <button class="btn btn-primary" onclick="generateNew()">
+          🎲 Generate New
+        </button>
+        <button class="btn btn-secondary" onclick="copyUuid()">
+          📋 Copy
+        </button>
+      </div>
+    </section>
+    
+    <section class="options">
+      <h2>Format Options</h2>
+      <div class="option-row">
+        <span class="option-label">Case</span>
+        <div class="option-control">
+          <button class="option-btn active" data-case="lower" onclick="setCase('lower')">lowercase</button>
+          <button class="option-btn" data-case="upper" onclick="setCase('upper')">UPPERCASE</button>
+        </div>
+      </div>
+      <div class="option-row">
+        <span class="option-label">Format</span>
+        <div class="option-control">
+          <button class="option-btn active" data-format="dashes" onclick="setFormat('dashes')">with-dashes</button>
+          <button class="option-btn" data-format="plain" onclick="setFormat('plain')">nodashes</button>
+          <button class="option-btn" data-format="braces" onclick="setFormat('braces')">{braces}</button>
+        </div>
+      </div>
+      <div class="option-row">
+        <span class="option-label">Version</span>
+        <div class="option-control">
+          <select id="versionSelect" onchange="generateNew()">
+            <option value="4">v4 (Random)</option>
+            <option value="7">v7 (Timestamp)</option>
+          </select>
+        </div>
+      </div>
+    </section>
+    
+    <section class="history-section">
+      <div class="section-header">
+        <h2>Recent UUIDs</h2>
+        <button class="clear-btn" onclick="clearHistory()" title="Clear history">Clear</button>
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="history-empty">Generated UUIDs will appear here</div>
+      </div>
+    </section>
+    
+    <section class="bulk-section">
+      <h2>Bulk Generate</h2>
+      <div class="bulk-controls">
+        <span>Generate</span>
+        <input type="number" id="bulkCount" value="10" min="1" max="1000">
+        <span>UUIDs</span>
+        <button class="btn btn-secondary" onclick="generateBulk()">Generate</button>
+        <button class="btn btn-secondary" onclick="copyBulk()">Copy All</button>
+      </div>
+      <div class="bulk-output" id="bulkOutput"></div>
+    </section>
+    
+    <section class="validator">
+      <h2>Validate UUID</h2>
+      <input type="text" id="validateInput" placeholder="Paste a UUID to validate..." oninput="validateUuid()">
+      <div class="validation-result" id="validationResult"></div>
+    </section>
+    
+    <div class="shortcuts">
+      <span class="shortcut"><kbd>Space</kbd> Generate</span>
+      <span class="shortcut"><kbd>C</kbd> Copy</span>
+      <span class="shortcut"><kbd>U</kbd> Uppercase</span>
+      <span class="shortcut"><kbd>L</kbd> Lowercase</span>
+    </div>
+    
+    <footer>
+      <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+  
+  <script>
+    // Theme
+    function toggleTheme() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      document.querySelector('.theme-toggle').textContent = isDark ? '🌙' : '☀️';
+      localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    }
+    
+    const savedTheme = localStorage.getItem('theme') || 
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.querySelector('.theme-toggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    
+    // Toast
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+    
+    // State
+    let currentCase = 'lower';
+    let currentFormat = 'dashes';
+    let currentUuid = '';
+    
+    // Generate UUID v4
+    function uuidv4() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+    
+    // Generate UUID v7 (timestamp-based)
+    function uuidv7() {
+      const now = Date.now();
+      const timestamp = now.toString(16).padStart(12, '0');
+      const random = Array.from(crypto.getRandomValues(new Uint8Array(10)))
+        .map(b => b.toString(16).padStart(2, '0')).join('');
+      
+      // Format: tttttttt-tttt-7xxx-yxxx-xxxxxxxxxxxx
+      const uuid = timestamp.slice(0, 8) + '-' + 
+                   timestamp.slice(8, 12) + '-7' + 
+                   random.slice(0, 3) + '-' + 
+                   ((parseInt(random.slice(3, 4), 16) & 0x3 | 0x8).toString(16)) + 
+                   random.slice(4, 7) + '-' + 
+                   random.slice(7, 19);
+      return uuid;
+    }
+    
+    function generateRawUuid() {
+      const version = document.getElementById('versionSelect').value;
+      return version === '7' ? uuidv7() : uuidv4();
+    }
+    
+    function formatUuid(uuid) {
+      let formatted = uuid;
+      
+      // Apply case
+      formatted = currentCase === 'upper' ? formatted.toUpperCase() : formatted.toLowerCase();
+      
+      // Apply format
+      if (currentFormat === 'plain') {
+        formatted = formatted.replace(/-/g, '');
+      } else if (currentFormat === 'braces') {
+        formatted = '{' + formatted + '}';
+      }
+      
+      return formatted;
+    }
+    
+    // History
+    let history = [];
+    const MAX_HISTORY = 10;
+    
+    function addToHistory(uuid) {
+      history.unshift({
+        uuid: uuid,
+        time: new Date()
+      });
+      if (history.length > MAX_HISTORY) {
+        history.pop();
+      }
+      renderHistory();
+    }
+    
+    function renderHistory() {
+      const list = document.getElementById('historyList');
+      if (history.length === 0) {
+        list.innerHTML = '<div class="history-empty">Generated UUIDs will appear here</div>';
+        return;
+      }
+      
+      list.innerHTML = history.map(item => {
+        const ago = getTimeAgo(item.time);
+        return `<div class="history-item" onclick="copyHistoryItem('${item.uuid}')">
+          <span>${item.uuid}</span>
+          <span class="history-time">${ago}</span>
+        </div>`;
+      }).join('');
+    }
+    
+    function getTimeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      if (seconds < 60) return 'just now';
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      return `${Math.floor(minutes / 60)}h ago`;
+    }
+    
+    function copyHistoryItem(uuid) {
+      navigator.clipboard.writeText(uuid);
+      showToast('Copied!');
+    }
+    
+    function clearHistory() {
+      history = [];
+      renderHistory();
+      showToast('History cleared');
+    }
+    
+    function generateNew() {
+      currentUuid = generateRawUuid();
+      const formatted = formatUuid(currentUuid);
+      const display = document.getElementById('uuidDisplay');
+      display.textContent = formatted;
+      display.classList.remove('copied');
+      display.classList.remove('generating');
+      void display.offsetWidth; // Trigger reflow
+      display.classList.add('generating');
+      addToHistory(formatted);
+    }
+    
+    function copyUuid() {
+      const display = document.getElementById('uuidDisplay');
+      navigator.clipboard.writeText(display.textContent);
+      display.classList.add('copied');
+      setTimeout(() => display.classList.remove('copied'), 1000);
+      showToast('Copied!');
+    }
+    
+    function setCase(c) {
+      currentCase = c;
+      document.querySelectorAll('[data-case]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.case === c);
+      });
+      if (currentUuid) {
+        document.getElementById('uuidDisplay').textContent = formatUuid(currentUuid);
+      }
+    }
+    
+    function setFormat(f) {
+      currentFormat = f;
+      document.querySelectorAll('[data-format]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.format === f);
+      });
+      if (currentUuid) {
+        document.getElementById('uuidDisplay').textContent = formatUuid(currentUuid);
+      }
+    }
+    
+    // Bulk generation
+    let bulkUuids = [];
+    
+    function generateBulk() {
+      const count = Math.min(Math.max(1, parseInt(document.getElementById('bulkCount').value) || 10), 1000);
+      bulkUuids = [];
+      
+      for (let i = 0; i < count; i++) {
+        bulkUuids.push(formatUuid(generateRawUuid()));
+      }
+      
+      const output = document.getElementById('bulkOutput');
+      output.innerHTML = bulkUuids.map(u => `<div onclick="copyOne(this)">${u}</div>`).join('');
+      output.classList.add('show');
+      showToast(`Generated ${count} UUIDs`);
+    }
+    
+    function copyOne(el) {
+      navigator.clipboard.writeText(el.textContent);
+      showToast('Copied!');
+    }
+    
+    function copyBulk() {
+      if (bulkUuids.length === 0) {
+        showToast('Generate UUIDs first');
+        return;
+      }
+      navigator.clipboard.writeText(bulkUuids.join('\n'));
+      showToast(`Copied ${bulkUuids.length} UUIDs`);
+    }
+    
+    // Validation
+    function validateUuid() {
+      const input = document.getElementById('validateInput').value.trim();
+      const result = document.getElementById('validationResult');
+      
+      if (!input) {
+        result.textContent = '';
+        result.className = 'validation-result';
+        return;
+      }
+      
+      // Remove braces and dashes for validation
+      const cleaned = input.replace(/[{}-]/g, '');
+      const uuidRegex = /^[0-9a-f]{32}$/i;
+      
+      if (uuidRegex.test(cleaned)) {
+        // Detect version
+        const withDashes = cleaned.slice(0,8) + '-' + cleaned.slice(8,12) + '-' + 
+                          cleaned.slice(12,16) + '-' + cleaned.slice(16,20) + '-' + cleaned.slice(20);
+        const version = cleaned[12];
+        const variant = parseInt(cleaned[16], 16);
+        
+        let versionText = `v${version}`;
+        if (version === '4') versionText = 'v4 (Random)';
+        else if (version === '7') versionText = 'v7 (Timestamp)';
+        else if (version === '1') versionText = 'v1 (Timestamp + MAC)';
+        
+        result.innerHTML = `✓ Valid UUID — ${versionText}`;
+        result.className = 'validation-result valid';
+      } else {
+        result.textContent = '✗ Invalid UUID format';
+        result.className = 'validation-result invalid';
+      }
+    }
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT') return;
+      
+      if (e.code === 'Space') {
+        e.preventDefault();
+        generateNew();
+      } else if (e.key === 'c' || e.key === 'C') {
+        copyUuid();
+      } else if (e.key === 'u' || e.key === 'U') {
+        setCase('upper');
+      } else if (e.key === 'l' || e.key === 'L') {
+        setCase('lower');
+      }
+    });
+    
+    // Initial generation
+    generateNew();
+  </script>
+</body>
+</html>

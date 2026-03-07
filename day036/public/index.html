@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVG Pattern Generator — Alkemist</title>
+  <meta name="description" content="Create seamless SVG patterns for backgrounds. Dots, lines, grids, waves, and more.">
+  <meta property="og:title" content="SVG Pattern Generator — Alkemist">
+  <meta property="og:description" content="Create seamless SVG patterns for backgrounds. Dots, lines, grids, waves, and more.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://day036.aikemist.com">
+  <meta property="og:image" content="https://day036.aikemist.com/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://day036.aikemist.com/og-image.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text: #0a0a0a;
+      --text-secondary: #666666;
+      --border: #e0e0e0;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --card-bg: #ffffff;
+      --code-bg: #1a1a2e;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --bg-secondary: #141414;
+      --text: #ffffff;
+      --text-secondary: #999999;
+      --border: #2a2a2a;
+      --card-bg: #141414;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+    
+    .logo svg {
+      width: 32px;
+      height: 32px;
+    }
+    
+    .logo span {
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .icon-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .icon-btn:hover {
+      background: var(--border);
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 2rem;
+    }
+    
+    @media (max-width: 1024px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .preview-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .pattern-name {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    
+    .preview-box {
+      aspect-ratio: 16/9;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    
+    .preview-inner {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .controls-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-height: calc(100vh - 200px);
+      overflow-y: auto;
+    }
+    
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .control-label {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .pattern-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+    
+    .pattern-btn {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--bg);
+      overflow: hidden;
+    }
+    
+    .pattern-btn:hover {
+      border-color: var(--accent);
+    }
+    
+    .pattern-btn.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+    }
+    
+    .pattern-btn svg {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .color-presets {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+    
+    .color-preset {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .color-preset:hover {
+      transform: scale(1.1);
+    }
+    
+    .color-preset .fg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+    }
+    
+    .color-preset .bg {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100%;
+    }
+    
+    .color-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    
+    .color-input {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1;
+    }
+    
+    .color-input label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      min-width: 70px;
+    }
+    
+    .color-input input[type="color"] {
+      width: 40px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: none;
+    }
+    
+    .color-input input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    
+    .color-input input[type="color"]::-webkit-color-swatch {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    
+    .color-input input[type="text"] {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+    }
+    
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .slider-label {
+      font-size: 0.9rem;
+      min-width: 80px;
+    }
+    
+    .slider-row input[type="range"] {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      appearance: none;
+      cursor: pointer;
+    }
+    
+    .slider-row input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+    }
+    
+    .slider-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      min-width: 45px;
+      text-align: right;
+      color: var(--text-secondary);
+    }
+    
+    .output-section {
+      background: var(--code-bg);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .output-tabs {
+      display: flex;
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .output-tab {
+      flex: 1;
+      padding: 0.75rem;
+      background: none;
+      border: none;
+      color: #888;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .output-tab:hover {
+      color: #ccc;
+    }
+    
+    .output-tab.active {
+      color: white;
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .output-content {
+      display: none;
+      padding: 1rem;
+    }
+    
+    .output-content.active {
+      display: block;
+    }
+    
+    .output-header {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 0.5rem;
+    }
+    
+    .copy-btn {
+      padding: 0.4rem 0.75rem;
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .copy-btn:hover {
+      background: var(--accent-hover);
+    }
+    
+    .output-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: #e0e0e0;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    
+    .actions-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .action-btn {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    
+    .action-btn:hover {
+      background: var(--border);
+    }
+    
+    .action-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    .action-btn.primary:hover {
+      background: var(--accent-hover);
+    }
+    
+    footer {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    
+    footer a:hover {
+      color: var(--text);
+    }
+    
+    @media (max-width: 640px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      h1 {
+        font-size: 1.75rem;
+      }
+      
+      .pattern-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="https://aikemist.com" class="logo">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#6366f1"/>
+              <stop offset="100%" style="stop-color:#8b5cf6"/>
+            </linearGradient>
+          </defs>
+          <rect width="100" height="100" rx="20" fill="url(#logoGrad)"/>
+          <path d="M30 70L50 30L70 70" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="50" cy="58" r="6" fill="white"/>
+        </svg>
+        <span>Alkemist</span>
+      </a>
+      <div class="header-actions">
+        <button class="icon-btn" id="randomBtn" title="Random pattern">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>
+          </svg>
+        </button>
+        <button class="icon-btn" id="themeToggle" title="Toggle theme">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+    
+    <h1>SVG Pattern Generator</h1>
+    <p class="subtitle">Create seamless patterns for backgrounds — export as SVG, CSS, or PNG.</p>
+    
+    <div class="main-layout">
+      <div class="preview-section">
+        <div class="preview-header">
+          <span class="pattern-name" id="patternName">Dots</span>
+        </div>
+        <div class="preview-box">
+          <div class="preview-inner" id="preview"></div>
+        </div>
+        
+        <div class="output-section">
+          <div class="output-tabs">
+            <button class="output-tab active" data-tab="svg">SVG</button>
+            <button class="output-tab" data-tab="css">CSS</button>
+          </div>
+          <div class="output-content active" id="svgOutput">
+            <div class="output-header">
+              <button class="copy-btn" data-copy="svg">Copy SVG</button>
+            </div>
+            <div class="output-code" id="svgCode"></div>
+          </div>
+          <div class="output-content" id="cssOutput">
+            <div class="output-header">
+              <button class="copy-btn" data-copy="css">Copy CSS</button>
+            </div>
+            <div class="output-code" id="cssCode"></div>
+          </div>
+        </div>
+        
+        <div class="actions-row">
+          <button class="action-btn" id="shareBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+              <polyline points="16 6 12 2 8 6"/>
+              <line x1="12" y1="2" x2="12" y2="15"/>
+            </svg>
+            Share
+          </button>
+          <button class="action-btn" id="downloadSvg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            SVG
+          </button>
+          <button class="action-btn primary" id="downloadPng">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            PNG
+          </button>
+        </div>
+      </div>
+      
+      <div class="controls-section">
+        <div class="control-group">
+          <span class="control-label">Pattern</span>
+          <div class="pattern-grid" id="patternGrid"></div>
+        </div>
+        
+        <div class="control-group">
+          <span class="control-label">Colors</span>
+          <div class="color-presets" id="colorPresets"></div>
+          <div class="color-row">
+            <div class="color-input">
+              <label>Foreground</label>
+              <input type="color" id="fgColor" value="#6366f1">
+              <input type="text" id="fgHex" value="#6366f1">
+            </div>
+          </div>
+          <div class="color-row">
+            <div class="color-input">
+              <label>Background</label>
+              <input type="color" id="bgColor" value="#ffffff">
+              <input type="text" id="bgHex" value="#ffffff">
+            </div>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <span class="control-label">Size</span>
+          <div class="slider-row">
+            <span class="slider-label">Scale</span>
+            <input type="range" id="scale" min="5" max="50" value="20">
+            <span class="slider-value" id="scaleValue">20px</span>
+          </div>
+          <div class="slider-row">
+            <span class="slider-label">Stroke</span>
+            <input type="range" id="stroke" min="1" max="10" value="2">
+            <span class="slider-value" id="strokeValue">2px</span>
+          </div>
+          <div class="slider-row">
+            <span class="slider-label">Opacity</span>
+            <input type="range" id="opacity" min="10" max="100" value="100">
+            <span class="slider-value" id="opacityValue">100%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <footer>
+      <a href="https://aikemist.com">aikemist.com</a>
+      <span>·</span>
+      <span>Made by</span>
+      <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+  </div>
+  
+  <script>
+    // Pattern definitions
+    const patterns = {
+      dots: {
+        name: 'Dots',
+        generate: (s) => `<circle cx="${s.scale/2}" cy="${s.scale/2}" r="${s.stroke}" fill="${s.fg}" fill-opacity="${s.opacity}"/>`
+      },
+      grid: {
+        name: 'Grid',
+        generate: (s) => `<path d="M ${s.scale} 0 L 0 0 0 ${s.scale}" fill="none" stroke="${s.fg}" stroke-width="${s.stroke}" stroke-opacity="${s.opacity}"/>`
+      },
+      lines: {
+        name: 'Lines',
+        generate: (s) => `<line x1="0" y1="${s.scale}" x2="${s.scale}" y2="${s.scale}" stroke="${s.fg}" stroke-width="${s.stroke}" stroke-opacity="${s.opacity}"/>`
+      },
+      diagonal: {
+        name: 'Diagonal',
+        generate: (s) => `<line x1="0" y1="0" x2="${s.scale}" y2="${s.scale}" stroke="${s.fg}" stroke-width="${s.stroke}" stroke-opacity="${s.opacity}"/>`
+      },
+      crosshatch: {
+        name: 'Crosshatch',
+        generate: (s) => `<line x1="0" y1="0" x2="${s.scale}" y2="${s.scale}" stroke="${s.fg}" stroke-width="${s.stroke}" stroke-opacity="${s.opacity}"/><line x1="${s.scale}" y1="0" x2="0" y2="${s.scale}" stroke="${s.fg}" stroke-width="${s.stroke}" stroke-opacity="${s.opacity}"/>`
+      },
+      chevron: {
+        name: 'Chevron',
+        generate: (s) => `<path d="M 0 ${s.scale*0.75} L ${s.scale/2} ${s.scale*0.25} L ${s.scale} ${s.scale*0.75}" fill="none" stroke="${s.fg}" stroke-width="${s.stroke}" stroke-opacity="${s.opacity}" stroke-linecap="round"/>`
+      },
+      zigzag: {
+        name: 'Zigzag',
+        generate: (s) => `<path d="M 0 ${s.scale/2} L ${s.scale/4} 0 L ${s.scale*3/4} ${s.scale} L ${s.scale} ${s.scale/2}" fill="none" stroke="${s.fg}" stroke-width="${s.stroke}" stroke-opacity="${s.opacity}"/>`
+      },
+      waves: {
+        name: 'Waves',
+        generate: (s) => `<path d="M 0 ${s.scale/2} Q ${s.scale/4} 0, ${s.scale/2} ${s.scale/2} T ${s.scale} ${s.scale/2}" fill="none" stroke="${s.fg}" stroke-width="${s.stroke}" stroke-opacity="${s.opacity}"/>`
+      },
+      circles: {
+        name: 'Circles',
+        generate: (s) => `<circle cx="${s.scale/2}" cy="${s.scale/2}" r="${s.scale/3}" fill="none" stroke="${s.fg}" stroke-width="${s.stroke}" stroke-opacity="${s.opacity}"/>`
+      },
+      plus: {
+        name: 'Plus',
+        generate: (s) => `<path d="M ${s.scale/2} ${s.scale*0.2} L ${s.scale/2} ${s.scale*0.8} M ${s.scale*0.2} ${s.scale/2} L ${s.scale*0.8} ${s.scale/2}" stroke="${s.fg}" stroke-width="${s.stroke}" stroke-opacity="${s.opacity}" stroke-linecap="round"/>`
+      },
+      squares: {
+        name: 'Squares',
+        generate: (s) => `<rect x="${s.scale*0.2}" y="${s.scale*0.2}" width="${s.scale*0.6}" height="${s.scale*0.6}" fill="none" stroke="${s.fg}" stroke-width="${s.stroke}" stroke-opacity="${s.opacity}"/>`
+      },
+      diamonds: {
+        name: 'Diamonds',
+        generate: (s) => `<path d="M ${s.scale/2} ${s.scale*0.15} L ${s.scale*0.85} ${s.scale/2} L ${s.scale/2} ${s.scale*0.85} L ${s.scale*0.15} ${s.scale/2} Z" fill="none" stroke="${s.fg}" stroke-width="${s.stroke}" stroke-opacity="${s.opacity}"/>`
+      }
+    };
+    
+    // Color presets
+    const colorPresets = [
+      { fg: '#6366f1', bg: '#ffffff', name: 'Indigo on White' },
+      { fg: '#000000', bg: '#ffffff', name: 'Black on White' },
+      { fg: '#ffffff', bg: '#0a0a0a', name: 'White on Black' },
+      { fg: '#22c55e', bg: '#f0fdf4', name: 'Green on Mint' },
+      { fg: '#f97316', bg: '#fff7ed', name: 'Orange on Cream' },
+      { fg: '#ec4899', bg: '#fdf2f8', name: 'Pink on Blush' },
+      { fg: '#06b6d4', bg: '#ecfeff', name: 'Cyan on Ice' },
+      { fg: '#8b5cf6', bg: '#0a0a0a', name: 'Violet on Dark' },
+    ];
+    
+    // State
+    let state = {
+      pattern: 'dots',
+      fg: '#6366f1',
+      bg: '#ffffff',
+      scale: 20,
+      stroke: 2,
+      opacity: 1
+    };
+    
+    // DOM
+    const preview = document.getElementById('preview');
+    const patternGrid = document.getElementById('patternGrid');
+    const svgCode = document.getElementById('svgCode');
+    const cssCode = document.getElementById('cssCode');
+    
+    // Theme
+    let darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (darkMode) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      state.bg = '#0a0a0a';
+      document.getElementById('bgColor').value = '#0a0a0a';
+      document.getElementById('bgHex').value = '#0a0a0a';
+    }
+    
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      darkMode = !darkMode;
+      document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    });
+    
+    // Build pattern SVG
+    function buildSVG() {
+      const s = {
+        scale: state.scale,
+        stroke: state.stroke,
+        fg: state.fg,
+        opacity: state.opacity
+      };
+      
+      const patternContent = patterns[state.pattern].generate(s);
+      
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="${state.scale}" height="${state.scale}">
+  <rect width="100%" height="100%" fill="${state.bg}"/>
+  ${patternContent}
+</svg>`;
+    }
+    
+    // Build CSS
+    function buildCSS() {
+      const svg = buildSVG();
+      const encoded = encodeURIComponent(svg).replace(/'/g, '%27').replace(/"/g, '%22');
+      return `background-color: ${state.bg};
+background-image: url("data:image/svg+xml,${encoded}");
+background-repeat: repeat;`;
+    }
+    
+    // Render
+    function render() {
+      const svg = buildSVG();
+      const encoded = encodeURIComponent(svg).replace(/'/g, '%27').replace(/"/g, '%22');
+      preview.style.backgroundColor = state.bg;
+      preview.style.backgroundImage = `url("data:image/svg+xml,${encoded}")`;
+      preview.style.backgroundRepeat = 'repeat';
+      
+      document.getElementById('patternName').textContent = patterns[state.pattern].name;
+      
+      svgCode.textContent = svg;
+      cssCode.textContent = buildCSS();
+      
+      updateURL();
+    }
+    
+    // Render pattern grid
+    function renderPatternGrid() {
+      patternGrid.innerHTML = Object.entries(patterns).map(([key, pattern]) => {
+        const s = { scale: 20, stroke: 2, fg: '#6366f1', opacity: 1 };
+        const content = pattern.generate(s);
+        const svg = `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="p-${key}" width="20" height="20" patternUnits="userSpaceOnUse">
+              <rect width="20" height="20" fill="#f5f5f5"/>
+              ${content}
+            </pattern>
+          </defs>
+          <rect width="60" height="60" fill="url(#p-${key})"/>
+        </svg>`;
+        return `<button class="pattern-btn ${state.pattern === key ? 'active' : ''}" data-pattern="${key}" title="${pattern.name}">${svg}</button>`;
+      }).join('');
+    }
+    
+    // Events: Pattern selection
+    patternGrid.addEventListener('click', (e) => {
+      const btn = e.target.closest('.pattern-btn');
+      if (!btn) return;
+      
+      state.pattern = btn.dataset.pattern;
+      document.querySelectorAll('.pattern-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render();
+    });
+    
+    // Events: Colors
+    document.getElementById('fgColor').addEventListener('input', (e) => {
+      state.fg = e.target.value;
+      document.getElementById('fgHex').value = e.target.value;
+      renderPatternGrid();
+      render();
+    });
+    
+    document.getElementById('fgHex').addEventListener('change', (e) => {
+      if (/^#[0-9a-fA-F]{6}$/.test(e.target.value)) {
+        state.fg = e.target.value;
+        document.getElementById('fgColor').value = e.target.value;
+        renderPatternGrid();
+        render();
+      }
+    });
+    
+    document.getElementById('bgColor').addEventListener('input', (e) => {
+      state.bg = e.target.value;
+      document.getElementById('bgHex').value = e.target.value;
+      render();
+    });
+    
+    document.getElementById('bgHex').addEventListener('change', (e) => {
+      if (/^#[0-9a-fA-F]{6}$/.test(e.target.value)) {
+        state.bg = e.target.value;
+        document.getElementById('bgColor').value = e.target.value;
+        render();
+      }
+    });
+    
+    // Events: Sliders
+    document.getElementById('scale').addEventListener('input', (e) => {
+      state.scale = parseInt(e.target.value);
+      document.getElementById('scaleValue').textContent = state.scale + 'px';
+      render();
+    });
+    
+    document.getElementById('stroke').addEventListener('input', (e) => {
+      state.stroke = parseInt(e.target.value);
+      document.getElementById('strokeValue').textContent = state.stroke + 'px';
+      render();
+    });
+    
+    document.getElementById('opacity').addEventListener('input', (e) => {
+      state.opacity = parseInt(e.target.value) / 100;
+      document.getElementById('opacityValue').textContent = e.target.value + '%';
+      render();
+    });
+    
+    // Events: Output tabs
+    document.querySelectorAll('.output-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.output-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab + 'Output').classList.add('active');
+      });
+    });
+    
+    // Events: Copy
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.dataset.copy;
+        const text = type === 'svg' ? buildSVG() : buildCSS();
+        navigator.clipboard.writeText(text);
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = `Copy ${type.toUpperCase()}`, 1500);
+      });
+    });
+    
+    // Events: Share
+    document.getElementById('shareBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(window.location.href);
+      const btn = document.getElementById('shareBtn');
+      const original = btn.innerHTML;
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+      setTimeout(() => btn.innerHTML = original, 1500);
+    });
+    
+    // Events: Download SVG
+    document.getElementById('downloadSvg').addEventListener('click', () => {
+      const svg = buildSVG();
+      const blob = new Blob([svg], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = `pattern-${state.pattern}.svg`;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+    
+    // Events: Download PNG
+    document.getElementById('downloadPng').addEventListener('click', () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+      
+      // Fill background
+      ctx.fillStyle = state.bg;
+      ctx.fillRect(0, 0, 512, 512);
+      
+      // Draw pattern
+      const svg = buildSVG();
+      const img = new Image();
+      const blob = new Blob([svg], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      
+      img.onload = () => {
+        const pattern = ctx.createPattern(img, 'repeat');
+        ctx.fillStyle = pattern;
+        ctx.fillRect(0, 0, 512, 512);
+        
+        const link = document.createElement('a');
+        link.download = `pattern-${state.pattern}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    });
+    
+    // Events: Random
+    document.getElementById('randomBtn').addEventListener('click', () => {
+      const patternKeys = Object.keys(patterns);
+      state.pattern = patternKeys[Math.floor(Math.random() * patternKeys.length)];
+      
+      const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#ef4444', '#f97316', '#22c55e', '#06b6d4', '#3b82f6', '#1e1b4b', '#0f172a'];
+      state.fg = colors[Math.floor(Math.random() * colors.length)];
+      
+      state.scale = 10 + Math.floor(Math.random() * 30);
+      state.stroke = 1 + Math.floor(Math.random() * 5);
+      state.opacity = 0.5 + Math.random() * 0.5;
+      
+      // Update UI
+      document.getElementById('fgColor').value = state.fg;
+      document.getElementById('fgHex').value = state.fg;
+      document.getElementById('scale').value = state.scale;
+      document.getElementById('scaleValue').textContent = state.scale + 'px';
+      document.getElementById('stroke').value = state.stroke;
+      document.getElementById('strokeValue').textContent = state.stroke + 'px';
+      document.getElementById('opacity').value = Math.round(state.opacity * 100);
+      document.getElementById('opacityValue').textContent = Math.round(state.opacity * 100) + '%';
+      
+      renderPatternGrid();
+      render();
+    });
+    
+    // URL state
+    function updateURL() {
+      const params = new URLSearchParams();
+      params.set('p', state.pattern);
+      params.set('fg', state.fg.slice(1));
+      params.set('bg', state.bg.slice(1));
+      params.set('s', state.scale);
+      params.set('st', state.stroke);
+      params.set('o', Math.round(state.opacity * 100));
+      
+      history.replaceState(null, '', `${location.pathname}?${params}`);
+    }
+    
+    function loadFromURL() {
+      const params = new URLSearchParams(location.search);
+      
+      if (params.has('p') && patterns[params.get('p')]) {
+        state.pattern = params.get('p');
+      }
+      if (params.has('fg')) {
+        state.fg = '#' + params.get('fg');
+        document.getElementById('fgColor').value = state.fg;
+        document.getElementById('fgHex').value = state.fg;
+      }
+      if (params.has('bg')) {
+        state.bg = '#' + params.get('bg');
+        document.getElementById('bgColor').value = state.bg;
+        document.getElementById('bgHex').value = state.bg;
+      }
+      if (params.has('s')) {
+        state.scale = parseInt(params.get('s'));
+        document.getElementById('scale').value = state.scale;
+        document.getElementById('scaleValue').textContent = state.scale + 'px';
+      }
+      if (params.has('st')) {
+        state.stroke = parseInt(params.get('st'));
+        document.getElementById('stroke').value = state.stroke;
+        document.getElementById('strokeValue').textContent = state.stroke + 'px';
+      }
+      if (params.has('o')) {
+        state.opacity = parseInt(params.get('o')) / 100;
+        document.getElementById('opacity').value = Math.round(state.opacity * 100);
+        document.getElementById('opacityValue').textContent = Math.round(state.opacity * 100) + '%';
+      }
+    }
+    
+    // Render color presets
+    function renderColorPresets() {
+      document.getElementById('colorPresets').innerHTML = colorPresets.map((preset, i) => `
+        <button class="color-preset" data-preset="${i}" title="${preset.name}">
+          <span class="fg" style="background: ${preset.fg}"></span>
+          <span class="bg" style="background: ${preset.bg}"></span>
+        </button>
+      `).join('');
+    }
+    
+    // Event: Color presets
+    document.getElementById('colorPresets').addEventListener('click', (e) => {
+      const btn = e.target.closest('.color-preset');
+      if (!btn) return;
+      
+      const preset = colorPresets[parseInt(btn.dataset.preset)];
+      state.fg = preset.fg;
+      state.bg = preset.bg;
+      
+      document.getElementById('fgColor').value = state.fg;
+      document.getElementById('fgHex').value = state.fg;
+      document.getElementById('bgColor').value = state.bg;
+      document.getElementById('bgHex').value = state.bg;
+      
+      renderPatternGrid();
+      render();
+    });
+    
+    // Init
+    loadFromURL();
+    renderColorPresets();
+    renderPatternGrid();
+    render();
+  </script>
+</body>
+</html>

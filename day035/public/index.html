@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gradient Generator — Alkemist</title>
+  <meta name="description" content="Create beautiful CSS gradients visually. Linear, radial, and conic gradients with live preview.">
+  <meta property="og:title" content="Gradient Generator — Alkemist">
+  <meta property="og:description" content="Create beautiful CSS gradients visually. Linear, radial, and conic gradients with live preview.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://day035.aikemist.com">
+  <meta property="og:image" content="https://day035.aikemist.com/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://day035.aikemist.com/og-image.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text: #0a0a0a;
+      --text-secondary: #666666;
+      --border: #e0e0e0;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --card-bg: #ffffff;
+      --code-bg: #1a1a2e;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --bg-secondary: #141414;
+      --text: #ffffff;
+      --text-secondary: #999999;
+      --border: #2a2a2a;
+      --card-bg: #141414;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+    
+    .logo svg {
+      width: 32px;
+      height: 32px;
+    }
+    
+    .logo span {
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .icon-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .icon-btn:hover {
+      background: var(--border);
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 2rem;
+    }
+    
+    @media (max-width: 1024px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .preview-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .preview-box {
+      aspect-ratio: 16/9;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .preview-inner {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .controls-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .control-label {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .type-tabs {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .type-tab {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    
+    .type-tab:hover {
+      background: var(--border);
+    }
+    
+    .type-tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+    
+    .preset-btn {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .preset-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .preset-btn.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+    }
+    
+    .direction-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+    
+    .direction-btn {
+      padding: 0.5rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    
+    .direction-btn:hover:not(:disabled) {
+      background: var(--border);
+    }
+    
+    .direction-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .slider-row input[type="range"] {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      appearance: none;
+      cursor: pointer;
+    }
+    
+    .slider-row input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+    }
+    
+    .slider-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      min-width: 50px;
+      text-align: right;
+      color: var(--text-secondary);
+    }
+    
+    .color-stops {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .gradient-bar {
+      height: 24px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+    
+    .gradient-bar-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 7px;
+    }
+    
+    .stop-marker {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      cursor: grab;
+    }
+    
+    .stop-marker:active {
+      cursor: grabbing;
+    }
+    
+    .color-stop {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+    }
+    
+    .color-stop input[type="color"] {
+      width: 40px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: none;
+    }
+    
+    .color-stop input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    
+    .color-stop input[type="color"]::-webkit-color-swatch {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    
+    .color-stop input[type="range"] {
+      flex: 1;
+      height: 4px;
+    }
+    
+    .color-stop .position {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      min-width: 35px;
+      color: var(--text-secondary);
+    }
+    
+    .color-stop .remove-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 0.25rem;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+    
+    .color-stop .remove-btn:hover {
+      opacity: 1;
+      color: #ef4444;
+    }
+    
+    .add-stop-btn {
+      padding: 0.75rem;
+      background: var(--bg-secondary);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+    
+    .add-stop-btn:hover {
+      border-style: solid;
+      color: var(--text);
+    }
+    
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+    }
+    
+    .toggle-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    
+    .toggle-label {
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+    
+    .hint {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: var(--bg-secondary);
+      border-radius: 6px;
+      border-left: 3px solid var(--accent);
+    }
+    
+    .position-select {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+    
+    .position-btn {
+      padding: 0.5rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    
+    .position-btn:hover {
+      background: var(--border);
+    }
+    
+    .position-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    .output-section {
+      background: var(--code-bg);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .output-label {
+      font-size: 0.85rem;
+      color: #888;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .copy-btn {
+      padding: 0.4rem 0.75rem;
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .copy-btn:hover {
+      background: var(--accent-hover);
+    }
+    
+    .output-code {
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: #e0e0e0;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    
+    .output-code .property {
+      color: #9cdcfe;
+    }
+    
+    .output-code .value {
+      color: #ce9178;
+    }
+    
+    .actions-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .action-btn {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    
+    .action-btn:hover {
+      background: var(--border);
+    }
+    
+    .action-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    .action-btn.primary:hover {
+      background: var(--accent-hover);
+    }
+    
+    footer {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    
+    footer a:hover {
+      color: var(--text);
+    }
+    
+    @media (max-width: 640px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      h1 {
+        font-size: 1.75rem;
+      }
+      
+      .presets-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="https://aikemist.com" class="logo">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#6366f1"/>
+              <stop offset="100%" style="stop-color:#8b5cf6"/>
+            </linearGradient>
+          </defs>
+          <rect width="100" height="100" rx="20" fill="url(#logoGrad)"/>
+          <path d="M30 70L50 30L70 70" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="50" cy="58" r="6" fill="white"/>
+        </svg>
+        <span>Alkemist</span>
+      </a>
+      <div class="header-actions">
+        <button class="icon-btn" id="randomBtn" title="Random gradient">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>
+          </svg>
+        </button>
+        <button class="icon-btn" id="themeToggle" title="Toggle theme">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+    
+    <h1>Gradient Generator</h1>
+    <p class="subtitle">Linear, radial, and conic gradients — with repeating patterns.</p>
+    
+    <div class="main-layout">
+      <div class="preview-section">
+        <div class="preview-box">
+          <div class="preview-inner" id="preview"></div>
+        </div>
+        
+        <div class="output-section">
+          <div class="output-header">
+            <span class="output-label">CSS</span>
+            <button class="copy-btn" id="copyBtn">Copy</button>
+          </div>
+          <div class="output-code" id="cssOutput"></div>
+        </div>
+        
+        <div class="actions-row">
+          <button class="action-btn" id="shareBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+              <polyline points="16 6 12 2 8 6"/>
+              <line x1="12" y1="2" x2="12" y2="15"/>
+            </svg>
+            Share
+          </button>
+          <button class="action-btn primary" id="downloadBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download PNG
+          </button>
+        </div>
+      </div>
+      
+      <div class="controls-section">
+        <div class="control-group">
+          <span class="control-label">Type</span>
+          <div class="type-tabs">
+            <button class="type-tab active" data-type="linear">Linear</button>
+            <button class="type-tab" data-type="radial">Radial</button>
+            <button class="type-tab" data-type="conic">Conic</button>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <span class="control-label">Presets</span>
+          <div class="presets-grid" id="presets"></div>
+        </div>
+        
+        <div class="control-group" id="angleGroup">
+          <span class="control-label">Direction</span>
+          <div class="direction-grid" id="directionGrid">
+            <button class="direction-btn" data-angle="315" title="↖ Top Left">↖</button>
+            <button class="direction-btn" data-angle="0" title="↑ Top">↑</button>
+            <button class="direction-btn" data-angle="45" title="↗ Top Right">↗</button>
+            <button class="direction-btn" data-angle="270" title="← Left">←</button>
+            <button class="direction-btn" data-angle="" title="Custom" disabled style="opacity:0.3">●</button>
+            <button class="direction-btn" data-angle="90" title="→ Right">→</button>
+            <button class="direction-btn" data-angle="225" title="↙ Bottom Left">↙</button>
+            <button class="direction-btn" data-angle="180" title="↓ Bottom">↓</button>
+            <button class="direction-btn active" data-angle="135" title="↘ Bottom Right">↘</button>
+          </div>
+          <div class="slider-row" style="margin-top: 0.75rem;">
+            <input type="range" id="angle" min="0" max="360" value="135">
+            <span class="slider-value" id="angleValue">135°</span>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <label class="toggle-row">
+            <input type="checkbox" id="repeating">
+            <span class="toggle-label">Repeating gradient</span>
+          </label>
+          <p class="hint" id="repeatHint" style="display: none;">Tip: For best patterns, keep stops under 50%</p>
+        </div>
+        
+        <div class="control-group" id="positionGroup" style="display: none;">
+          <span class="control-label">Position</span>
+          <div class="position-select">
+            <button class="position-btn" data-pos="top left">↖</button>
+            <button class="position-btn" data-pos="top">↑</button>
+            <button class="position-btn" data-pos="top right">↗</button>
+            <button class="position-btn" data-pos="left">←</button>
+            <button class="position-btn active" data-pos="center">●</button>
+            <button class="position-btn" data-pos="right">→</button>
+            <button class="position-btn" data-pos="bottom left">↙</button>
+            <button class="position-btn" data-pos="bottom">↓</button>
+            <button class="position-btn" data-pos="bottom right">↘</button>
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <span class="control-label">Color Stops</span>
+          <div class="gradient-bar" id="gradientBar">
+            <div class="gradient-bar-inner" id="gradientBarInner"></div>
+          </div>
+          <div class="color-stops" id="colorStops"></div>
+          <button class="add-stop-btn" id="addStop">+ Add Color Stop</button>
+        </div>
+      </div>
+    </div>
+    
+    <footer>
+      <a href="https://aikemist.com">aikemist.com</a>
+      <span>·</span>
+      <span>Made by</span>
+      <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+  </div>
+  
+  <script>
+    // State
+    let state = {
+      type: 'linear',
+      angle: 135,
+      position: 'center',
+      repeating: false,
+      stops: [
+        { color: '#6366f1', position: 0 },
+        { color: '#8b5cf6', position: 50 },
+        { color: '#ec4899', position: 100 }
+      ]
+    };
+    
+    // Presets
+    const presets = [
+      { name: 'Sunset', stops: [{ color: '#f97316', position: 0 }, { color: '#ec4899', position: 50 }, { color: '#8b5cf6', position: 100 }] },
+      { name: 'Ocean', stops: [{ color: '#06b6d4', position: 0 }, { color: '#3b82f6', position: 50 }, { color: '#6366f1', position: 100 }] },
+      { name: 'Forest', stops: [{ color: '#22c55e', position: 0 }, { color: '#14b8a6', position: 50 }, { color: '#06b6d4', position: 100 }] },
+      { name: 'Fire', stops: [{ color: '#fbbf24', position: 0 }, { color: '#f97316', position: 50 }, { color: '#ef4444', position: 100 }] },
+      { name: 'Berry', stops: [{ color: '#ec4899', position: 0 }, { color: '#8b5cf6', position: 50 }, { color: '#6366f1', position: 100 }] },
+      { name: 'Mint', stops: [{ color: '#a7f3d0', position: 0 }, { color: '#6ee7b7', position: 50 }, { color: '#34d399', position: 100 }] },
+      { name: 'Night', stops: [{ color: '#1e1b4b', position: 0 }, { color: '#312e81', position: 50 }, { color: '#4338ca', position: 100 }] },
+      { name: 'Peach', stops: [{ color: '#fef3c7', position: 0 }, { color: '#fde68a', position: 50 }, { color: '#fbbf24', position: 100 }] },
+    ];
+    
+    // DOM elements
+    const preview = document.getElementById('preview');
+    const cssOutput = document.getElementById('cssOutput');
+    const colorStopsContainer = document.getElementById('colorStops');
+    const presetsContainer = document.getElementById('presets');
+    const angleSlider = document.getElementById('angle');
+    const angleValue = document.getElementById('angleValue');
+    const angleGroup = document.getElementById('angleGroup');
+    const positionGroup = document.getElementById('positionGroup');
+    
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    let darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (darkMode) document.documentElement.setAttribute('data-theme', 'dark');
+    
+    themeToggle.addEventListener('click', () => {
+      darkMode = !darkMode;
+      document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    });
+    
+    // Build gradient CSS
+    function buildGradient() {
+      const stops = state.stops
+        .sort((a, b) => a.position - b.position)
+        .map(s => `${s.color} ${s.position}%`)
+        .join(', ');
+      
+      const prefix = state.repeating ? 'repeating-' : '';
+      
+      switch (state.type) {
+        case 'linear':
+          return `${prefix}linear-gradient(${state.angle}deg, ${stops})`;
+        case 'radial':
+          return `${prefix}radial-gradient(circle at ${state.position}, ${stops})`;
+        case 'conic':
+          return `${prefix}conic-gradient(from ${state.angle}deg at ${state.position}, ${stops})`;
+      }
+    }
+    
+    // Update preview and output
+    function render() {
+      const gradient = buildGradient();
+      preview.style.background = gradient;
+      
+      cssOutput.innerHTML = `<span class="property">background</span>: <span class="value">${gradient}</span>;`;
+      
+      // Update gradient bar
+      const barGradient = state.stops
+        .sort((a, b) => a.position - b.position)
+        .map(s => `${s.color} ${s.position}%`)
+        .join(', ');
+      document.getElementById('gradientBarInner').style.background = `linear-gradient(90deg, ${barGradient})`;
+      
+      renderColorStops();
+      updateURL();
+    }
+    
+    // Render color stops
+    function renderColorStops() {
+      colorStopsContainer.innerHTML = state.stops.map((stop, i) => `
+        <div class="color-stop" data-index="${i}">
+          <input type="color" value="${stop.color}" data-action="color">
+          <input type="range" min="0" max="100" value="${stop.position}" data-action="position">
+          <span class="position">${stop.position}%</span>
+          <button class="remove-btn" data-action="remove" ${state.stops.length <= 2 ? 'disabled style="visibility:hidden"' : ''}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      `).join('');
+    }
+    
+    // Render presets
+    function renderPresets() {
+      presetsContainer.innerHTML = presets.map((preset, i) => {
+        const grad = preset.stops.map(s => `${s.color} ${s.position}%`).join(', ');
+        return `<button class="preset-btn" data-preset="${i}" style="background: linear-gradient(135deg, ${grad})" title="${preset.name}"></button>`;
+      }).join('');
+    }
+    
+    // Event: Type tabs
+    document.querySelectorAll('.type-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.type-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        state.type = tab.dataset.type;
+        
+        // Show/hide controls based on type
+        if (state.type === 'linear') {
+          angleGroup.style.display = 'flex';
+          positionGroup.style.display = 'none';
+        } else if (state.type === 'radial') {
+          angleGroup.style.display = 'none';
+          positionGroup.style.display = 'flex';
+        } else {
+          angleGroup.style.display = 'flex';
+          positionGroup.style.display = 'flex';
+        }
+        
+        render();
+      });
+    });
+    
+    // Event: Angle slider
+    angleSlider.addEventListener('input', (e) => {
+      state.angle = parseInt(e.target.value);
+      angleValue.textContent = state.angle + '°';
+      updateDirectionButtons();
+      render();
+    });
+    
+    // Event: Direction buttons
+    document.querySelectorAll('.direction-btn[data-angle]').forEach(btn => {
+      if (btn.dataset.angle === '') return;
+      btn.addEventListener('click', () => {
+        state.angle = parseInt(btn.dataset.angle);
+        angleSlider.value = state.angle;
+        angleValue.textContent = state.angle + '°';
+        updateDirectionButtons();
+        render();
+      });
+    });
+    
+    function updateDirectionButtons() {
+      document.querySelectorAll('.direction-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.angle === String(state.angle));
+      });
+    }
+    
+    // Event: Repeating toggle
+    document.getElementById('repeating').addEventListener('change', (e) => {
+      state.repeating = e.target.checked;
+      document.getElementById('repeatHint').style.display = state.repeating ? 'block' : 'none';
+      render();
+    });
+    
+    // Event: Position buttons
+    document.querySelectorAll('.position-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.position-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.position = btn.dataset.pos;
+        render();
+      });
+    });
+    
+    // Event: Presets
+    presetsContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('.preset-btn');
+      if (!btn) return;
+      
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const preset = presets[parseInt(btn.dataset.preset)];
+      state.stops = JSON.parse(JSON.stringify(preset.stops));
+      render();
+    });
+    
+    // Event: Color stops
+    colorStopsContainer.addEventListener('input', (e) => {
+      const stop = e.target.closest('.color-stop');
+      if (!stop) return;
+      const index = parseInt(stop.dataset.index);
+      const action = e.target.dataset.action;
+      
+      if (action === 'color') {
+        state.stops[index].color = e.target.value;
+      } else if (action === 'position') {
+        state.stops[index].position = parseInt(e.target.value);
+        stop.querySelector('.position').textContent = e.target.value + '%';
+      }
+      
+      render();
+    });
+    
+    colorStopsContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action="remove"]');
+      if (!btn || state.stops.length <= 2) return;
+      
+      const stop = btn.closest('.color-stop');
+      const index = parseInt(stop.dataset.index);
+      state.stops.splice(index, 1);
+      render();
+    });
+    
+    // Event: Add color stop
+    document.getElementById('addStop').addEventListener('click', () => {
+      if (state.stops.length >= 8) return;
+      
+      // Find a good position for new stop
+      const positions = state.stops.map(s => s.position).sort((a, b) => a - b);
+      let newPos = 50;
+      for (let i = 0; i < positions.length - 1; i++) {
+        const gap = positions[i + 1] - positions[i];
+        if (gap >= 20) {
+          newPos = Math.round(positions[i] + gap / 2);
+          break;
+        }
+      }
+      
+      // Random color
+      const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#ef4444', '#f97316', '#22c55e', '#06b6d4', '#3b82f6'];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      
+      state.stops.push({ color, position: newPos });
+      render();
+    });
+    
+    // Event: Copy
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      const css = `background: ${buildGradient()};`;
+      navigator.clipboard.writeText(css);
+      
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+    });
+    
+    // Event: Share
+    document.getElementById('shareBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(window.location.href);
+      
+      const btn = document.getElementById('shareBtn');
+      const original = btn.innerHTML;
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+      setTimeout(() => btn.innerHTML = original, 1500);
+    });
+    
+    // Event: Download PNG
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1920;
+      canvas.height = 1080;
+      const ctx = canvas.getContext('2d');
+      
+      // Create gradient
+      let gradient;
+      if (state.type === 'linear') {
+        const rad = state.angle * Math.PI / 180;
+        const x1 = canvas.width / 2 - Math.cos(rad) * canvas.width;
+        const y1 = canvas.height / 2 - Math.sin(rad) * canvas.height;
+        const x2 = canvas.width / 2 + Math.cos(rad) * canvas.width;
+        const y2 = canvas.height / 2 + Math.sin(rad) * canvas.height;
+        gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+      } else if (state.type === 'radial') {
+        const posMap = {
+          'top left': [0, 0], 'top': [canvas.width/2, 0], 'top right': [canvas.width, 0],
+          'left': [0, canvas.height/2], 'center': [canvas.width/2, canvas.height/2], 'right': [canvas.width, canvas.height/2],
+          'bottom left': [0, canvas.height], 'bottom': [canvas.width/2, canvas.height], 'bottom right': [canvas.width, canvas.height]
+        };
+        const [cx, cy] = posMap[state.position] || [canvas.width/2, canvas.height/2];
+        const radius = Math.max(canvas.width, canvas.height);
+        gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+      } else {
+        // Conic — fallback to linear for canvas
+        const rad = state.angle * Math.PI / 180;
+        gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      }
+      
+      state.stops.forEach(stop => {
+        gradient.addColorStop(stop.position / 100, stop.color);
+      });
+      
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      const link = document.createElement('a');
+      link.download = 'gradient.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+    
+    // Event: Random
+    document.getElementById('randomBtn').addEventListener('click', () => {
+      const types = ['linear', 'radial', 'conic'];
+      state.type = types[Math.floor(Math.random() * types.length)];
+      state.angle = Math.floor(Math.random() * 360);
+      
+      const positions = ['top left', 'top', 'top right', 'left', 'center', 'right', 'bottom left', 'bottom', 'bottom right'];
+      state.position = positions[Math.floor(Math.random() * positions.length)];
+      
+      // Random 2-4 color stops
+      const numStops = 2 + Math.floor(Math.random() * 3);
+      const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#ef4444', '#f97316', '#fbbf24', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6', '#a855f7', '#f43f5e'];
+      state.stops = [];
+      for (let i = 0; i < numStops; i++) {
+        state.stops.push({
+          color: colors[Math.floor(Math.random() * colors.length)],
+          position: Math.round(i * 100 / (numStops - 1))
+        });
+      }
+      
+      // Update UI
+      document.querySelectorAll('.type-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`[data-type="${state.type}"]`).classList.add('active');
+      angleSlider.value = state.angle;
+      angleValue.textContent = state.angle + '°';
+      document.querySelectorAll('.position-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.pos === state.position);
+      });
+      
+      if (state.type === 'linear') {
+        angleGroup.style.display = 'flex';
+        positionGroup.style.display = 'none';
+      } else if (state.type === 'radial') {
+        angleGroup.style.display = 'none';
+        positionGroup.style.display = 'flex';
+      } else {
+        angleGroup.style.display = 'flex';
+        positionGroup.style.display = 'flex';
+      }
+      
+      render();
+    });
+    
+    // URL state
+    function updateURL() {
+      const params = new URLSearchParams();
+      params.set('t', state.type);
+      params.set('a', state.angle);
+      params.set('p', state.position);
+      if (state.repeating) params.set('r', '1');
+      params.set('s', state.stops.map(s => `${s.color.slice(1)}-${s.position}`).join('_'));
+      
+      const url = `${location.pathname}?${params}`;
+      history.replaceState(null, '', url);
+    }
+    
+    function loadFromURL() {
+      const params = new URLSearchParams(location.search);
+      
+      if (params.has('t')) {
+        state.type = params.get('t');
+        document.querySelectorAll('.type-tab').forEach(t => {
+          t.classList.toggle('active', t.dataset.type === state.type);
+        });
+      }
+      
+      if (params.has('a')) {
+        state.angle = parseInt(params.get('a'));
+        angleSlider.value = state.angle;
+        angleValue.textContent = state.angle + '°';
+      }
+      
+      if (params.has('p')) {
+        state.position = params.get('p');
+        document.querySelectorAll('.position-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.pos === state.position);
+        });
+      }
+      
+      if (params.has('r')) {
+        state.repeating = params.get('r') === '1';
+        document.getElementById('repeating').checked = state.repeating;
+      }
+      
+      if (params.has('s')) {
+        const stops = params.get('s').split('_').map(s => {
+          const [color, position] = s.split('-');
+          return { color: '#' + color, position: parseInt(position) };
+        });
+        if (stops.length >= 2) state.stops = stops;
+      }
+      
+      // Update UI visibility
+      if (state.type === 'linear') {
+        angleGroup.style.display = 'flex';
+        positionGroup.style.display = 'none';
+      } else if (state.type === 'radial') {
+        angleGroup.style.display = 'none';
+        positionGroup.style.display = 'flex';
+      } else {
+        angleGroup.style.display = 'flex';
+        positionGroup.style.display = 'flex';
+      }
+    }
+    
+    // Init
+    renderPresets();
+    loadFromURL();
+    render();
+  </script>
+</body>
+</html>

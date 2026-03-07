@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Cursor Generator — Alkemist</title>
+  <meta name="description" content="Preview and generate CSS cursor styles. Built-in cursors and custom cursor support.">
+  <meta property="og:title" content="CSS Cursor Generator — Alkemist">
+  <meta property="og:description" content="Preview and generate CSS cursor styles. Built-in cursors and custom cursor support.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://day038.aikemist.com">
+  <meta property="og:image" content="https://day038.aikemist.com/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text: #0a0a0a;
+      --text-secondary: #666666;
+      --border: #e0e0e0;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --card-bg: #ffffff;
+      --code-bg: #1a1a2e;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --bg-secondary: #141414;
+      --text: #ffffff;
+      --text-secondary: #999999;
+      --border: #2a2a2a;
+      --card-bg: #141414;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+    
+    .logo svg {
+      width: 32px;
+      height: 32px;
+    }
+    
+    .logo span {
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+    
+    .icon-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .icon-btn:hover {
+      background: var(--border);
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+    
+    .cursors-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    
+    .cursor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 0.75rem;
+    }
+    
+    .cursor-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem 0.5rem;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    
+    .cursor-btn:hover {
+      border-color: var(--accent);
+    }
+    
+    .cursor-btn.active {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+    
+    .cursor-btn .icon {
+      font-size: 1.5rem;
+    }
+    
+    .preview-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .preview-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 3rem;
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    
+    .preview-box p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+    }
+    
+    .output-section {
+      background: var(--code-bg);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .output-label {
+      font-size: 0.85rem;
+      color: #888;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .copy-btn {
+      padding: 0.4rem 0.75rem;
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .copy-btn:hover {
+      background: var(--accent-hover);
+    }
+    
+    .output-code {
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #e0e0e0;
+    }
+    
+    .output-code .property {
+      color: #9cdcfe;
+    }
+    
+    .output-code .value {
+      color: #ce9178;
+    }
+    
+    .reference-section {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    
+    .reference-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .reference-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: var(--bg);
+      border-radius: 8px;
+    }
+    
+    .reference-item .cursor-demo {
+      width: 40px;
+      height: 40px;
+      background: var(--border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .reference-item code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+    
+    footer {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    
+    footer a:hover {
+      color: var(--text);
+    }
+    
+    @media (max-width: 640px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      h1 {
+        font-size: 1.75rem;
+      }
+      
+      .cursor-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="https://aikemist.com" class="logo">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#6366f1"/>
+              <stop offset="100%" style="stop-color:#8b5cf6"/>
+            </linearGradient>
+          </defs>
+          <rect width="100" height="100" rx="20" fill="url(#logoGrad)"/>
+          <path d="M30 70L50 30L70 70" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="50" cy="58" r="6" fill="white"/>
+        </svg>
+        <span>Alkemist</span>
+      </a>
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+    </header>
+    
+    <h1>CSS Cursor Generator</h1>
+    <p class="subtitle">Preview and copy CSS cursor styles — all built-in cursors at a glance.</p>
+    
+    <div class="main-layout">
+      <div class="cursors-section">
+        <h3 class="section-title">Select Cursor</h3>
+        <div class="cursor-grid" id="cursorGrid"></div>
+      </div>
+      
+      <div class="preview-section">
+        <h3 class="section-title">Preview</h3>
+        <div class="preview-box" id="previewBox">
+          <p>Move your cursor here<br>to preview the selected style</p>
+        </div>
+        
+        <div class="output-section">
+          <div class="output-header">
+            <span class="output-label">CSS</span>
+            <button class="copy-btn" id="copyBtn">Copy</button>
+          </div>
+          <div class="output-code" id="cssOutput"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="reference-section">
+      <h3 class="section-title">Cursor Categories</h3>
+      <div class="reference-grid">
+        <div class="reference-item">
+          <div class="cursor-demo" style="cursor: default">🖱️</div>
+          <div>
+            <code>General</code>
+            <div style="font-size: 0.8rem; color: var(--text-secondary)">default, none, auto</div>
+          </div>
+        </div>
+        <div class="reference-item">
+          <div class="cursor-demo" style="cursor: pointer">👆</div>
+          <div>
+            <code>Links & Actions</code>
+            <div style="font-size: 0.8rem; color: var(--text-secondary)">pointer, context-menu</div>
+          </div>
+        </div>
+        <div class="reference-item">
+          <div class="cursor-demo" style="cursor: wait">⏳</div>
+          <div>
+            <code>Status</code>
+            <div style="font-size: 0.8rem; color: var(--text-secondary)">wait, progress, help</div>
+          </div>
+        </div>
+        <div class="reference-item">
+          <div class="cursor-demo" style="cursor: text">📝</div>
+          <div>
+            <code>Selection</code>
+            <div style="font-size: 0.8rem; color: var(--text-secondary)">text, crosshair, cell</div>
+          </div>
+        </div>
+        <div class="reference-item">
+          <div class="cursor-demo" style="cursor: grab">✊</div>
+          <div>
+            <code>Drag & Drop</code>
+            <div style="font-size: 0.8rem; color: var(--text-secondary)">grab, grabbing, move</div>
+          </div>
+        </div>
+        <div class="reference-item">
+          <div class="cursor-demo" style="cursor: zoom-in">🔍</div>
+          <div>
+            <code>Zoom</code>
+            <div style="font-size: 0.8rem; color: var(--text-secondary)">zoom-in, zoom-out</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <footer>
+      <a href="https://aikemist.com">aikemist.com</a>
+      <span>·</span>
+      <span>Made by</span>
+      <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+  </div>
+  
+  <script>
+    // All CSS cursors
+    const cursors = [
+      // General
+      { name: 'default', icon: '🖱️', category: 'general' },
+      { name: 'auto', icon: '🔄', category: 'general' },
+      { name: 'none', icon: '🚫', category: 'general' },
+      
+      // Links & Actions
+      { name: 'pointer', icon: '👆', category: 'action' },
+      { name: 'context-menu', icon: '📋', category: 'action' },
+      { name: 'help', icon: '❓', category: 'action' },
+      
+      // Status
+      { name: 'wait', icon: '⏳', category: 'status' },
+      { name: 'progress', icon: '⏱️', category: 'status' },
+      { name: 'not-allowed', icon: '🚷', category: 'status' },
+      
+      // Selection
+      { name: 'text', icon: '📝', category: 'selection' },
+      { name: 'vertical-text', icon: '📄', category: 'selection' },
+      { name: 'crosshair', icon: '➕', category: 'selection' },
+      { name: 'cell', icon: '📊', category: 'selection' },
+      
+      // Drag & Drop
+      { name: 'move', icon: '✥', category: 'drag' },
+      { name: 'grab', icon: '✊', category: 'drag' },
+      { name: 'grabbing', icon: '🤏', category: 'drag' },
+      { name: 'copy', icon: '📑', category: 'drag' },
+      { name: 'alias', icon: '↗️', category: 'drag' },
+      { name: 'no-drop', icon: '🚫', category: 'drag' },
+      
+      // Resize
+      { name: 'col-resize', icon: '↔️', category: 'resize' },
+      { name: 'row-resize', icon: '↕️', category: 'resize' },
+      { name: 'n-resize', icon: '⬆️', category: 'resize' },
+      { name: 's-resize', icon: '⬇️', category: 'resize' },
+      { name: 'e-resize', icon: '➡️', category: 'resize' },
+      { name: 'w-resize', icon: '⬅️', category: 'resize' },
+      { name: 'ne-resize', icon: '↗️', category: 'resize' },
+      { name: 'nw-resize', icon: '↖️', category: 'resize' },
+      { name: 'se-resize', icon: '↘️', category: 'resize' },
+      { name: 'sw-resize', icon: '↙️', category: 'resize' },
+      { name: 'ew-resize', icon: '↔️', category: 'resize' },
+      { name: 'ns-resize', icon: '↕️', category: 'resize' },
+      { name: 'nesw-resize', icon: '⤡', category: 'resize' },
+      { name: 'nwse-resize', icon: '⤢', category: 'resize' },
+      
+      // Zoom
+      { name: 'zoom-in', icon: '🔍', category: 'zoom' },
+      { name: 'zoom-out', icon: '🔎', category: 'zoom' },
+    ];
+    
+    // State
+    let selectedCursor = 'default';
+    
+    // DOM
+    const cursorGrid = document.getElementById('cursorGrid');
+    const previewBox = document.getElementById('previewBox');
+    const cssOutput = document.getElementById('cssOutput');
+    
+    // Theme
+    let darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (darkMode) document.documentElement.setAttribute('data-theme', 'dark');
+    
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      darkMode = !darkMode;
+      document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    });
+    
+    // Render cursors
+    function renderCursors() {
+      cursorGrid.innerHTML = cursors.map(c => `
+        <button class="cursor-btn ${c.name === selectedCursor ? 'active' : ''}" 
+                data-cursor="${c.name}" 
+                style="cursor: ${c.name}"
+                title="${c.name}">
+          <span class="icon">${c.icon}</span>
+          <span>${c.name}</span>
+        </button>
+      `).join('');
+    }
+    
+    // Update preview and output
+    function render() {
+      previewBox.style.cursor = selectedCursor;
+      cssOutput.innerHTML = `<span class="property">cursor</span>: <span class="value">${selectedCursor}</span>;`;
+    }
+    
+    // Events
+    cursorGrid.addEventListener('click', (e) => {
+      const btn = e.target.closest('.cursor-btn');
+      if (!btn) return;
+      
+      selectedCursor = btn.dataset.cursor;
+      
+      document.querySelectorAll('.cursor-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      render();
+    });
+    
+    // Copy
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(`cursor: ${selectedCursor};`);
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+    });
+    
+    // URL state
+    function updateURL() {
+      const url = `${location.pathname}?c=${selectedCursor}`;
+      history.replaceState(null, '', url);
+    }
+    
+    function loadFromURL() {
+      const params = new URLSearchParams(location.search);
+      if (params.has('c') && cursors.find(c => c.name === params.get('c'))) {
+        selectedCursor = params.get('c');
+      }
+    }
+    
+    // Update render to include URL
+    const originalRender = render;
+    render = function() {
+      previewBox.style.cursor = selectedCursor;
+      cssOutput.innerHTML = `<span class="property">cursor</span>: <span class="value">${selectedCursor}</span>;`;
+      updateURL();
+    };
+    
+    // Init
+    loadFromURL();
+    renderCursors();
+    render();
+  </script>
+</body>
+</html>

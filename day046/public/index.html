@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unix Timestamp Converter — Alkemist</title>
+    <meta name="description" content="Convert Unix timestamps to human-readable dates and back. Live clock, time ago, multiple formats, timezone support.">
+    <meta property="og:title" content="Unix Timestamp Converter — Alkemist">
+    <meta property="og:description" content="Convert Unix timestamps instantly. Live clock, relative times, multiple formats.">
+    <meta property="og:image" content="https://day046.aikemist.com/og.png">
+    <meta property="og:url" content="https://day046.aikemist.com">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱️</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #fafafa;
+            --bg-card: #ffffff;
+            --text: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e5e5e5;
+            --accent: #7c3aed;
+            --accent-light: #ede9fe;
+            --success: #22c55e;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --bg-card: #141414;
+            --text: #f5f5f5;
+            --text-muted: #888888;
+            --border: #2a2a2a;
+            --accent: #a78bfa;
+            --accent-light: #1e1b2e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.5rem;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent);
+        }
+
+        /* Live Clock Section */
+        .live-clock {
+            background: linear-gradient(135deg, var(--accent), #9333ea);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+        }
+
+        .live-clock-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .live-timestamp {
+            font-family: var(--mono);
+            font-size: clamp(1.75rem, 6vw, 2.75rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0.25rem 0.75rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .live-timestamp:hover {
+            transform: scale(1.02);
+            background: rgba(255,255,255,0.2);
+        }
+
+        .live-human {
+            font-size: 0.9rem;
+            opacity: 0.85;
+            margin-top: 0.75rem;
+            font-weight: 500;
+        }
+
+        .live-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.9); }
+        }
+
+        .copied-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .copied-badge.show {
+            opacity: 1;
+        }
+
+        /* Converter Sections */
+        .converter-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 640px) {
+            .converter-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.25rem;
+            }
+
+            .live-clock {
+                padding: 1.5rem 1rem;
+                border-radius: 12px;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .quick-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .shortcuts {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-group .btn {
+                width: 100%;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        input[type="text"],
+        input[type="datetime-local"] {
+            flex: 1;
+            font-family: var(--mono);
+            font-size: 1rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn {
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .result {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 80px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .result-value {
+            font-family: var(--mono);
+            font-size: 0.875rem;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .result-value:hover {
+            background: var(--accent-light);
+        }
+
+        .time-ago {
+            font-size: 1rem;
+            color: var(--accent);
+            font-weight: 600;
+            text-align: center;
+            padding: 0.75rem;
+            background: var(--accent-light);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Quick Timestamps */
+        .quick-section {
+            margin-bottom: 2rem;
+        }
+
+        .quick-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .quick-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.875rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--accent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .quick-item:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+        }
+
+        .quick-item:hover::before {
+            opacity: 0.05;
+        }
+
+        .quick-item:active {
+            transform: translateY(0);
+        }
+
+        .quick-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .quick-ts {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            position: relative;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text);
+            color: var(--bg);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Timezone Select */
+        .tz-select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--border);
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .pulse {
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        /* Keyboard shortcuts hint */
+        .shortcuts {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        kbd {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.15rem 0.4rem;
+            font-family: var(--mono);
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⏱️ Unix Timestamp</h1>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+        </header>
+
+        <!-- Live Clock -->
+        <div class="live-clock">
+            <div class="live-clock-label"><span class="live-dot"></span>Current Unix Timestamp</div>
+            <div class="live-timestamp" id="liveTimestamp" onclick="copyLive()" title="Click to copy">-</div>
+            <div class="live-human" id="liveHuman">-</div>
+            <div class="copied-badge" id="liveCopied">Copied!</div>
+        </div>
+
+        <!-- Converters -->
+        <div class="converter-grid">
+            <!-- Timestamp to Human -->
+            <div class="card">
+                <div class="card-title">Timestamp → Human</div>
+                <div class="input-group">
+                    <input type="text" id="tsInput" placeholder="Paste or type timestamp..." oninput="convertTimestamp()">
+                    <button class="btn btn-secondary" onclick="pasteNow()">Now</button>
+                </div>
+                <select class="tz-select" id="tzSelect1" onchange="convertTimestamp()">
+                    <option value="local">Local Time</option>
+                    <option value="UTC">UTC</option>
+                    <option value="America/New_York">New York</option>
+                    <option value="America/Los_Angeles">Los Angeles</option>
+                    <option value="Europe/London">London</option>
+                    <option value="Europe/Oslo">Oslo</option>
+                    <option value="Europe/Paris">Paris</option>
+                    <option value="Asia/Tokyo">Tokyo</option>
+                    <option value="Asia/Shanghai">Shanghai</option>
+                    <option value="Australia/Sydney">Sydney</option>
+                </select>
+                <div class="result" id="tsResult">
+                    <div style="color: var(--text-muted); text-align: center; padding: 1rem;">
+                        Enter a timestamp above
+                    </div>
+                </div>
+            </div>
+
+            <!-- Human to Timestamp -->
+            <div class="card">
+                <div class="card-title">Human → Timestamp</div>
+                <div class="input-group">
+                    <input type="datetime-local" id="dtInput" onchange="convertDatetime()">
+                    <button class="btn btn-secondary" onclick="setNow()">Now</button>
+                </div>
+                <select class="tz-select" id="tzSelect2" onchange="convertDatetime()">
+                    <option value="local">Local Time</option>
+                    <option value="UTC">UTC</option>
+                </select>
+                <div class="result" id="dtResult">
+                    <div style="color: var(--text-muted); text-align: center; padding: 1rem;">
+                        Select a date/time above
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Timestamps -->
+        <div class="quick-section">
+            <div class="quick-title">Notable Timestamps</div>
+            <div class="quick-grid" id="quickGrid"></div>
+        </div>
+
+        <!-- Shortcuts -->
+        <div class="shortcuts">
+            <span><kbd>N</kbd> Now</span>
+            <span><kbd>C</kbd> Copy</span>
+            <span><kbd>V</kbd> Paste & convert</span>
+            <span><kbd>T</kbd> Theme</span>
+        </div>
+
+        <footer>
+            <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+        </footer>
+    </div>
+
+    <div class="toast" id="toast">Copied!</div>
+
+    <script>
+        // Theme
+        function initTheme() {
+            const saved = localStorage.getItem('theme');
+            if (saved) {
+                document.documentElement.dataset.theme = saved;
+                updateThemeIcon();
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.dataset.theme = 'dark';
+                updateThemeIcon();
+            }
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.dataset.theme;
+            document.documentElement.dataset.theme = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', document.documentElement.dataset.theme);
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const btn = document.querySelector('.theme-toggle');
+            btn.textContent = document.documentElement.dataset.theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Live clock
+        function updateLiveClock() {
+            const now = Math.floor(Date.now() / 1000);
+            document.getElementById('liveTimestamp').textContent = now;
+            document.getElementById('liveHuman').textContent = new Date().toLocaleString('en-US', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+        }
+
+        function copyLive() {
+            const ts = document.getElementById('liveTimestamp').textContent;
+            navigator.clipboard.writeText(ts);
+            const badge = document.getElementById('liveCopied');
+            badge.classList.add('show');
+            setTimeout(() => badge.classList.remove('show'), 1500);
+            showToast(`Copied: ${ts}`);
+        }
+
+        // Timestamp to Human
+        function convertTimestamp() {
+            const input = document.getElementById('tsInput').value.trim();
+            const result = document.getElementById('tsResult');
+            const tz = document.getElementById('tzSelect1').value;
+
+            if (!input) {
+                result.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 1rem; font-size: 0.875rem;">Paste a Unix timestamp (seconds or milliseconds)</div>';
+                return;
+            }
+
+            let ts = parseInt(input);
+            if (isNaN(ts)) {
+                result.innerHTML = '<div style="color: #ef4444; text-align: center; padding: 1rem;">Invalid timestamp</div>';
+                return;
+            }
+
+            // Handle milliseconds
+            if (input.length === 13) {
+                ts = Math.floor(ts / 1000);
+            }
+
+            const date = new Date(ts * 1000);
+            if (isNaN(date.getTime())) {
+                result.innerHTML = '<div style="color: #ef4444; text-align: center; padding: 1rem;">Invalid timestamp</div>';
+                return;
+            }
+
+            const options = { 
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit',
+                hour12: false
+            };
+            if (tz !== 'local') {
+                options.timeZone = tz;
+            }
+
+            const formatted = date.toLocaleString('en-US', options);
+            const iso = date.toISOString();
+            const rfc = date.toUTCString();
+            const timeAgo = getTimeAgo(date);
+
+            result.innerHTML = `
+                <div class="time-ago">${timeAgo}</div>
+                <div class="result-row">
+                    <span class="result-label">Local</span>
+                    <span class="result-value" onclick="copy('${formatted}')">${formatted}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">ISO 8601</span>
+                    <span class="result-value" onclick="copy('${iso}')">${iso}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">RFC 2822</span>
+                    <span class="result-value" onclick="copy('${rfc}')">${rfc}</span>
+                </div>
+            `;
+        }
+
+        // Human to Timestamp
+        function convertDatetime() {
+            const input = document.getElementById('dtInput').value;
+            const result = document.getElementById('dtResult');
+            const tz = document.getElementById('tzSelect2').value;
+
+            if (!input) {
+                result.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 1rem;">Select a date/time above</div>';
+                return;
+            }
+
+            let date;
+            if (tz === 'UTC') {
+                date = new Date(input + 'Z');
+            } else {
+                date = new Date(input);
+            }
+
+            const ts = Math.floor(date.getTime() / 1000);
+            const tsMs = date.getTime();
+            const timeAgo = getTimeAgo(date);
+
+            result.innerHTML = `
+                <div class="time-ago">${timeAgo}</div>
+                <div class="result-row">
+                    <span class="result-label">Unix (seconds)</span>
+                    <span class="result-value" onclick="copy('${ts}')">${ts}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Unix (ms)</span>
+                    <span class="result-value" onclick="copy('${tsMs}')">${tsMs}</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">ISO 8601</span>
+                    <span class="result-value" onclick="copy('${date.toISOString()}')">${date.toISOString()}</span>
+                </div>
+            `;
+        }
+
+        // Time ago
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diff = date - now;
+            const absDiff = Math.abs(diff);
+            const isPast = diff < 0;
+
+            const seconds = Math.floor(absDiff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            const months = Math.floor(days / 30);
+            const years = Math.floor(days / 365);
+
+            let text;
+            if (seconds < 60) text = `${seconds} second${seconds !== 1 ? 's' : ''}`;
+            else if (minutes < 60) text = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+            else if (hours < 24) text = `${hours} hour${hours !== 1 ? 's' : ''}`;
+            else if (days < 30) text = `${days} day${days !== 1 ? 's' : ''}`;
+            else if (months < 12) text = `${months} month${months !== 1 ? 's' : ''}`;
+            else text = `${years} year${years !== 1 ? 's' : ''}`;
+
+            return isPast ? `${text} ago` : `in ${text}`;
+        }
+
+        // Quick timestamps
+        const quickTimestamps = [
+            { name: 'Unix Epoch', ts: 0, desc: 'Jan 1, 1970' },
+            { name: 'Y2K', ts: 946684800, desc: 'Jan 1, 2000' },
+            { name: 'Bitcoin Genesis', ts: 1231006505, desc: 'Jan 3, 2009' },
+            { name: '32-bit Overflow', ts: 2147483647, desc: 'Jan 19, 2038' },
+            { name: '1 Billion', ts: 1000000000, desc: 'Sep 9, 2001' },
+            { name: '2 Billion', ts: 2000000000, desc: 'May 18, 2033' },
+            { name: 'Start of Hour', ts: () => Math.floor(Date.now() / 3600000) * 3600 },
+            { name: 'Midnight Today', ts: () => Math.floor(new Date().setHours(0,0,0,0) / 1000) },
+            { name: '24h Ago', ts: () => Math.floor(Date.now() / 1000) - 86400 },
+            { name: '+1 Hour', ts: () => Math.floor(Date.now() / 1000) + 3600 },
+            { name: '+24 Hours', ts: () => Math.floor(Date.now() / 1000) + 86400 },
+            { name: '+1 Week', ts: () => Math.floor(Date.now() / 1000) + 604800 },
+        ];
+
+        function initQuickTimestamps() {
+            const grid = document.getElementById('quickGrid');
+            grid.innerHTML = quickTimestamps.map(item => {
+                const ts = typeof item.ts === 'function' ? item.ts() : item.ts;
+                return `
+                    <div class="quick-item" onclick="useQuickTs(${ts})">
+                        <span class="quick-name">${item.name}</span>
+                        <span class="quick-ts">${ts}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function useQuickTs(ts) {
+            document.getElementById('tsInput').value = ts;
+            convertTimestamp();
+            copy(ts.toString());
+        }
+
+        // Helpers
+        function pasteNow() {
+            document.getElementById('tsInput').value = Math.floor(Date.now() / 1000);
+            convertTimestamp();
+        }
+
+        function setNow() {
+            const now = new Date();
+            const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+            document.getElementById('dtInput').value = local.toISOString().slice(0, 16);
+            convertDatetime();
+        }
+
+        function copy(text) {
+            navigator.clipboard.writeText(text);
+            showToast(`Copied: ${text.length > 25 ? text.slice(0, 22) + '...' : text}`);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', async (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+            
+            switch(e.key.toLowerCase()) {
+                case 'n':
+                    pasteNow();
+                    break;
+                case 'c':
+                    copyLive();
+                    break;
+                case 't':
+                    toggleTheme();
+                    break;
+                case 'v':
+                    try {
+                        const text = await navigator.clipboard.readText();
+                        document.getElementById('tsInput').value = text.trim();
+                        convertTimestamp();
+                        showToast('Pasted from clipboard');
+                    } catch (err) {
+                        showToast('Could not read clipboard');
+                    }
+                    break;
+            }
+        });
+
+        // Init
+        initTheme();
+        updateLiveClock();
+        setInterval(updateLiveClock, 1000);
+        initQuickTimestamps();
+    </script>
+</body>
+</html>

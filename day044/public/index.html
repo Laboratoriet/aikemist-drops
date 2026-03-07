@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Formatter & Validator — aikemist.com</title>
+  <meta name="description" content="Format, validate, and minify JSON instantly. Syntax highlighting, error detection, and tree view.">
+  <meta property="og:title" content="JSON Formatter & Validator">
+  <meta property="og:description" content="Format, validate, and minify JSON instantly.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://day044.aikemist.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="JSON Formatter & Validator">
+  <meta name="twitter:description" content="Paste messy JSON, get clean results. Syntax highlighting, tree view, and more.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>{ }</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --border: #e5e5e5;
+      --text: #171717;
+      --text-muted: #737373;
+      --accent: #8b5cf6;
+      --accent-hover: #7c3aed;
+      --success: #22c55e;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --field-bg: #f5f5f5;
+      --code-bg: #1e1e1e;
+      --code-text: #d4d4d4;
+      /* Syntax colors */
+      --syn-key: #9cdcfe;
+      --syn-string: #ce9178;
+      --syn-number: #b5cea8;
+      --syn-bool: #569cd6;
+      --syn-null: #569cd6;
+      --syn-bracket: #ffd700;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0a;
+      --surface: #171717;
+      --border: #262626;
+      --text: #fafafa;
+      --text-muted: #a3a3a3;
+      --accent: #a78bfa;
+      --accent-hover: #c4b5fd;
+      --field-bg: #1a1a1a;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      cursor: pointer;
+      font-size: 1.25rem;
+      z-index: 100;
+    }
+    
+    /* Status Bar */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+    
+    .status-dot.valid { background: var(--success); }
+    .status-dot.invalid { background: var(--error); }
+    .status-dot.empty { background: var(--text-muted); }
+    
+    .stats {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    
+    .stats span {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    /* Editor Layout */
+    .editor-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .editor-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--field-bg);
+    }
+    
+    .panel-title {
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    
+    .panel-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .panel-btn {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.75rem;
+      font-family: inherit;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    
+    .panel-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    textarea {
+      width: 100%;
+      height: 400px;
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      background: var(--code-bg);
+      color: var(--code-text);
+      border: none;
+      resize: vertical;
+    }
+    
+    textarea:focus {
+      outline: none;
+    }
+    
+    textarea::placeholder {
+      color: #666;
+    }
+    
+    /* Output with syntax highlighting */
+    .output-container {
+      position: relative;
+      height: 400px;
+      overflow: auto;
+      background: var(--code-bg);
+    }
+    
+    .output-code {
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: var(--code-text);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    
+    /* Syntax highlighting */
+    .syn-key { color: var(--syn-key); }
+    .syn-string { color: var(--syn-string); }
+    .syn-number { color: var(--syn-number); }
+    .syn-bool { color: var(--syn-bool); }
+    .syn-null { color: var(--syn-null); }
+    .syn-bracket { color: var(--syn-bracket); }
+    
+    /* Tree view */
+    .tree-view {
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      line-height: 1.8;
+      color: var(--code-text);
+      display: none;
+    }
+    
+    .tree-view.active {
+      display: block;
+    }
+    
+    .output-code.active {
+      display: block;
+    }
+    
+    .output-code:not(.active) {
+      display: none;
+    }
+    
+    .tree-item {
+      padding-left: 1.25rem;
+      position: relative;
+    }
+    
+    .tree-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: #444;
+    }
+    
+    .tree-key {
+      color: var(--syn-key);
+      cursor: pointer;
+    }
+    
+    .tree-key:hover {
+      text-decoration: underline;
+    }
+    
+    .tree-value {
+      color: var(--syn-string);
+    }
+    
+    .tree-value.number { color: var(--syn-number); }
+    .tree-value.boolean { color: var(--syn-bool); }
+    .tree-value.null { color: var(--syn-null); }
+    
+    .tree-toggle {
+      cursor: pointer;
+      user-select: none;
+      margin-right: 0.25rem;
+      color: #888;
+    }
+    
+    .tree-toggle:hover {
+      color: var(--accent);
+    }
+    
+    .tree-collapsed > .tree-item {
+      display: none;
+    }
+    
+    .tree-bracket {
+      color: var(--syn-bracket);
+    }
+    
+    .tree-type {
+      color: #888;
+      font-size: 0.75rem;
+      margin-left: 0.5rem;
+    }
+    
+    .path-display {
+      padding: 0.5rem 1rem;
+      background: #111;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      border-bottom: 1px solid #333;
+      min-height: 28px;
+    }
+    
+    /* Error display */
+    .error-message {
+      padding: 1rem;
+      background: rgba(239, 68, 68, 0.1);
+      border-left: 4px solid var(--error);
+      color: var(--error);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+    }
+    
+    .error-message strong {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    
+    /* Action buttons */
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+    
+    .btn-secondary {
+      background: var(--field-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-secondary:hover {
+      border-color: var(--accent);
+    }
+    
+    /* Indent selector */
+    .indent-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    
+    .indent-selector select {
+      padding: 0.5rem;
+      font-family: inherit;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      cursor: pointer;
+    }
+    
+    /* Shortcuts */
+    .shortcuts {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .shortcut {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    
+    .shortcut kbd {
+      background: var(--field-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.15rem 0.4rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding-top: 2rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      color: var(--accent);
+    }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 1000;
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
+    @media (max-width: 768px) {
+      .editor-layout {
+        grid-template-columns: 1fr;
+      }
+      
+      textarea, .output-container {
+        height: 300px;
+      }
+      
+      .stats {
+        display: none;
+      }
+      
+      .shortcuts {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+  
+  <div class="container">
+    <header>
+      <h1>JSON Formatter & Validator</h1>
+      <p class="subtitle">Paste messy JSON, get clean results</p>
+    </header>
+    
+    <div class="status-bar">
+      <div class="status">
+        <div class="status-dot empty" id="statusDot"></div>
+        <span id="statusText">Paste JSON to begin</span>
+      </div>
+      <div class="stats">
+        <div>Size: <span id="sizeBytes">0 B</span></div>
+        <div>Lines: <span id="lineCount">0</span></div>
+        <div>Depth: <span id="depthCount">0</span></div>
+      </div>
+    </div>
+    
+    <div class="editor-layout">
+      <div class="editor-panel">
+        <div class="panel-header">
+          <span class="panel-title">Input</span>
+          <div class="panel-actions">
+            <button class="panel-btn" onclick="pasteFromClipboard()">📋 Paste</button>
+            <button class="panel-btn" onclick="loadSample()">Sample</button>
+            <button class="panel-btn" onclick="clearInput()">Clear</button>
+          </div>
+        </div>
+        <textarea id="input" placeholder='Paste your JSON here...
+
+{
+  "example": "data",
+  "numbers": [1, 2, 3]
+}'></textarea>
+      </div>
+      
+      <div class="editor-panel">
+        <div class="panel-header">
+          <span class="panel-title">Output</span>
+          <div class="panel-actions">
+            <button class="panel-btn" id="viewCode" onclick="setView('code')" style="background: var(--accent); color: white;">Code</button>
+            <button class="panel-btn" id="viewTree" onclick="setView('tree')">Tree</button>
+            <button class="panel-btn" onclick="copyOutput()">Copy</button>
+            <button class="panel-btn" onclick="downloadJSON()">↓ Save</button>
+          </div>
+        </div>
+        <div class="path-display" id="pathDisplay">$</div>
+        <div class="output-container">
+          <pre class="output-code active" id="output"></pre>
+          <div class="tree-view" id="treeView"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="actions">
+      <button class="btn btn-primary" onclick="formatJSON()">
+        ✨ Format
+      </button>
+      <button class="btn btn-secondary" onclick="minifyJSON()">
+        📦 Minify
+      </button>
+      <button class="btn btn-secondary" onclick="sortKeys()">
+        🔤 Sort Keys
+      </button>
+      <div class="indent-selector">
+        <label for="indent">Indent:</label>
+        <select id="indent" onchange="formatJSON()">
+          <option value="2">2 spaces</option>
+          <option value="4">4 spaces</option>
+          <option value="tab">Tab</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="shortcuts">
+      <span class="shortcut"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> Format</span>
+      <span class="shortcut"><kbd>Ctrl</kbd>+<kbd>M</kbd> Minify</span>
+      <span class="shortcut"><kbd>Ctrl</kbd>+<kbd>S</kbd> Sort keys</span>
+    </div>
+    
+    <footer>
+      <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+    </footer>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+  
+  <script>
+    // Theme
+    function toggleTheme() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      document.querySelector('.theme-toggle').textContent = isDark ? '🌙' : '☀️';
+      localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    }
+    
+    const savedTheme = localStorage.getItem('theme') || 
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.querySelector('.theme-toggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    
+    // Toast
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+    
+    // Elements
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    
+    // Format JSON with syntax highlighting
+    function formatJSON() {
+      const text = input.value.trim();
+      if (!text) {
+        setStatus('empty', 'Paste JSON to begin');
+        output.innerHTML = '';
+        parsedData = null;
+        updateStats(0, 0, 0);
+        document.getElementById('pathDisplay').textContent = '$';
+        return;
+      }
+      
+      try {
+        const parsed = JSON.parse(text);
+        parsedData = parsed;
+        const indent = document.getElementById('indent').value;
+        const indentValue = indent === 'tab' ? '\t' : parseInt(indent);
+        const formatted = JSON.stringify(parsed, null, indentValue);
+        
+        output.innerHTML = syntaxHighlight(formatted);
+        setStatus('valid', 'Valid JSON');
+        updateStats(formatted.length, formatted.split('\n').length, getDepth(parsed));
+        
+        if (currentView === 'tree') {
+          renderTree();
+        }
+      } catch (e) {
+        parsedData = null;
+        showError(e);
+      }
+    }
+    
+    function minifyJSON() {
+      const text = input.value.trim();
+      if (!text) return;
+      
+      try {
+        const parsed = JSON.parse(text);
+        const minified = JSON.stringify(parsed);
+        
+        output.innerHTML = syntaxHighlight(minified);
+        setStatus('valid', 'Valid JSON (minified)');
+        updateStats(minified.length, 1, getDepth(parsed));
+        showToast('Minified!');
+      } catch (e) {
+        showError(e);
+      }
+    }
+    
+    function sortKeys() {
+      const text = input.value.trim();
+      if (!text) return;
+      
+      try {
+        const parsed = JSON.parse(text);
+        const sorted = sortObject(parsed);
+        parsedData = sorted;
+        
+        const indent = document.getElementById('indent').value;
+        const indentValue = indent === 'tab' ? '\t' : parseInt(indent);
+        const formatted = JSON.stringify(sorted, null, indentValue);
+        
+        output.innerHTML = syntaxHighlight(formatted);
+        setStatus('valid', 'Valid JSON (keys sorted)');
+        updateStats(formatted.length, formatted.split('\n').length, getDepth(sorted));
+        
+        if (currentView === 'tree') {
+          renderTree();
+        }
+        showToast('Keys sorted A-Z!');
+      } catch (e) {
+        showError(e);
+      }
+    }
+    
+    function sortObject(obj) {
+      if (Array.isArray(obj)) {
+        return obj.map(sortObject);
+      }
+      if (obj !== null && typeof obj === 'object') {
+        return Object.keys(obj)
+          .sort()
+          .reduce((result, key) => {
+            result[key] = sortObject(obj[key]);
+            return result;
+          }, {});
+      }
+      return obj;
+    }
+    
+    function syntaxHighlight(json) {
+      // Escape HTML
+      json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      
+      // Apply syntax highlighting
+      return json.replace(
+        /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+        function(match) {
+          let cls = 'syn-number';
+          if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+              cls = 'syn-key';
+            } else {
+              cls = 'syn-string';
+            }
+          } else if (/true|false/.test(match)) {
+            cls = 'syn-bool';
+          } else if (/null/.test(match)) {
+            cls = 'syn-null';
+          }
+          return '<span class="' + cls + '">' + match + '</span>';
+        }
+      );
+    }
+    
+    function showError(e) {
+      const message = e.message;
+      let position = '';
+      
+      // Try to extract position from error
+      const posMatch = message.match(/position (\d+)/);
+      if (posMatch) {
+        const pos = parseInt(posMatch[1]);
+        const lines = input.value.substring(0, pos).split('\n');
+        position = `Line ${lines.length}, Column ${lines[lines.length - 1].length + 1}`;
+      }
+      
+      output.innerHTML = `<div class="error-message">
+        <strong>❌ Invalid JSON</strong>
+        ${message}
+        ${position ? `<br><br>📍 ${position}` : ''}
+      </div>`;
+      
+      setStatus('invalid', 'Invalid JSON');
+      updateStats(input.value.length, input.value.split('\n').length, 0);
+    }
+    
+    function setStatus(type, text) {
+      statusDot.className = 'status-dot ' + type;
+      statusText.textContent = text;
+    }
+    
+    function updateStats(bytes, lines, depth) {
+      document.getElementById('sizeBytes').textContent = formatBytes(bytes);
+      document.getElementById('lineCount').textContent = lines;
+      document.getElementById('depthCount').textContent = depth;
+    }
+    
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+    
+    function getDepth(obj, current = 0) {
+      if (typeof obj !== 'object' || obj === null) return current;
+      
+      let maxDepth = current;
+      for (const key in obj) {
+        const depth = getDepth(obj[key], current + 1);
+        if (depth > maxDepth) maxDepth = depth;
+      }
+      return maxDepth;
+    }
+    
+    function copyOutput() {
+      // Get plain text without HTML
+      const text = output.textContent;
+      if (!text) {
+        showToast('Nothing to copy');
+        return;
+      }
+      navigator.clipboard.writeText(text);
+      showToast('Copied!');
+    }
+    
+    function downloadJSON() {
+      const text = output.textContent;
+      if (!text) {
+        showToast('Nothing to download');
+        return;
+      }
+      const blob = new Blob([text], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'formatted.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Downloaded!');
+    }
+    
+    function clearInput() {
+      input.value = '';
+      output.innerHTML = '';
+      parsedData = null;
+      setStatus('empty', 'Paste JSON to begin');
+      updateStats(0, 0, 0);
+      document.getElementById('pathDisplay').textContent = '$';
+    }
+    
+    async function pasteFromClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        input.value = text;
+        formatJSON();
+        showToast('Pasted from clipboard');
+      } catch (e) {
+        showToast('Could not access clipboard');
+      }
+    }
+    
+    function loadSample() {
+      input.value = JSON.stringify({
+        "name": "JSON Formatter",
+        "version": "1.0.0",
+        "features": ["format", "validate", "minify"],
+        "config": {
+          "theme": "dark",
+          "indent": 2,
+          "syntaxHighlight": true
+        },
+        "stats": {
+          "users": 1000,
+          "rating": 4.8,
+          "active": true
+        },
+        "tags": null
+      }, null, 2);
+      formatJSON();
+      showToast('Sample loaded');
+    }
+    
+    // Auto-format on input (debounced)
+    let timeout;
+    input.addEventListener('input', () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(formatJSON, 300);
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          formatJSON();
+        } else if (e.key === 'm' || e.key === 'M') {
+          e.preventDefault();
+          minifyJSON();
+        } else if (e.key === 's' || e.key === 'S') {
+          e.preventDefault();
+          sortKeys();
+        }
+      }
+    });
+    
+    // View switching
+    let currentView = 'code';
+    let parsedData = null;
+    
+    function setView(view) {
+      currentView = view;
+      const codeView = document.getElementById('output');
+      const treeView = document.getElementById('treeView');
+      const codeBtn = document.getElementById('viewCode');
+      const treeBtn = document.getElementById('viewTree');
+      
+      if (view === 'code') {
+        codeView.classList.add('active');
+        treeView.classList.remove('active');
+        codeBtn.style.background = 'var(--accent)';
+        codeBtn.style.color = 'white';
+        treeBtn.style.background = '';
+        treeBtn.style.color = '';
+      } else {
+        codeView.classList.remove('active');
+        treeView.classList.add('active');
+        treeBtn.style.background = 'var(--accent)';
+        treeBtn.style.color = 'white';
+        codeBtn.style.background = '';
+        codeBtn.style.color = '';
+        renderTree();
+      }
+    }
+    
+    function renderTree() {
+      const treeView = document.getElementById('treeView');
+      if (!parsedData) {
+        treeView.innerHTML = '<span style="color: #888;">No valid JSON to display</span>';
+        return;
+      }
+      treeView.innerHTML = buildTree(parsedData, '$');
+    }
+    
+    function buildTree(data, path, depth = 0) {
+      if (data === null) {
+        return `<span class="tree-value null" data-path="${path}">null</span>`;
+      }
+      
+      const type = typeof data;
+      
+      if (type !== 'object') {
+        let cls = type;
+        let val = type === 'string' ? `"${escapeHtml(data)}"` : String(data);
+        return `<span class="tree-value ${cls}" data-path="${path}">${val}</span>`;
+      }
+      
+      const isArray = Array.isArray(data);
+      const entries = Object.entries(data);
+      const bracket = isArray ? ['[', ']'] : ['{', '}'];
+      const typeName = isArray ? `Array(${entries.length})` : `Object`;
+      
+      if (entries.length === 0) {
+        return `<span class="tree-bracket">${bracket[0]}${bracket[1]}</span>`;
+      }
+      
+      let html = `<span class="tree-toggle" onclick="toggleTree(this)">▼</span>`;
+      html += `<span class="tree-bracket">${bracket[0]}</span>`;
+      html += `<span class="tree-type">${typeName}</span>`;
+      html += '<div class="tree-children">';
+      
+      for (const [key, value] of entries) {
+        const childPath = isArray ? `${path}[${key}]` : `${path}.${key}`;
+        html += '<div class="tree-item">';
+        html += `<span class="tree-key" onclick="showPath('${escapeHtml(childPath)}')">${isArray ? key : `"${escapeHtml(key)}"`}</span>: `;
+        html += buildTree(value, childPath, depth + 1);
+        html += '</div>';
+      }
+      
+      html += '</div>';
+      html += `<span class="tree-bracket">${bracket[1]}</span>`;
+      
+      return html;
+    }
+    
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    
+    function toggleTree(el) {
+      const parent = el.parentElement;
+      parent.classList.toggle('tree-collapsed');
+      el.textContent = parent.classList.contains('tree-collapsed') ? '▶' : '▼';
+    }
+    
+    function showPath(path) {
+      document.getElementById('pathDisplay').textContent = path;
+      navigator.clipboard.writeText(path);
+      showToast('Path copied!');
+    }
+    
+    // Initial state
+    formatJSON();
+  </script>
+</body>
+</html>
