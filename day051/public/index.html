@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Tag Generator — SEO & Social Tags | Alkemist</title>
+    <meta name="description" content="Generate perfect meta tags for SEO and social sharing. Preview how your page looks on Google, Facebook, and Twitter.">
+    <meta property="og:title" content="Meta Tag Generator — SEO & Social Tags">
+    <meta property="og:description" content="Generate perfect meta tags for SEO and social sharing. Free tool by Alkemist.">
+    <meta property="og:image" content="https://day051.aikemist.com/og.png">
+    <meta property="og:url" content="https://day051.aikemist.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏷️</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --surface-hover: #f5f5f5;
+            --text: #0a0a0a;
+            --text-secondary: #666;
+            --border: #e5e5e5;
+            --accent: #0ea5e9;
+            --accent-hover: #0284c7;
+            --accent-soft: rgba(14, 165, 233, 0.1);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --shadow: 0 4px 24px rgba(0,0,0,0.06);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.08);
+        }
+        
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-hover: #1a1a1a;
+            --text: #fafafa;
+            --text-secondary: #888;
+            --border: #2a2a2a;
+            --accent-soft: rgba(14, 165, 233, 0.15);
+            --shadow: 0 4px 24px rgba(0,0,0,0.3);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.4);
+        }
+        
+        body {
+            font-family: 'Jost', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        
+        h1 {
+            font-size: clamp(1.75rem, 5vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        .main-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        @media (min-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .card h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .char-count {
+            font-size: 0.75rem;
+            font-weight: 400;
+        }
+        
+        .char-count.warning { color: var(--warning); }
+        .char-count.error { color: var(--error); }
+        .char-count.good { color: var(--success); }
+        
+        input, textarea {
+            width: 100%;
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            resize: vertical;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+        
+        textarea {
+            min-height: 80px;
+        }
+        
+        .preview-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 400px) {
+            .preview-tabs {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .preview-tab {
+                text-align: center;
+                padding: 0.5rem 0.5rem;
+            }
+        }
+        
+        .preview-tab {
+            padding: 0.5rem 1rem;
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .preview-tab:hover {
+            border-color: var(--accent);
+            transform: translateY(-1px);
+        }
+        
+        .preview-tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+        }
+        
+        .preview-content {
+            display: none;
+        }
+        
+        .preview-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Google Preview */
+        .google-preview {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+        }
+        
+        .google-url {
+            font-size: 14px;
+            color: #202124;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        
+        [data-theme="dark"] .google-url {
+            color: #bdc1c6;
+        }
+        
+        .google-url-icon {
+            width: 26px;
+            height: 26px;
+            background: var(--surface-hover);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .google-title {
+            font-size: 20px;
+            color: #1a0dab;
+            text-decoration: none;
+            line-height: 1.3;
+            margin-bottom: 4px;
+            display: block;
+        }
+        
+        [data-theme="dark"] .google-title {
+            color: #8ab4f8;
+        }
+        
+        .google-desc {
+            font-size: 14px;
+            color: #4d5156;
+            line-height: 1.58;
+        }
+        
+        [data-theme="dark"] .google-desc {
+            color: #bdc1c6;
+        }
+        
+        /* Facebook Preview */
+        .facebook-preview {
+            max-width: 500px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--surface);
+        }
+        
+        .facebook-image {
+            width: 100%;
+            height: 260px;
+            background: var(--surface-hover);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .facebook-info {
+            padding: 12px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .facebook-domain {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        
+        .facebook-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+        
+        .facebook-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+        
+        /* Twitter Preview */
+        .twitter-preview {
+            max-width: 500px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--surface);
+        }
+        
+        .twitter-image {
+            width: 100%;
+            height: 250px;
+            background: var(--surface-hover);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .twitter-info {
+            padding: 12px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .twitter-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 2px;
+            line-height: 1.3;
+        }
+        
+        .twitter-desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+        
+        .twitter-domain {
+            font-size: 15px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        /* Code Output */
+        .code-section {
+            margin-top: 1.5rem;
+        }
+        
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        
+        @media (max-width: 500px) {
+            .code-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+        
+        .code-header h2 {
+            margin-bottom: 0;
+        }
+        
+        .code-output {
+            background: #1e1e1e;
+            border-radius: 12px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: #d4d4d4;
+        }
+        
+        .code-output .tag { color: #569cd6; }
+        .code-output .attr { color: #9cdcfe; }
+        .code-output .string { color: #ce9178; }
+        .code-output .comment { color: #6a9955; }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: var(--surface-hover);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+        
+        .btn.copied {
+            background: var(--success);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+            z-index: 100;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text);
+            color: var(--bg);
+            padding: 0.875rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .tips {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--accent-soft);
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+        
+        .tips h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tips ul {
+            margin: 0;
+            padding-left: 1.25rem;
+        }
+        
+        .tips li {
+            margin-bottom: 0.25rem;
+        }
+        
+        .keyboard-hints {
+            display: none;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            justify-content: center;
+        }
+        
+        @media (min-width: 768px) {
+            .keyboard-hints {
+                display: flex;
+            }
+        }
+        
+        kbd {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme (T)">🌙</button>
+    
+    <div class="container">
+        <header>
+            <div class="logo">🏷️</div>
+            <h1>Meta Tag Generator</h1>
+            <p class="tagline">Get more clicks from Google and social media</p>
+        </header>
+        
+        <div class="main-grid">
+            <div class="input-section">
+                <div class="card">
+                    <h2>📝 Page Info</h2>
+                    
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label for="titleInput">Page Title</label>
+                            <span class="char-count" id="titleCount">0/60</span>
+                        </div>
+                        <input type="text" id="titleInput" placeholder="My Awesome Page" maxlength="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label for="descInput">Description</label>
+                            <span class="char-count" id="descCount">0/160</span>
+                        </div>
+                        <textarea id="descInput" placeholder="A brief description of your page content..." maxlength="300"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="urlInput">Page URL</label>
+                        <input type="url" id="urlInput" placeholder="https://example.com/page">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="imageInput">Image URL (1200×630 recommended)</label>
+                        <input type="url" id="imageInput" placeholder="https://example.com/og-image.png">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="siteInput">Site Name (optional)</label>
+                        <input type="text" id="siteInput" placeholder="My Website">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="twitterInput">Twitter Handle (optional)</label>
+                        <input type="text" id="twitterInput" placeholder="@username">
+                    </div>
+                    
+                    <div class="tips">
+                        <h3>💡 Quick Tips</h3>
+                        <ul>
+                            <li><strong>Title:</strong> 50-60 chars — Google truncates longer</li>
+                            <li><strong>Description:</strong> 150-160 chars — hook them fast</li>
+                            <li><strong>Image:</strong> 1200×630px — fits all platforms</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <div class="card">
+                    <h2>👁️ Preview</h2>
+                    
+                    <div class="preview-tabs">
+                        <button class="preview-tab active" data-tab="google">Google</button>
+                        <button class="preview-tab" data-tab="facebook">Facebook</button>
+                        <button class="preview-tab" data-tab="twitter">Twitter</button>
+                    </div>
+                    
+                    <div class="preview-content active" id="preview-google">
+                        <div class="google-preview">
+                            <div class="google-url">
+                                <span class="google-url-icon">🌐</span>
+                                <span id="google-url-text">example.com</span>
+                            </div>
+                            <a class="google-title" id="google-title">Page Title</a>
+                            <div class="google-desc" id="google-desc">Page description will appear here...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-content" id="preview-facebook">
+                        <div class="facebook-preview">
+                            <div class="facebook-image" id="facebook-image">No image</div>
+                            <div class="facebook-info">
+                                <div class="facebook-domain" id="facebook-domain">example.com</div>
+                                <div class="facebook-title" id="facebook-title">Page Title</div>
+                                <div class="facebook-desc" id="facebook-desc">Description...</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-content" id="preview-twitter">
+                        <div class="twitter-preview">
+                            <div class="twitter-image" id="twitter-image">No image</div>
+                            <div class="twitter-info">
+                                <div class="twitter-title" id="twitter-title">Page Title</div>
+                                <div class="twitter-desc" id="twitter-desc">Description...</div>
+                                <div class="twitter-domain" id="twitter-domain">🔗 example.com</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card code-section">
+            <div class="code-header">
+                <h2>📋 Generated Tags</h2>
+                <button class="btn btn-primary" id="copyBtn" onclick="copyCode()">
+                    📋 Copy All
+                </button>
+            </div>
+            <pre class="code-output" id="codeOutput"></pre>
+        </div>
+        
+        <div class="keyboard-hints">
+            <span><kbd>C</kbd> Copy tags</span>
+            <span><kbd>T</kbd> Toggle theme</span>
+        </div>
+        
+        <footer>
+            <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+        </footer>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        // ========== ELEMENTS ==========
+        const titleInput = document.getElementById('titleInput');
+        const descInput = document.getElementById('descInput');
+        const urlInput = document.getElementById('urlInput');
+        const imageInput = document.getElementById('imageInput');
+        const siteInput = document.getElementById('siteInput');
+        const twitterInput = document.getElementById('twitterInput');
+        
+        // ========== INIT ==========
+        function init() {
+            loadTheme();
+            setupTabs();
+            setupListeners();
+            updateAll();
+        }
+        
+        function setupListeners() {
+            [titleInput, descInput, urlInput, imageInput, siteInput, twitterInput].forEach(el => {
+                el.addEventListener('input', updateAll);
+            });
+        }
+        
+        function setupTabs() {
+            document.querySelectorAll('.preview-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.preview-content').forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById('preview-' + tab.dataset.tab).classList.add('active');
+                });
+            });
+        }
+        
+        // ========== UPDATE ==========
+        function updateAll() {
+            updateCharCounts();
+            updatePreviews();
+            updateCode();
+        }
+        
+        function updateCharCounts() {
+            const titleLen = titleInput.value.length;
+            const descLen = descInput.value.length;
+            
+            const titleCount = document.getElementById('titleCount');
+            titleCount.textContent = `${titleLen}/60`;
+            titleCount.className = 'char-count ' + (titleLen === 0 ? '' : titleLen <= 60 ? 'good' : titleLen <= 70 ? 'warning' : 'error');
+            
+            const descCount = document.getElementById('descCount');
+            descCount.textContent = `${descLen}/160`;
+            descCount.className = 'char-count ' + (descLen === 0 ? '' : descLen <= 160 ? 'good' : descLen <= 200 ? 'warning' : 'error');
+        }
+        
+        function updatePreviews() {
+            const title = titleInput.value || 'Page Title';
+            const desc = descInput.value || 'Page description will appear here...';
+            const url = urlInput.value || 'https://example.com';
+            const image = imageInput.value;
+            
+            let domain = 'example.com';
+            try {
+                domain = new URL(url).hostname;
+            } catch {}
+            
+            // Google
+            document.getElementById('google-url-text').textContent = domain;
+            document.getElementById('google-title').textContent = title;
+            document.getElementById('google-desc').textContent = desc.slice(0, 160) + (desc.length > 160 ? '...' : '');
+            
+            // Facebook
+            document.getElementById('facebook-domain').textContent = domain.toUpperCase();
+            document.getElementById('facebook-title').textContent = title;
+            document.getElementById('facebook-desc').textContent = desc.slice(0, 100) + (desc.length > 100 ? '...' : '');
+            const fbImage = document.getElementById('facebook-image');
+            if (image) {
+                fbImage.style.backgroundImage = `url(${image})`;
+                fbImage.textContent = '';
+            } else {
+                fbImage.style.backgroundImage = '';
+                fbImage.textContent = 'No image';
+            }
+            
+            // Twitter
+            document.getElementById('twitter-title').textContent = title;
+            document.getElementById('twitter-desc').textContent = desc.slice(0, 100) + (desc.length > 100 ? '...' : '');
+            document.getElementById('twitter-domain').textContent = '🔗 ' + domain;
+            const twImage = document.getElementById('twitter-image');
+            if (image) {
+                twImage.style.backgroundImage = `url(${image})`;
+                twImage.textContent = '';
+            } else {
+                twImage.style.backgroundImage = '';
+                twImage.textContent = 'No image';
+            }
+        }
+        
+        function updateCode() {
+            const title = titleInput.value;
+            const desc = descInput.value;
+            const url = urlInput.value;
+            const image = imageInput.value;
+            const site = siteInput.value;
+            const twitter = twitterInput.value;
+            
+            let html = '<span class="comment">&lt;!-- Primary Meta Tags --&gt;</span>\n';
+            if (title) html += `<span class="tag">&lt;title&gt;</span>${escapeHtml(title)}<span class="tag">&lt;/title&gt;</span>\n`;
+            if (desc) html += `<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="string">"description"</span> <span class="attr">content</span>=<span class="string">"${escapeHtml(desc)}"</span><span class="tag">&gt;</span>\n`;
+            
+            html += '\n<span class="comment">&lt;!-- Open Graph / Facebook --&gt;</span>\n';
+            html += `<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="string">"og:type"</span> <span class="attr">content</span>=<span class="string">"website"</span><span class="tag">&gt;</span>\n`;
+            if (url) html += `<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="string">"og:url"</span> <span class="attr">content</span>=<span class="string">"${escapeHtml(url)}"</span><span class="tag">&gt;</span>\n`;
+            if (title) html += `<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="string">"og:title"</span> <span class="attr">content</span>=<span class="string">"${escapeHtml(title)}"</span><span class="tag">&gt;</span>\n`;
+            if (desc) html += `<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="string">"og:description"</span> <span class="attr">content</span>=<span class="string">"${escapeHtml(desc)}"</span><span class="tag">&gt;</span>\n`;
+            if (image) html += `<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="string">"og:image"</span> <span class="attr">content</span>=<span class="string">"${escapeHtml(image)}"</span><span class="tag">&gt;</span>\n`;
+            if (site) html += `<span class="tag">&lt;meta</span> <span class="attr">property</span>=<span class="string">"og:site_name"</span> <span class="attr">content</span>=<span class="string">"${escapeHtml(site)}"</span><span class="tag">&gt;</span>\n`;
+            
+            html += '\n<span class="comment">&lt;!-- Twitter --&gt;</span>\n';
+            html += `<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="string">"twitter:card"</span> <span class="attr">content</span>=<span class="string">"summary_large_image"</span><span class="tag">&gt;</span>\n`;
+            if (url) html += `<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="string">"twitter:url"</span> <span class="attr">content</span>=<span class="string">"${escapeHtml(url)}"</span><span class="tag">&gt;</span>\n`;
+            if (title) html += `<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="string">"twitter:title"</span> <span class="attr">content</span>=<span class="string">"${escapeHtml(title)}"</span><span class="tag">&gt;</span>\n`;
+            if (desc) html += `<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="string">"twitter:description"</span> <span class="attr">content</span>=<span class="string">"${escapeHtml(desc)}"</span><span class="tag">&gt;</span>\n`;
+            if (image) html += `<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="string">"twitter:image"</span> <span class="attr">content</span>=<span class="string">"${escapeHtml(image)}"</span><span class="tag">&gt;</span>\n`;
+            if (twitter) html += `<span class="tag">&lt;meta</span> <span class="attr">name</span>=<span class="string">"twitter:site"</span> <span class="attr">content</span>=<span class="string">"${escapeHtml(twitter)}"</span><span class="tag">&gt;</span>\n`;
+            
+            document.getElementById('codeOutput').innerHTML = html;
+        }
+        
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        
+        // ========== COPY ==========
+        function copyCode() {
+            const code = document.getElementById('codeOutput').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.innerHTML = '✓ Copied!';
+                btn.classList.add('copied');
+                showToast('Copied to clipboard!');
+                setTimeout(() => {
+                    btn.innerHTML = '📋 Copy All';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+        
+        // ========== THEME ==========
+        function toggleTheme() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.querySelector('.theme-toggle').textContent = isDark ? '🌙' : '☀️';
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        }
+        
+        function loadTheme() {
+            const saved = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+            document.querySelector('.theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+        
+        // ========== TOAST ==========
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        // ========== KEYBOARD ==========
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            
+            if (e.key.toLowerCase() === 'c') {
+                copyCode();
+            } else if (e.key.toLowerCase() === 't') {
+                toggleTheme();
+            }
+        });
+        
+        // ========== START ==========
+        init();
+    </script>
+</body>
+</html>
