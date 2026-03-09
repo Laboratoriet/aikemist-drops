@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lorem Generator — Creative Placeholder Text | Alkemist</title>
+    <meta name="description" content="Tired of boring lorem ipsum? Generate placeholder text with personality — Hipster, Corporate Speak, Pirate, Sci-Fi, Film Noir, and more. Free tool by Alkemist.">
+    <meta property="og:title" content="Lorem Generator — Creative Placeholder Text">
+    <meta property="og:description" content="Placeholder text with personality. 10 creative flavors to choose from.">
+    <meta property="og:image" content="https://day050.aikemist.com/og.png">
+    <meta property="og:url" content="https://day050.aikemist.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --surface-hover: #f5f5f5;
+            --text: #0a0a0a;
+            --text-secondary: #666;
+            --border: #e5e5e5;
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --accent-soft: rgba(139, 92, 246, 0.1);
+            --success: #10b981;
+            --shadow: 0 4px 24px rgba(0,0,0,0.06);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.08);
+        }
+        
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-hover: #1a1a1a;
+            --text: #fafafa;
+            --text-secondary: #888;
+            --border: #2a2a2a;
+            --accent-soft: rgba(139, 92, 246, 0.15);
+            --shadow: 0 4px 24px rgba(0,0,0,0.3);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.4);
+        }
+        
+        body {
+            font-family: 'Jost', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        
+        h1 {
+            font-size: clamp(1.75rem, 5vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        .milestone {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent), #ec4899);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+        
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .controls {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .control-row {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        @media (min-width: 600px) {
+            .control-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .control-row.three {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        select, input[type="number"] {
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        select:hover, input[type="number"]:hover {
+            border-color: var(--accent);
+        }
+        
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+        
+        .flavor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        @media (min-width: 600px) {
+            .flavor-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+        
+        .flavor-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 0.75rem;
+            background: var(--surface-hover);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .flavor-btn:hover {
+            border-color: var(--border);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .flavor-btn.active {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+        
+        .flavor-btn .emoji {
+            transition: transform 0.2s;
+        }
+        
+        .flavor-btn:hover .emoji {
+            transform: scale(1.15);
+        }
+        
+        .flavor-btn.active .emoji {
+            animation: bounce 0.3s ease;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        .flavor-btn .emoji {
+            font-size: 1.75rem;
+        }
+        
+        .flavor-btn .name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text);
+            text-align: center;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 500px) {
+            .actions {
+                flex-direction: column;
+            }
+            .actions .btn {
+                width: 100%;
+            }
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .generating .btn-primary {
+            animation: pulse 0.6s ease infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(139, 92, 246, 0); }
+        }
+        
+        .btn-secondary {
+            background: var(--surface-hover);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+        
+        .output-section h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .output-section h2 .flavor-tag {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-radius: 999px;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .output {
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .output p {
+            margin-bottom: 1rem;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .output p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .output p:nth-child(1) { animation-delay: 0s; }
+        .output p:nth-child(2) { animation-delay: 0.1s; }
+        .output p:nth-child(3) { animation-delay: 0.2s; }
+        .output p:nth-child(4) { animation-delay: 0.3s; }
+        .output p:nth-child(5) { animation-delay: 0.4s; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .copy-btn {
+            position: relative;
+        }
+        
+        .copy-btn.copied {
+            background: var(--success);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+            z-index: 100;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text);
+            color: var(--bg);
+            padding: 0.875rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .keyboard-hints {
+            display: none;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        @media (min-width: 768px) {
+            .keyboard-hints {
+                display: flex;
+            }
+        }
+        
+        kbd {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme (T)">🌙</button>
+    
+    <div class="container">
+        <header>
+            <span class="milestone">🎉 Day 050</span>
+            <div class="logo">📝</div>
+            <h1>Lorem Generator</h1>
+            <p class="tagline">Not your boring placeholder text</p>
+        </header>
+        
+        <div class="card">
+            <div class="controls">
+                <div class="control-group">
+                    <label>Choose Your Flavor</label>
+                    <div class="flavor-grid" id="flavorGrid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                
+                <div class="control-row three">
+                    <div class="control-group">
+                        <label for="unitSelect">Generate</label>
+                        <select id="unitSelect">
+                            <option value="paragraphs">Paragraphs</option>
+                            <option value="sentences">Sentences</option>
+                            <option value="words">Words</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="countInput">Count</label>
+                        <input type="number" id="countInput" value="3" min="1" max="100">
+                    </div>
+                    <div class="control-group">
+                        <label for="startClassic">Start with</label>
+                        <select id="startClassic">
+                            <option value="yes">Classic opener</option>
+                            <option value="no">Random start</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="generate()">
+                        ✨ Generate
+                    </button>
+                    <button class="btn btn-secondary" onclick="randomFlavor()">
+                        🎲 Surprise Me
+                    </button>
+                    <button class="btn btn-secondary copy-btn" id="copyBtn" onclick="copyText()">
+                        📋 Copy
+                    </button>
+                </div>
+                
+                <div class="keyboard-hints">
+                    <span><kbd>Space</kbd> Generate</span>
+                    <span><kbd>C</kbd> Copy</span>
+                    <span><kbd>R</kbd> Random</span>
+                    <span><kbd>T</kbd> Theme</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card output-section">
+            <h2>
+                Output
+                <span class="flavor-tag" id="flavorTag">📜 Classic Latin</span>
+            </h2>
+            <div class="stats" id="stats">
+                <span class="stat">📝 <span id="wordCount">0</span> words</span>
+                <span class="stat">📄 <span id="charCount">0</span> chars</span>
+                <span class="stat">📃 <span id="paraCount">0</span> paragraphs</span>
+            </div>
+            <div class="output" id="output">
+                Pick a flavor and hit generate ✨
+            </div>
+        </div>
+        
+        <footer>
+            <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+        </footer>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        // ========== FLAVORS ==========
+        const FLAVORS = {
+            classic: {
+                name: 'Classic Latin',
+                emoji: '📜',
+                opener: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+                words: [
+                    'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit',
+                    'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore',
+                    'magna', 'aliqua', 'enim', 'ad', 'minim', 'veniam', 'quis', 'nostrud',
+                    'exercitation', 'ullamco', 'laboris', 'nisi', 'aliquip', 'ex', 'ea', 'commodo',
+                    'consequat', 'duis', 'aute', 'irure', 'in', 'reprehenderit', 'voluptate',
+                    'velit', 'esse', 'cillum', 'fugiat', 'nulla', 'pariatur', 'excepteur', 'sint',
+                    'occaecat', 'cupidatat', 'non', 'proident', 'sunt', 'culpa', 'qui', 'officia',
+                    'deserunt', 'mollit', 'anim', 'id', 'est', 'laborum', 'vitae', 'elementum',
+                    'curabitur', 'viverra', 'nunc', 'pellentesque', 'habitant', 'morbi', 'tristique',
+                    'senectus', 'netus', 'malesuada', 'fames', 'turpis', 'egestas', 'proin',
+                    'sagittis', 'nisl', 'rhoncus', 'mattis', 'massa', 'faucibus', 'ornare',
+                    'quam', 'lacinia', 'congue', 'mauris', 'integer', 'feugiat', 'scelerisque'
+                ]
+            },
+            hipster: {
+                name: 'Hipster',
+                emoji: '🧔',
+                opener: 'You probably haven\'t heard of this artisan pour-over — it\'s pretty underground.',
+                words: [
+                    'artisan', 'pour-over', 'aesthetic', 'fixie', 'bicycle', 'rights', 'sustainable',
+                    'quinoa', 'brooklyn', 'vegan', 'kombucha', 'craft', 'beer', 'vinyl', 'typewriter',
+                    'portland', 'meditation', 'microdosing', 'shabby', 'chic', 'organic', 'kale',
+                    'tumeric', 'activated', 'charcoal', 'single-origin', 'cold-brew', 'brunch',
+                    'avocado', 'toast', 'sourdough', 'fermented', 'locally', 'sourced', 'farm-to-table',
+                    'ethically', 'handcrafted', 'bespoke', 'curated', 'mindful', 'authentic',
+                    'vintage', 'thrifted', 'upcycled', 'minimalist', 'hygge', 'slow-living',
+                    'intentional', 'plant-based', 'oat-milk', 'matcha', 'latte', 'cortado',
+                    'flat-white', 'third-wave', 'specialty', 'roasted', 'ethical', 'sustainable',
+                    'conscious', 'wellness', 'self-care', 'journaling', 'gratitude', 'manifesting',
+                    'energy', 'vibes', 'aesthetic', 'cozy', 'cottagecore', 'goblincore', 'solarpunk'
+                ]
+            },
+            corporate: {
+                name: 'Corporate',
+                emoji: '💼',
+                opener: 'Per my last email, let\'s circle back and synergize our core competencies.',
+                words: [
+                    'synergy', 'leverage', 'scalable', 'paradigm', 'shift', 'proactive', 'bandwidth',
+                    'deliverables', 'stakeholder', 'alignment', 'circle', 'back', 'deep', 'dive',
+                    'low-hanging', 'fruit', 'move', 'needle', 'ecosystem', 'disrupt', 'innovation',
+                    'strategic', 'initiative', 'core', 'competency', 'value', 'proposition',
+                    'actionable', 'insights', 'best', 'practices', 'thought', 'leadership',
+                    'forward-thinking', 'robust', 'solution', 'holistic', 'approach', 'optimize',
+                    'streamline', 'efficiency', 'productivity', 'performance', 'metrics', 'KPIs',
+                    'ROI', 'bottom', 'line', 'top', 'touch', 'base', 'reach', 'out', 'loop', 'in',
+                    'ping', 'offline', 'take', 'conversation', 'agile', 'sprint', 'roadmap',
+                    'milestone', 'north', 'star', 'mission-critical', 'enterprise', 'grade',
+                    'next', 'level', 'game', 'changer', 'bleeding', 'edge', 'cutting', 'pivot'
+                ]
+            },
+            pirate: {
+                name: 'Pirate',
+                emoji: '🏴‍☠️',
+                opener: 'Ahoy matey! Shiver me timbers and hoist the Jolly Roger!',
+                words: [
+                    'ahoy', 'matey', 'shiver', 'timbers', 'hoist', 'jolly', 'roger', 'yarr',
+                    'avast', 'landlubber', 'scallywag', 'buccaneer', 'plunder', 'treasure',
+                    'doubloons', 'pieces', 'eight', 'crow\'s', 'nest', 'port', 'starboard',
+                    'stern', 'bow', 'anchor', 'galleon', 'frigate', 'cutlass', 'saber',
+                    'parrot', 'eyepatch', 'peg-leg', 'hook', 'kraken', 'davy', 'jones',
+                    'locker', 'seven', 'seas', 'caribbean', 'rum', 'grog', 'swashbuckler',
+                    'plank', 'walk', 'mutiny', 'captain', 'first', 'mate', 'boatswain',
+                    'deck', 'swab', 'cannon', 'broadside', 'powder', 'monkey', 'black',
+                    'beard', 'calico', 'jack', 'maroon', 'maelstrom', 'siren', 'mermaid',
+                    'compass', 'spyglass', 'map', 'X', 'marks', 'spot', 'booty', 'loot'
+                ]
+            },
+            scifi: {
+                name: 'Sci-Fi',
+                emoji: '🚀',
+                opener: 'The quantum hyperdrive engaged, warping spacetime across the nebula.',
+                words: [
+                    'quantum', 'hyperdrive', 'warp', 'spacetime', 'nebula', 'starship', 'galaxy',
+                    'android', 'cyborg', 'hologram', 'teleport', 'photon', 'laser', 'plasma',
+                    'antimatter', 'singularity', 'wormhole', 'multiverse', 'dimensional', 'rift',
+                    'alien', 'extraterrestrial', 'xenomorph', 'terraform', 'colony', 'outpost',
+                    'station', 'orbital', 'lunar', 'martian', 'asteroid', 'comet', 'solar',
+                    'fusion', 'reactor', 'shield', 'deflector', 'cloaking', 'device', 'probe',
+                    'beacon', 'transmission', 'frequency', 'coordinates', 'trajectory', 'thrust',
+                    'velocity', 'acceleration', 'gravity', 'artificial', 'intelligence', 'neural',
+                    'interface', 'cybernetic', 'enhancement', 'cryogenic', 'stasis', 'capsule',
+                    'biometric', 'scanner', 'sensor', 'array', 'fleet', 'armada', 'federation'
+                ]
+            },
+            fantasy: {
+                name: 'Fantasy',
+                emoji: '🧙',
+                opener: 'The ancient wizard channeled arcane energies through his enchanted staff.',
+                words: [
+                    'ancient', 'wizard', 'arcane', 'enchanted', 'staff', 'dragon', 'elven',
+                    'dwarven', 'mystical', 'realm', 'kingdom', 'castle', 'dungeon', 'quest',
+                    'prophecy', 'chosen', 'one', 'magical', 'spell', 'potion', 'grimoire',
+                    'rune', 'artifact', 'legendary', 'mythical', 'creature', 'phoenix', 'unicorn',
+                    'griffin', 'basilisk', 'troll', 'ogre', 'goblin', 'orc', 'elf', 'dwarf',
+                    'halfling', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'cleric',
+                    'druid', 'bard', 'tavern', 'guild', 'throne', 'crown', 'sword', 'shield',
+                    'armor', 'bow', 'arrow', 'mana', 'crystal', 'gem', 'portal', 'dimension',
+                    'ethereal', 'celestial', 'infernal', 'elemental', 'summoning', 'conjuring'
+                ]
+            },
+            cooking: {
+                name: 'Culinary',
+                emoji: '👨‍🍳',
+                opener: 'Sauté the aromatics until fragrant, then deglaze with white wine.',
+                words: [
+                    'sauté', 'aromatics', 'fragrant', 'deglaze', 'wine', 'braise', 'roast',
+                    'sear', 'caramelize', 'julienne', 'brunoise', 'mirepoix', 'reduction',
+                    'emulsion', 'infusion', 'consommé', 'roux', 'beurre', 'blanc', 'noisette',
+                    'flambé', 'gratinée', 'sous-vide', 'confit', 'carpaccio', 'tartare',
+                    'mise', 'en', 'place', 'amuse-bouche', 'entrée', 'appetizer', 'palate',
+                    'cleanser', 'umami', 'savory', 'tangy', 'zesty', 'herbs', 'spices',
+                    'seasoning', 'garnish', 'plating', 'presentation', 'texture', 'flavor',
+                    'profile', 'pairing', 'sommelier', 'chef', 'kitchen', 'brigade', 'station',
+                    'saucier', 'pastry', 'pâtisserie', 'ganache', 'coulis', 'compote', 'chiffonade'
+                ]
+            },
+            noir: {
+                name: 'Film Noir',
+                emoji: '🕵️',
+                opener: 'The rain hammered the pavement as she walked into my office, trouble written all over her.',
+                words: [
+                    'rain', 'hammered', 'pavement', 'office', 'trouble', 'dame', 'doll',
+                    'gumshoe', 'private', 'eye', 'detective', 'mystery', 'shadows', 'alley',
+                    'streetlamp', 'cigarette', 'smoke', 'whiskey', 'bourbon', 'fedora', 'trenchcoat',
+                    'revolver', 'bullet', 'corpse', 'murder', 'crime', 'scene', 'clue', 'lead',
+                    'suspect', 'alibi', 'motive', 'case', 'file', 'evidence', 'witness',
+                    'testimony', 'confession', 'double-cross', 'betrayal', 'femme', 'fatale',
+                    'shady', 'deal', 'underworld', 'mob', 'boss', 'racket', 'heist', 'caper',
+                    'getaway', 'hideout', 'stakeout', 'tail', 'shadow', 'midnight', 'jazz',
+                    'club', 'speakeasy', 'bootleg', 'dirty', 'money', 'blackmail', 'ransom'
+                ]
+            },
+            zen: {
+                name: 'Zen',
+                emoji: '☯️',
+                opener: 'In stillness, the mind reflects like a calm mountain lake.',
+                words: [
+                    'stillness', 'mind', 'reflects', 'calm', 'mountain', 'lake', 'breath',
+                    'awareness', 'presence', 'moment', 'eternal', 'now', 'emptiness', 'void',
+                    'fullness', 'balance', 'harmony', 'peace', 'serenity', 'tranquility',
+                    'meditation', 'contemplation', 'wisdom', 'enlightenment', 'awakening',
+                    'consciousness', 'being', 'existence', 'essence', 'nature', 'flow', 'river',
+                    'stone', 'garden', 'bamboo', 'cherry', 'blossom', 'moon', 'sun', 'sky',
+                    'cloud', 'wind', 'rain', 'snow', 'silence', 'solitude', 'simplicity',
+                    'impermanence', 'acceptance', 'letting', 'go', 'detachment', 'compassion',
+                    'kindness', 'gratitude', 'mindfulness', 'intention', 'purpose', 'path', 'way'
+                ]
+            },
+            gaming: {
+                name: 'Gaming',
+                emoji: '🎮',
+                opener: 'GG EZ. The meta shifted hard after the nerf, but sweaty tryhards adapted.',
+                words: [
+                    'GG', 'speedrun', 'meta', 'patch', 'nerf', 'buff', 'OP', 'noob', 'pro',
+                    'clutch', 'combo', 'respawn', 'spawn', 'camp', 'rush', 'flank', 'snipe',
+                    'headshot', 'killstreak', 'achievement', 'trophy', 'platinum', 'grind',
+                    'farm', 'loot', 'drop', 'RNG', 'crit', 'DPS', 'tank', 'healer', 'support',
+                    'carry', 'feed', 'int', 'throw', 'tilt', 'rage', 'quit', 'AFK', 'lag',
+                    'ping', 'FPS', 'frame', 'rate', 'hitbox', 'cooldown', 'ultimate', 'super',
+                    'power-up', 'boss', 'raid', 'dungeon', 'guild', 'clan', 'squad', 'party',
+                    'lobby', 'matchmaking', 'ranked', 'casual', 'competitive', 'esports', 'stream'
+                ]
+            }
+        };
+        
+        let selectedFlavor = 'classic';
+        let generatedText = '';
+        
+        // ========== INIT ==========
+        function init() {
+            loadTheme();
+            renderFlavorGrid();
+            loadFromURL();
+            generate();
+        }
+        
+        function renderFlavorGrid() {
+            const grid = document.getElementById('flavorGrid');
+            grid.innerHTML = Object.entries(FLAVORS).map(([key, flavor]) => `
+                <button class="flavor-btn ${key === selectedFlavor ? 'active' : ''}" 
+                        onclick="selectFlavor('${key}')"
+                        data-flavor="${key}">
+                    <span class="emoji">${flavor.emoji}</span>
+                    <span class="name">${flavor.name}</span>
+                </button>
+            `).join('');
+        }
+        
+        function selectFlavor(key) {
+            selectedFlavor = key;
+            document.querySelectorAll('.flavor-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.flavor === key);
+            });
+            document.getElementById('flavorTag').textContent = FLAVORS[key].emoji + ' ' + FLAVORS[key].name;
+            generate();
+        }
+        
+        function randomFlavor() {
+            const keys = Object.keys(FLAVORS);
+            const randomKey = keys[Math.floor(Math.random() * keys.length)];
+            selectFlavor(randomKey);
+        }
+        
+        // ========== GENERATION ==========
+        function generate() {
+            const unit = document.getElementById('unitSelect').value;
+            const count = Math.min(100, Math.max(1, parseInt(document.getElementById('countInput').value) || 3));
+            const startClassic = document.getElementById('startClassic').value === 'yes';
+            const flavor = FLAVORS[selectedFlavor];
+            
+            let text = '';
+            
+            if (unit === 'paragraphs') {
+                const paragraphs = [];
+                for (let i = 0; i < count; i++) {
+                    const sentenceCount = 4 + Math.floor(Math.random() * 4); // 4-7 sentences
+                    let para = '';
+                    if (i === 0 && startClassic) {
+                        para = flavor.opener + ' ';
+                        para += generateSentences(sentenceCount - 1, flavor.words);
+                    } else {
+                        para = generateSentences(sentenceCount, flavor.words);
+                    }
+                    paragraphs.push(para);
+                }
+                text = paragraphs.join('\n\n');
+            } else if (unit === 'sentences') {
+                if (startClassic) {
+                    text = flavor.opener + ' ';
+                    text += generateSentences(count - 1, flavor.words);
+                } else {
+                    text = generateSentences(count, flavor.words);
+                }
+            } else {
+                if (startClassic) {
+                    const openerWords = flavor.opener.split(/\s+/);
+                    const remaining = count - openerWords.length;
+                    if (remaining > 0) {
+                        text = flavor.opener + ' ' + generateWords(remaining, flavor.words);
+                    } else {
+                        text = openerWords.slice(0, count).join(' ');
+                    }
+                } else {
+                    text = generateWords(count, flavor.words);
+                }
+            }
+            
+            generatedText = text;
+            document.getElementById('output').innerHTML = text.split('\n\n').map(p => `<p>${p}</p>`).join('');
+            updateStats();
+            updateURL();
+        }
+        
+        function generateSentences(count, words) {
+            const sentences = [];
+            for (let i = 0; i < count; i++) {
+                const wordCount = 6 + Math.floor(Math.random() * 10); // 6-15 words
+                let sentence = generateWords(wordCount, words);
+                sentence = sentence.charAt(0).toUpperCase() + sentence.slice(1);
+                // Add punctuation variety
+                const punct = Math.random() > 0.85 ? '!' : (Math.random() > 0.9 ? '?' : '.');
+                sentences.push(sentence + punct);
+            }
+            return sentences.join(' ');
+        }
+        
+        function generateWords(count, words) {
+            const result = [];
+            for (let i = 0; i < count; i++) {
+                result.push(words[Math.floor(Math.random() * words.length)]);
+            }
+            return result.join(' ');
+        }
+        
+        function updateStats() {
+            const words = generatedText.split(/\s+/).filter(w => w.length > 0);
+            const chars = generatedText.length;
+            const paras = generatedText.split('\n\n').length;
+            
+            document.getElementById('wordCount').textContent = words.length;
+            document.getElementById('charCount').textContent = chars.toLocaleString();
+            document.getElementById('paraCount').textContent = paras;
+        }
+        
+        // ========== COPY ==========
+        function copyText() {
+            navigator.clipboard.writeText(generatedText).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.innerHTML = '✓ Copied';
+                btn.classList.add('copied');
+                showToast('Copied to clipboard!');
+                setTimeout(() => {
+                    btn.innerHTML = '📋 Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+        
+        // ========== URL STATE ==========
+        function updateURL() {
+            const params = new URLSearchParams();
+            params.set('f', selectedFlavor);
+            params.set('u', document.getElementById('unitSelect').value);
+            params.set('c', document.getElementById('countInput').value);
+            params.set('s', document.getElementById('startClassic').value);
+            history.replaceState(null, '', '?' + params.toString());
+        }
+        
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('f') && FLAVORS[params.get('f')]) {
+                selectFlavor(params.get('f'));
+            }
+            if (params.has('u')) {
+                document.getElementById('unitSelect').value = params.get('u');
+            }
+            if (params.has('c')) {
+                document.getElementById('countInput').value = params.get('c');
+            }
+            if (params.has('s')) {
+                document.getElementById('startClassic').value = params.get('s');
+            }
+        }
+        
+        // ========== THEME ==========
+        function toggleTheme() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.querySelector('.theme-toggle').textContent = isDark ? '🌙' : '☀️';
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        }
+        
+        function loadTheme() {
+            const saved = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+            document.querySelector('.theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+        
+        // ========== TOAST ==========
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        // ========== KEYBOARD ==========
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+            
+            if (e.code === 'Space') {
+                e.preventDefault();
+                generate();
+            } else if (e.key.toLowerCase() === 'c') {
+                copyText();
+            } else if (e.key.toLowerCase() === 'r') {
+                randomFlavor();
+            } else if (e.key.toLowerCase() === 't') {
+                toggleTheme();
+            }
+        });
+        
+        // ========== START ==========
+        init();
+    </script>
+</body>
+</html>
