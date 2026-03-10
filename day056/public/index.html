@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diff Checker | aikemist.com</title>
+  <meta name="description" content="Compare two texts and see the differences highlighted. Find changes instantly.">
+  <meta property="og:title" content="Diff Checker">
+  <meta property="og:description" content="Compare two texts and see the differences highlighted. Find changes instantly.">
+  <meta property="og:image" content="https://day056.aikemist.com/og.png">
+  <meta property="og:url" content="https://day056.aikemist.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #fafafa;
+      --bg-card: #ffffff;
+      --text: #1a1a2e;
+      --text-muted: #6b7280;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-soft: rgba(99, 102, 241, 0.1);
+      --border: #e5e7eb;
+      --input-bg: #f9fafb;
+      --added: #dcfce7;
+      --added-text: #166534;
+      --removed: #fee2e2;
+      --removed-text: #991b1b;
+      --changed: #fef9c3;
+      --changed-text: #854d0e;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #1e293b;
+      --input-bg: #1e1e2e;
+      --added: #14532d;
+      --added-text: #86efac;
+      --removed: #7f1d1d;
+      --removed-text: #fca5a5;
+      --changed: #713f12;
+      --changed-text: #fde047;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .tagline {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+      z-index: 100;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+    }
+    
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Input Grid */
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+      .input-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .input-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .input-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .input-label-text {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    
+    .char-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    
+    textarea {
+      width: 100%;
+      min-height: 200px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--input-bg);
+      color: var(--text);
+      resize: vertical;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    
+    /* Actions */
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .action-btn {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.625rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--input-bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .action-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    
+    .action-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    .action-btn.primary:hover {
+      background: var(--accent-hover);
+    }
+    
+    /* Stats */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 1rem 0;
+      flex-wrap: wrap;
+    }
+    
+    .stat {
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    
+    .stat-value.added { color: var(--added-text); }
+    .stat-value.removed { color: var(--removed-text); }
+    .stat-value.changed { color: var(--changed-text); }
+    
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    /* Diff Output */
+    .diff-output {
+      margin-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+    }
+    
+    .diff-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    
+    .diff-content {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      line-height: 1.8;
+      background: var(--input-bg);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    
+    .diff-line {
+      display: block;
+      padding: 2px 8px;
+      margin: 0 -8px;
+      border-radius: 4px;
+    }
+    
+    .diff-line.added {
+      background: var(--added);
+      color: var(--added-text);
+    }
+    
+    .diff-line.removed {
+      background: var(--removed);
+      color: var(--removed-text);
+    }
+    
+    .diff-line.changed {
+      background: var(--changed);
+      color: var(--changed-text);
+    }
+    
+    .diff-line-number {
+      display: inline-block;
+      width: 3ch;
+      color: var(--text-muted);
+      margin-right: 1rem;
+      user-select: none;
+    }
+    
+    .diff-prefix {
+      display: inline-block;
+      width: 2ch;
+      font-weight: 600;
+      user-select: none;
+    }
+    
+    /* Legend */
+    .legend {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+    }
+    
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+    
+    .legend-color.added { background: var(--added); border: 1px solid var(--added-text); }
+    .legend-color.removed { background: var(--removed); border: 1px solid var(--removed-text); }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 1000;
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
+    .keyboard-hints {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    
+    kbd {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.125rem 0.375rem;
+      font-size: 0.7rem;
+    }
+    
+    @media (max-width: 600px) {
+      h1 { font-size: 1.75rem; }
+      .container { padding: 1rem; }
+      .card { padding: 1rem; }
+      textarea { min-height: 150px; }
+      .keyboard-hints { display: none; }
+      .stats { gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+  
+  <div class="container">
+    <header>
+      <h1>Diff Checker</h1>
+      <p class="tagline">Compare two texts. See every difference. Find changes fast.</p>
+    </header>
+    
+    <div class="card">
+      <!-- Input Grid -->
+      <div class="input-grid">
+        <div class="input-group">
+          <div class="input-label">
+            <span class="input-label-text">Original Text</span>
+            <span class="char-count" id="count1">0 chars</span>
+          </div>
+          <textarea id="text1" placeholder="Paste original text here..."></textarea>
+        </div>
+        <div class="input-group">
+          <div class="input-label">
+            <span class="input-label-text">Modified Text</span>
+            <span class="char-count" id="count2">0 chars</span>
+          </div>
+          <textarea id="text2" placeholder="Paste modified text here..."></textarea>
+        </div>
+      </div>
+      
+      <!-- Actions -->
+      <div class="actions">
+        <button class="action-btn primary" id="compareBtn">🔍 Compare</button>
+        <button class="action-btn" id="swapBtn">🔄 Swap</button>
+        <button class="action-btn" id="clearBtn">✕ Clear</button>
+        <button class="action-btn" id="sampleBtn">📝 Sample</button>
+      </div>
+      
+      <!-- Stats -->
+      <div class="stats" id="stats" style="display: none;">
+        <div class="stat">
+          <div class="stat-value added" id="addedCount">0</div>
+          <div class="stat-label">Added</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value removed" id="removedCount">0</div>
+          <div class="stat-label">Removed</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="totalLines">0</div>
+          <div class="stat-label">Total Lines</div>
+        </div>
+      </div>
+      
+      <!-- Diff Output -->
+      <div class="diff-output" id="diffOutput" style="display: none;">
+        <div class="diff-title">Differences</div>
+        <div class="diff-content" id="diffContent"></div>
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-color added"></div>
+            <span>Added</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color removed"></div>
+            <span>Removed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="keyboard-hints">
+      <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> Compare</span>
+      <span><kbd>T</kbd> Theme</span>
+    </div>
+  </div>
+  
+  <footer>
+    <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+  </footer>
+  
+  <div class="toast" id="toast">Copied!</div>
+  
+  <script>
+    // Theme
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    
+    themeToggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+    
+    // Elements
+    const text1 = document.getElementById('text1');
+    const text2 = document.getElementById('text2');
+    const count1 = document.getElementById('count1');
+    const count2 = document.getElementById('count2');
+    const stats = document.getElementById('stats');
+    const diffOutput = document.getElementById('diffOutput');
+    const diffContent = document.getElementById('diffContent');
+    
+    // Toast
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+    
+    // Update counts
+    function updateCounts() {
+      count1.textContent = `${text1.value.length} chars`;
+      count2.textContent = `${text2.value.length} chars`;
+    }
+    
+    text1.addEventListener('input', updateCounts);
+    text2.addEventListener('input', updateCounts);
+    
+    // Simple line-by-line diff
+    function computeDiff(original, modified) {
+      const lines1 = original.split('\n');
+      const lines2 = modified.split('\n');
+      const result = [];
+      let added = 0, removed = 0;
+      
+      const maxLen = Math.max(lines1.length, lines2.length);
+      
+      // Use LCS for better diff
+      const lcs = longestCommonSubsequence(lines1, lines2);
+      
+      let i = 0, j = 0, k = 0;
+      
+      while (i < lines1.length || j < lines2.length) {
+        if (k < lcs.length && i < lines1.length && lines1[i] === lcs[k]) {
+          if (j < lines2.length && lines2[j] === lcs[k]) {
+            // Same line in both
+            result.push({ type: 'same', line: lines1[i], num: i + 1 });
+            i++; j++; k++;
+          } else {
+            // Line added in modified
+            result.push({ type: 'added', line: lines2[j], num: j + 1 });
+            added++;
+            j++;
+          }
+        } else if (k < lcs.length && j < lines2.length && lines2[j] === lcs[k]) {
+          // Line removed from original
+          result.push({ type: 'removed', line: lines1[i], num: i + 1 });
+          removed++;
+          i++;
+        } else if (i < lines1.length && j < lines2.length) {
+          // Both different, check which to output
+          if (i < lines1.length) {
+            result.push({ type: 'removed', line: lines1[i], num: i + 1 });
+            removed++;
+            i++;
+          }
+          if (j < lines2.length && (i >= lines1.length || lines1[i] !== lines2[j])) {
+            result.push({ type: 'added', line: lines2[j], num: j + 1 });
+            added++;
+            j++;
+          }
+        } else if (i < lines1.length) {
+          result.push({ type: 'removed', line: lines1[i], num: i + 1 });
+          removed++;
+          i++;
+        } else if (j < lines2.length) {
+          result.push({ type: 'added', line: lines2[j], num: j + 1 });
+          added++;
+          j++;
+        }
+      }
+      
+      return { diff: result, added, removed, total: maxLen };
+    }
+    
+    // LCS algorithm
+    function longestCommonSubsequence(arr1, arr2) {
+      const m = arr1.length, n = arr2.length;
+      const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+      
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          if (arr1[i - 1] === arr2[j - 1]) {
+            dp[i][j] = dp[i - 1][j - 1] + 1;
+          } else {
+            dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+          }
+        }
+      }
+      
+      // Backtrack to find LCS
+      const lcs = [];
+      let i = m, j = n;
+      while (i > 0 && j > 0) {
+        if (arr1[i - 1] === arr2[j - 1]) {
+          lcs.unshift(arr1[i - 1]);
+          i--; j--;
+        } else if (dp[i - 1][j] > dp[i][j - 1]) {
+          i--;
+        } else {
+          j--;
+        }
+      }
+      
+      return lcs;
+    }
+    
+    // Simple fallback diff
+    function simpleDiff(original, modified) {
+      const lines1 = original.split('\n');
+      const lines2 = modified.split('\n');
+      const result = [];
+      let added = 0, removed = 0;
+      
+      const maxLen = Math.max(lines1.length, lines2.length);
+      
+      for (let i = 0; i < maxLen; i++) {
+        const line1 = lines1[i];
+        const line2 = lines2[i];
+        
+        if (line1 === undefined) {
+          result.push({ type: 'added', line: line2, num: i + 1 });
+          added++;
+        } else if (line2 === undefined) {
+          result.push({ type: 'removed', line: line1, num: i + 1 });
+          removed++;
+        } else if (line1 === line2) {
+          result.push({ type: 'same', line: line1, num: i + 1 });
+        } else {
+          result.push({ type: 'removed', line: line1, num: i + 1 });
+          result.push({ type: 'added', line: line2, num: i + 1 });
+          added++;
+          removed++;
+        }
+      }
+      
+      return { diff: result, added, removed, total: maxLen };
+    }
+    
+    // Compare
+    function compare() {
+      const original = text1.value;
+      const modified = text2.value;
+      
+      if (!original && !modified) {
+        showToast('Enter text to compare');
+        return;
+      }
+      
+      const { diff, added, removed, total } = simpleDiff(original, modified);
+      
+      // Update stats
+      document.getElementById('addedCount').textContent = added;
+      document.getElementById('removedCount').textContent = removed;
+      document.getElementById('totalLines').textContent = total;
+      stats.style.display = 'flex';
+      
+      // Render diff
+      let html = '';
+      diff.forEach((item, idx) => {
+        const prefix = item.type === 'added' ? '+' : item.type === 'removed' ? '-' : ' ';
+        const escapedLine = escapeHtml(item.line || '');
+        html += `<span class="diff-line ${item.type}"><span class="diff-prefix">${prefix}</span>${escapedLine || '&nbsp;'}</span>\n`;
+      });
+      
+      diffContent.innerHTML = html;
+      diffOutput.style.display = 'block';
+      
+      if (added === 0 && removed === 0) {
+        showToast('Texts are identical!');
+      }
+    }
+    
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+    }
+    
+    // Compare button
+    document.getElementById('compareBtn').addEventListener('click', compare);
+    
+    // Swap
+    document.getElementById('swapBtn').addEventListener('click', () => {
+      const temp = text1.value;
+      text1.value = text2.value;
+      text2.value = temp;
+      updateCounts();
+    });
+    
+    // Clear
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      text1.value = '';
+      text2.value = '';
+      updateCounts();
+      stats.style.display = 'none';
+      diffOutput.style.display = 'none';
+      text1.focus();
+    });
+    
+    // Sample
+    document.getElementById('sampleBtn').addEventListener('click', () => {
+      text1.value = `function greet(name) {
+  console.log("Hello, " + name);
+  return true;
+}
+
+greet("World");`;
+      
+      text2.value = `function greet(name, greeting = "Hello") {
+  console.log(greeting + ", " + name + "!");
+  return true;
+}
+
+// Call the function
+greet("World");
+greet("Frank", "Hi");`;
+      
+      updateCounts();
+      compare();
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter') {
+        compare();
+      } else if (e.key.toLowerCase() === 't' && document.activeElement.tagName !== 'TEXTAREA') {
+        themeToggle.click();
+      }
+    });
+    
+    // Init
+    updateCounts();
+  </script>
+</body>
+</html>
