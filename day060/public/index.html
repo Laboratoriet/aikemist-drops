@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number Base Converter | aikemist.com</title>
+  <meta name="description" content="Convert numbers between decimal, binary, hexadecimal, and octal instantly.">
+  <meta property="og:title" content="Number Base Converter">
+  <meta property="og:description" content="Convert numbers between decimal, binary, hexadecimal, and octal instantly.">
+  <meta property="og:image" content="https://day060.aikemist.com/og.png">
+  <meta property="og:url" content="https://day060.aikemist.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #fafafa;
+      --bg-card: #ffffff;
+      --text: #1a1a2e;
+      --text-muted: #6b7280;
+      --accent: #f59e0b;
+      --accent-hover: #d97706;
+      --accent-soft: rgba(245, 158, 11, 0.1);
+      --border: #e5e7eb;
+      --input-bg: #f9fafb;
+      --success: #10b981;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #1e293b;
+      --input-bg: #1e1e2e;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), #fbbf24);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .tagline {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+      z-index: 100;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+    }
+    
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Base Cards */
+    .base-grid {
+      display: grid;
+      gap: 1rem;
+    }
+    
+    .base-card {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      transition: border-color 0.2s;
+    }
+    
+    .base-card:focus-within {
+      border-color: var(--accent);
+    }
+    
+    .base-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .base-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    
+    .base-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      padding: 0.25rem 0.5rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 4px;
+    }
+    
+    .base-input {
+      width: 100%;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.25rem;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--text);
+      outline: none;
+    }
+    
+    .base-input::placeholder {
+      color: var(--text-muted);
+    }
+    
+    .base-input:focus {
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+    
+    .base-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    
+    .copy-btn {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.75rem;
+      padding: 0.375rem 0.625rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .copy-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .copy-btn.copied {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+    
+    /* Bit Display */
+    .bit-display {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .bit-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+    
+    .bit-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .bit {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      border-radius: 4px;
+      background: var(--input-bg);
+    }
+    
+    .bit.one {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .bit-separator {
+      width: 8px;
+    }
+    
+    /* Quick Values */
+    .quick-values {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    .quick-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--input-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .quick-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .keyboard-hints {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    
+    kbd {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.125rem 0.375rem;
+      font-size: 0.7rem;
+    }
+    
+    @media (max-width: 600px) {
+      h1 { font-size: 1.75rem; }
+      .container { padding: 1rem; }
+      .card { padding: 1rem; }
+      .base-input { font-size: 1rem; }
+      .keyboard-hints { display: none; }
+      .bit { width: 24px; height: 24px; font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+  
+  <div class="container">
+    <header>
+      <h1>Number Base Converter</h1>
+      <p class="tagline">Decimal ↔ Binary ↔ Hex ↔ Octal. Type anywhere, see all.</p>
+    </header>
+    
+    <div class="card">
+      <div class="base-grid">
+        <!-- Decimal -->
+        <div class="base-card">
+          <div class="base-header">
+            <span class="base-label">Decimal</span>
+            <span class="base-badge">Base 10</span>
+          </div>
+          <input type="text" class="base-input" id="decimal" placeholder="0" data-base="10">
+          <div class="base-actions">
+            <button class="copy-btn" data-target="decimal">Copy</button>
+          </div>
+        </div>
+        
+        <!-- Binary -->
+        <div class="base-card">
+          <div class="base-header">
+            <span class="base-label">Binary</span>
+            <span class="base-badge">Base 2</span>
+          </div>
+          <input type="text" class="base-input" id="binary" placeholder="0" data-base="2">
+          <div class="base-actions">
+            <button class="copy-btn" data-target="binary">Copy</button>
+          </div>
+        </div>
+        
+        <!-- Hexadecimal -->
+        <div class="base-card">
+          <div class="base-header">
+            <span class="base-label">Hexadecimal</span>
+            <span class="base-badge">Base 16</span>
+          </div>
+          <input type="text" class="base-input" id="hex" placeholder="0" data-base="16">
+          <div class="base-actions">
+            <button class="copy-btn" data-target="hex">Copy</button>
+            <button class="copy-btn" data-target="hex" data-prefix="0x">Copy 0x</button>
+          </div>
+        </div>
+        
+        <!-- Octal -->
+        <div class="base-card">
+          <div class="base-header">
+            <span class="base-label">Octal</span>
+            <span class="base-badge">Base 8</span>
+          </div>
+          <input type="text" class="base-input" id="octal" placeholder="0" data-base="8">
+          <div class="base-actions">
+            <button class="copy-btn" data-target="octal">Copy</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Bit Display -->
+      <div class="bit-display">
+        <div class="bit-title">Binary Bits (32-bit)</div>
+        <div class="bit-grid" id="bitGrid"></div>
+      </div>
+      
+      <!-- Quick Values -->
+      <div class="quick-values">
+        <div class="bit-title">Quick Values</div>
+        <div class="quick-chips">
+          <button class="quick-chip" data-value="255">255</button>
+          <button class="quick-chip" data-value="256">256</button>
+          <button class="quick-chip" data-value="1024">1024</button>
+          <button class="quick-chip" data-value="65535">65535</button>
+          <button class="quick-chip" data-value="16777215">16777215</button>
+          <button class="quick-chip" data-value="2147483647">MAX_INT32</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="keyboard-hints">
+      <span><kbd>T</kbd> Theme</span>
+    </div>
+  </div>
+  
+  <footer>
+    <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+  </footer>
+  
+  <script>
+    // Theme
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    
+    themeToggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+    
+    // Elements
+    const decimal = document.getElementById('decimal');
+    const binary = document.getElementById('binary');
+    const hex = document.getElementById('hex');
+    const octal = document.getElementById('octal');
+    const bitGrid = document.getElementById('bitGrid');
+    
+    // Convert and update all fields
+    function convert(sourceId, value) {
+      const base = parseInt(document.getElementById(sourceId).dataset.base);
+      
+      // Parse the input
+      let num;
+      try {
+        num = parseInt(value.replace(/\s/g, ''), base);
+        if (isNaN(num) || num < 0) num = 0;
+      } catch {
+        num = 0;
+      }
+      
+      // Update all fields except source
+      if (sourceId !== 'decimal') decimal.value = num.toString(10);
+      if (sourceId !== 'binary') binary.value = num.toString(2);
+      if (sourceId !== 'hex') hex.value = num.toString(16).toUpperCase();
+      if (sourceId !== 'octal') octal.value = num.toString(8);
+      
+      // Update bit display
+      updateBitDisplay(num);
+    }
+    
+    // Update bit visualization
+    function updateBitDisplay(num) {
+      const bits = num.toString(2).padStart(32, '0');
+      let html = '';
+      
+      for (let i = 0; i < 32; i++) {
+        if (i > 0 && i % 8 === 0) {
+          html += '<div class="bit-separator"></div>';
+        }
+        html += `<div class="bit ${bits[i] === '1' ? 'one' : ''}">${bits[i]}</div>`;
+      }
+      
+      bitGrid.innerHTML = html;
+    }
+    
+    // Input handlers
+    [decimal, binary, hex, octal].forEach(input => {
+      input.addEventListener('input', (e) => {
+        convert(e.target.id, e.target.value);
+      });
+    });
+    
+    // Copy buttons
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.dataset.target);
+        let value = target.value;
+        
+        if (btn.dataset.prefix) {
+          value = btn.dataset.prefix + value;
+        }
+        
+        navigator.clipboard.writeText(value);
+        btn.textContent = '✓';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = btn.dataset.prefix ? `Copy ${btn.dataset.prefix}` : 'Copy';
+          btn.classList.remove('copied');
+        }, 1500);
+      });
+    });
+    
+    // Quick values
+    document.querySelectorAll('.quick-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        decimal.value = chip.dataset.value;
+        convert('decimal', chip.dataset.value);
+      });
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 't' && document.activeElement.tagName !== 'INPUT') {
+        themeToggle.click();
+      }
+    });
+    
+    // Init
+    updateBitDisplay(0);
+  </script>
+</body>
+</html>
