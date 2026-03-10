@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Format Converter | aikemist.com</title>
+  <meta name="description" content="Convert colors between HEX, RGB, HSL, and CMYK. Click to copy any format.">
+  <meta property="og:title" content="Color Format Converter">
+  <meta property="og:description" content="Convert colors between HEX, RGB, HSL, and CMYK. Click to copy any format.">
+  <meta property="og:image" content="https://day053.aikemist.com/og.png">
+  <meta property="og:url" content="https://day053.aikemist.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #fafafa;
+      --bg-card: #ffffff;
+      --text: #1a1a2e;
+      --text-muted: #6b7280;
+      --accent: #f43f5e;
+      --accent-hover: #e11d48;
+      --accent-soft: rgba(244, 63, 94, 0.1);
+      --border: #e5e7eb;
+      --input-bg: #f9fafb;
+      --success: #10b981;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #1e293b;
+      --input-bg: #1e1e2e;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .tagline {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+      z-index: 100;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Color Preview */
+    .color-preview {
+      height: 120px;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .color-preview::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 50% / 20px 20px;
+      z-index: 0;
+    }
+    
+    .color-preview-inner {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .color-name {
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Input Section */
+    .input-section {
+      margin-bottom: 1.5rem;
+    }
+    
+    .input-row {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+    
+    .input-group {
+      flex: 1;
+    }
+    
+    .input-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    
+    .input-field {
+      width: 100%;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--input-bg);
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    
+    .input-hint {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.375rem;
+    }
+    
+    .color-picker-wrapper {
+      position: relative;
+    }
+    
+    .color-picker {
+      width: 52px;
+      height: 52px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+      overflow: hidden;
+    }
+    
+    .color-picker::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    
+    .color-picker::-webkit-color-swatch {
+      border: none;
+      border-radius: 8px;
+    }
+    
+    .formats-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+    
+    /* Format Cards */
+    .formats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    
+    @media (max-width: 500px) {
+      .formats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .format-card {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .format-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    
+    .format-card:active {
+      transform: translateY(0);
+    }
+    
+    .format-card.copied {
+      border-color: var(--success);
+      background: rgba(16, 185, 129, 0.1);
+    }
+    
+    .format-name {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+    
+    .format-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--text);
+      word-break: break-all;
+    }
+    
+    .format-hint {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    
+    /* Contrast Info */
+    .contrast-info {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .contrast-item {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.75rem;
+      background: var(--input-bg);
+      border-radius: 8px;
+    }
+    
+    .contrast-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    
+    .contrast-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+    
+    .contrast-badge.pass-aaa {
+      background: #10b981;
+      color: white;
+    }
+    
+    .contrast-badge.pass-aa {
+      background: #84cc16;
+      color: white;
+    }
+    
+    .contrast-badge.fail {
+      background: #ef4444;
+      color: white;
+    }
+    
+    /* Presets */
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .preset-btn {
+      width: 32px;
+      height: 32px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    
+    .preset-btn:hover {
+      transform: scale(1.1);
+      border-color: var(--text);
+    }
+    
+    .preset-btn.active {
+      border-color: var(--text);
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--text);
+    }
+    
+    /* Random Button */
+    .random-btn {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .random-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 1000;
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
+    .keyboard-hints {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    
+    kbd {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.125rem 0.375rem;
+      font-size: 0.7rem;
+    }
+    
+    @media (max-width: 500px) {
+      h1 { font-size: 1.75rem; }
+      .container { padding: 1rem; }
+      .card { padding: 1rem; }
+      .input-row { flex-direction: column; gap: 0.75rem; }
+      .color-picker-wrapper { align-self: flex-start; }
+      .contrast-info { flex-direction: column; gap: 0.5rem; }
+      .color-preview { height: 80px; }
+      .format-card { padding: 0.75rem; }
+      .format-value { font-size: 0.8rem; }
+      .contrast-info { flex-direction: column; gap: 0.5rem; }
+      .presets { gap: 0.375rem; }
+      .preset-btn { width: 28px; height: 28px; }
+      .keyboard-hints { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+  
+  <div class="container">
+    <header>
+      <h1>Color Format Converter</h1>
+      <p class="tagline">Type any format. Get every format. Click to copy.</p>
+    </header>
+    
+    <div class="card">
+      <!-- Color Preview -->
+      <div class="color-preview" id="colorPreview">
+        <div class="color-preview-inner" id="colorPreviewInner">
+          <span class="color-name" id="colorName">Rose</span>
+        </div>
+      </div>
+      
+      <!-- Input -->
+      <div class="input-section">
+        <div class="input-row">
+          <div class="input-group">
+            <label class="input-label">Enter any color format</label>
+            <input type="text" class="input-field" id="colorInput" value="#f43f5e" placeholder="#hex, rgb(r,g,b), hsl(h,s%,l%)">
+            <span class="input-hint">Accepts: #hex, rgb(), rgba(), hsl(), hsla()</span>
+          </div>
+          <div class="color-picker-wrapper">
+            <input type="color" class="color-picker" id="colorPicker" value="#f43f5e">
+          </div>
+        </div>
+      </div>
+      
+      <!-- Formats -->
+      <p class="formats-hint">Click any format to copy</p>
+      <div class="formats-grid" id="formatsGrid">
+        <div class="format-card" data-format="hex">
+          <div class="format-name">HEX</div>
+          <div class="format-value" id="hexValue">#f43f5e</div>
+        </div>
+        <div class="format-card" data-format="rgb">
+          <div class="format-name">RGB</div>
+          <div class="format-value" id="rgbValue">rgb(244, 63, 94)</div>
+        </div>
+        <div class="format-card" data-format="hsl">
+          <div class="format-name">HSL</div>
+          <div class="format-value" id="hslValue">hsl(350, 89%, 60%)</div>
+        </div>
+        <div class="format-card" data-format="cmyk">
+          <div class="format-name">CMYK</div>
+          <div class="format-value" id="cmykValue">cmyk(0%, 74%, 61%, 4%)</div>
+        </div>
+        <div class="format-card" data-format="rgba">
+          <div class="format-name">RGBA</div>
+          <div class="format-value" id="rgbaValue">rgba(244, 63, 94, 1)</div>
+        </div>
+        <div class="format-card" data-format="hsla">
+          <div class="format-name">HSLA</div>
+          <div class="format-value" id="hslaValue">hsla(350, 89%, 60%, 1)</div>
+        </div>
+        <div class="format-card" data-format="hwb">
+          <div class="format-name">HWB</div>
+          <div class="format-value" id="hwbValue">hwb(350 25% 4%)</div>
+        </div>
+        <div class="format-card" data-format="css">
+          <div class="format-name">CSS Variable</div>
+          <div class="format-value" id="cssValue">--color: #f43f5e;</div>
+        </div>
+      </div>
+      
+      <!-- Contrast Info -->
+      <div class="contrast-info" id="contrastInfo">
+        <div class="contrast-item">
+          <span class="contrast-label">On White</span>
+          <span class="contrast-badge" id="contrastWhite">3.4:1</span>
+        </div>
+        <div class="contrast-item">
+          <span class="contrast-label">On Black</span>
+          <span class="contrast-badge" id="contrastBlack">6.1:1</span>
+        </div>
+      </div>
+      
+      <!-- Presets -->
+      <div class="presets" id="presets">
+        <button class="preset-btn" style="background: #f43f5e" data-color="#f43f5e" title="Rose"></button>
+        <button class="preset-btn" style="background: #8b5cf6" data-color="#8b5cf6" title="Violet"></button>
+        <button class="preset-btn" style="background: #3b82f6" data-color="#3b82f6" title="Blue"></button>
+        <button class="preset-btn" style="background: #06b6d4" data-color="#06b6d4" title="Cyan"></button>
+        <button class="preset-btn" style="background: #10b981" data-color="#10b981" title="Emerald"></button>
+        <button class="preset-btn" style="background: #84cc16" data-color="#84cc16" title="Lime"></button>
+        <button class="preset-btn" style="background: #eab308" data-color="#eab308" title="Yellow"></button>
+        <button class="preset-btn" style="background: #f97316" data-color="#f97316" title="Orange"></button>
+        <button class="preset-btn" style="background: #ef4444" data-color="#ef4444" title="Red"></button>
+        <button class="preset-btn" style="background: #ec4899" data-color="#ec4899" title="Pink"></button>
+        <button class="preset-btn" style="background: #0a0a0a" data-color="#0a0a0a" title="Black"></button>
+        <button class="preset-btn" style="background: #fafafa; border-color: #ccc" data-color="#fafafa" title="White"></button>
+        <button class="random-btn" id="randomBtn">🎲 Random</button>
+      </div>
+    </div>
+    
+    <div class="keyboard-hints">
+      <span><kbd>R</kbd> Random</span>
+      <span><kbd>T</kbd> Theme</span>
+    </div>
+  </div>
+  
+  <footer>
+    <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+  </footer>
+  
+  <div class="toast" id="toast">Copied!</div>
+  
+  <script>
+    // Theme
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    
+    themeToggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+    
+    // Elements
+    const colorInput = document.getElementById('colorInput');
+    const colorPicker = document.getElementById('colorPicker');
+    const colorPreviewInner = document.getElementById('colorPreviewInner');
+    const colorName = document.getElementById('colorName');
+    
+    // Color names
+    const colorNames = {
+      '#f43f5e': 'Rose', '#e11d48': 'Rose Dark', '#fb7185': 'Rose Light',
+      '#8b5cf6': 'Violet', '#7c3aed': 'Violet Dark', '#a78bfa': 'Violet Light',
+      '#3b82f6': 'Blue', '#2563eb': 'Blue Dark', '#60a5fa': 'Blue Light',
+      '#06b6d4': 'Cyan', '#0891b2': 'Cyan Dark', '#22d3ee': 'Cyan Light',
+      '#10b981': 'Emerald', '#059669': 'Emerald Dark', '#34d399': 'Emerald Light',
+      '#84cc16': 'Lime', '#65a30d': 'Lime Dark', '#a3e635': 'Lime Light',
+      '#eab308': 'Yellow', '#ca8a04': 'Yellow Dark', '#facc15': 'Yellow Light',
+      '#f97316': 'Orange', '#ea580c': 'Orange Dark', '#fb923c': 'Orange Light',
+      '#ef4444': 'Red', '#dc2626': 'Red Dark', '#f87171': 'Red Light',
+      '#ec4899': 'Pink', '#db2777': 'Pink Dark', '#f472b6': 'Pink Light',
+      '#0a0a0a': 'Black', '#1a1a1a': 'Charcoal', '#262626': 'Gray Dark',
+      '#fafafa': 'White', '#f5f5f5': 'Gray Light', '#e5e5e5': 'Gray',
+      '#000000': 'Black', '#ffffff': 'White',
+    };
+    
+    // Toast
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+    
+    // Parse any color format
+    function parseColor(input) {
+      input = input.trim().toLowerCase();
+      
+      // HEX
+      if (input.startsWith('#')) {
+        let hex = input.slice(1);
+        if (hex.length === 3) {
+          hex = hex.split('').map(c => c + c).join('');
+        }
+        if (hex.length === 6 && /^[0-9a-f]{6}$/.test(hex)) {
+          const r = parseInt(hex.slice(0, 2), 16);
+          const g = parseInt(hex.slice(2, 4), 16);
+          const b = parseInt(hex.slice(4, 6), 16);
+          return { r, g, b, a: 1 };
+        }
+      }
+      
+      // RGB / RGBA
+      const rgbaMatch = input.match(/rgba?\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+))?\s*\)/);
+      if (rgbaMatch) {
+        return {
+          r: parseInt(rgbaMatch[1]),
+          g: parseInt(rgbaMatch[2]),
+          b: parseInt(rgbaMatch[3]),
+          a: rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1
+        };
+      }
+      
+      // HSL / HSLA
+      const hslaMatch = input.match(/hsla?\s*\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?\s*(?:,\s*([\d.]+))?\s*\)/);
+      if (hslaMatch) {
+        const h = parseInt(hslaMatch[1]);
+        const s = parseInt(hslaMatch[2]) / 100;
+        const l = parseInt(hslaMatch[3]) / 100;
+        const a = hslaMatch[4] ? parseFloat(hslaMatch[4]) : 1;
+        const rgb = hslToRgb(h, s, l);
+        return { ...rgb, a };
+      }
+      
+      return null;
+    }
+    
+    // HSL to RGB
+    function hslToRgb(h, s, l) {
+      let r, g, b;
+      if (s === 0) {
+        r = g = b = l;
+      } else {
+        const hue2rgb = (p, q, t) => {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h / 360 + 1/3);
+        g = hue2rgb(p, q, h / 360);
+        b = hue2rgb(p, q, h / 360 - 1/3);
+      }
+      return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+    }
+    
+    // RGB to HSL
+    function rgbToHsl(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h, s, l = (max + min) / 2;
+      
+      if (max === min) {
+        h = s = 0;
+      } else {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+          case g: h = ((b - r) / d + 2) / 6; break;
+          case b: h = ((r - g) / d + 4) / 6; break;
+        }
+      }
+      return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+    }
+    
+    // RGB to CMYK
+    function rgbToCmyk(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      const k = 1 - Math.max(r, g, b);
+      if (k === 1) return { c: 0, m: 0, y: 0, k: 100 };
+      const c = (1 - r - k) / (1 - k);
+      const m = (1 - g - k) / (1 - k);
+      const y = (1 - b - k) / (1 - k);
+      return {
+        c: Math.round(c * 100),
+        m: Math.round(m * 100),
+        y: Math.round(y * 100),
+        k: Math.round(k * 100)
+      };
+    }
+    
+    // RGB to HEX
+    function rgbToHex(r, g, b) {
+      return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+    
+    // RGB to HWB
+    function rgbToHwb(r, g, b) {
+      const hsl = rgbToHsl(r, g, b);
+      const max = Math.max(r, g, b) / 255;
+      const min = Math.min(r, g, b) / 255;
+      return {
+        h: hsl.h,
+        w: Math.round(min * 100),
+        b: Math.round((1 - max) * 100)
+      };
+    }
+    
+    // Calculate relative luminance
+    function getLuminance(r, g, b) {
+      const [rs, gs, bs] = [r, g, b].map(c => {
+        c = c / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+    }
+    
+    // Calculate contrast ratio
+    function getContrastRatio(l1, l2) {
+      const lighter = Math.max(l1, l2);
+      const darker = Math.min(l1, l2);
+      return (lighter + 0.05) / (darker + 0.05);
+    }
+    
+    // Update all formats
+    function updateFormats(color) {
+      if (!color) return;
+      
+      const { r, g, b, a } = color;
+      const hex = rgbToHex(r, g, b);
+      const hsl = rgbToHsl(r, g, b);
+      const cmyk = rgbToCmyk(r, g, b);
+      const hwb = rgbToHwb(r, g, b);
+      
+      // Update values
+      document.getElementById('hexValue').textContent = hex;
+      document.getElementById('rgbValue').textContent = `rgb(${r}, ${g}, ${b})`;
+      document.getElementById('hslValue').textContent = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+      document.getElementById('cmykValue').textContent = `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`;
+      document.getElementById('rgbaValue').textContent = `rgba(${r}, ${g}, ${b}, ${a})`;
+      document.getElementById('hslaValue').textContent = `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, ${a})`;
+      document.getElementById('hwbValue').textContent = `hwb(${hwb.h} ${hwb.w}% ${hwb.b}%)`;
+      document.getElementById('cssValue').textContent = `--color: ${hex};`;
+      
+      // Update contrast info
+      const lum = getLuminance(r, g, b);
+      const whiteLum = getLuminance(255, 255, 255);
+      const blackLum = getLuminance(0, 0, 0);
+      
+      const contrastWhite = getContrastRatio(lum, whiteLum);
+      const contrastBlack = getContrastRatio(lum, blackLum);
+      
+      const contrastWhiteEl = document.getElementById('contrastWhite');
+      const contrastBlackEl = document.getElementById('contrastBlack');
+      
+      contrastWhiteEl.textContent = contrastWhite.toFixed(1) + ':1';
+      contrastBlackEl.textContent = contrastBlack.toFixed(1) + ':1';
+      
+      // WCAG ratings
+      contrastWhiteEl.className = 'contrast-badge ' + (contrastWhite >= 7 ? 'pass-aaa' : contrastWhite >= 4.5 ? 'pass-aa' : 'fail');
+      contrastBlackEl.className = 'contrast-badge ' + (contrastBlack >= 7 ? 'pass-aaa' : contrastBlack >= 4.5 ? 'pass-aa' : 'fail');
+      
+      // Update preview
+      colorPreviewInner.style.backgroundColor = a < 1 
+        ? `rgba(${r}, ${g}, ${b}, ${a})` 
+        : hex;
+      
+      // Update color name
+      const name = colorNames[hex.toLowerCase()] || getClosestColorName(r, g, b);
+      colorName.textContent = name;
+      
+      // Update text color based on luminance
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      colorName.style.background = luminance > 0.5 ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.3)';
+      colorName.style.color = luminance > 0.5 ? 'white' : 'white';
+      
+      // Update picker
+      colorPicker.value = hex;
+      
+      // Update URL
+      history.replaceState(null, '', `?c=${encodeURIComponent(hex)}`);
+    }
+    
+    // Get closest named color
+    function getClosestColorName(r, g, b) {
+      const hsl = rgbToHsl(r, g, b);
+      const { h, s, l } = hsl;
+      
+      if (s < 10) {
+        if (l < 20) return 'Black';
+        if (l > 80) return 'White';
+        return 'Gray';
+      }
+      
+      if (h < 15 || h >= 345) return 'Red';
+      if (h < 45) return 'Orange';
+      if (h < 75) return 'Yellow';
+      if (h < 165) return 'Green';
+      if (h < 195) return 'Cyan';
+      if (h < 255) return 'Blue';
+      if (h < 285) return 'Violet';
+      if (h < 345) return 'Pink';
+      return 'Red';
+    }
+    
+    // Input handlers
+    colorInput.addEventListener('input', () => {
+      const color = parseColor(colorInput.value);
+      if (color) updateFormats(color);
+    });
+    
+    colorPicker.addEventListener('input', () => {
+      colorInput.value = colorPicker.value;
+      const color = parseColor(colorPicker.value);
+      if (color) updateFormats(color);
+    });
+    
+    // Copy on click
+    document.getElementById('formatsGrid').addEventListener('click', (e) => {
+      const card = e.target.closest('.format-card');
+      if (card) {
+        const value = card.querySelector('.format-value').textContent;
+        navigator.clipboard.writeText(value);
+        
+        // Visual feedback
+        card.classList.add('copied');
+        setTimeout(() => card.classList.remove('copied'), 500);
+        
+        showToast(`Copied: ${value}`);
+      }
+    });
+    
+    // Presets
+    document.getElementById('presets').addEventListener('click', (e) => {
+      if (e.target.classList.contains('preset-btn')) {
+        const color = e.target.dataset.color;
+        colorInput.value = color;
+        updateFormats(parseColor(color));
+        
+        // Update active state
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+      }
+    });
+    
+    // Random
+    document.getElementById('randomBtn').addEventListener('click', () => {
+      const r = Math.floor(Math.random() * 256);
+      const g = Math.floor(Math.random() * 256);
+      const b = Math.floor(Math.random() * 256);
+      const hex = rgbToHex(r, g, b);
+      colorInput.value = hex;
+      updateFormats({ r, g, b, a: 1 });
+      
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT') return;
+      
+      if (e.key.toLowerCase() === 'r') {
+        document.getElementById('randomBtn').click();
+      } else if (e.key.toLowerCase() === 't') {
+        themeToggle.click();
+      }
+    });
+    
+    // Load from URL
+    function loadFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const c = params.get('c');
+      if (c) {
+        colorInput.value = decodeURIComponent(c);
+      }
+      const color = parseColor(colorInput.value);
+      if (color) updateFormats(color);
+    }
+    
+    // Init
+    loadFromURL();
+  </script>
+</body>
+</html>
