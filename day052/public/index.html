@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cron Expression Builder | aikemist.com</title>
+  <meta name="description" content="Build cron expressions visually. No more memorizing syntax.">
+  <meta property="og:title" content="Cron Expression Builder">
+  <meta property="og:description" content="Build cron expressions visually. No more memorizing syntax.">
+  <meta property="og:image" content="https://day052.aikemist.com/og.png">
+  <meta property="og:url" content="https://day052.aikemist.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #fafafa;
+      --bg-card: #ffffff;
+      --text: #1a1a2e;
+      --text-muted: #6b7280;
+      --accent: #8b5cf6;
+      --accent-hover: #7c3aed;
+      --accent-soft: rgba(139, 92, 246, 0.1);
+      --border: #e5e7eb;
+      --input-bg: #f9fafb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #1e293b;
+      --input-bg: #1e1e2e;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .tagline {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+      z-index: 100;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .card-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    
+    /* Cron Output */
+    .cron-output {
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .cron-expression {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      padding: 1rem 2rem;
+      background: var(--accent-soft);
+      border-radius: 12px;
+      display: inline-block;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .cron-expression:hover {
+      transform: scale(1.02);
+    }
+    
+    .cron-expression-wrapper {
+      display: inline-block;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    
+    .copy-btn {
+      position: absolute;
+      top: 50%;
+      right: -2.5rem;
+      transform: translateY(-100%);
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .copy-btn:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+    
+    @media (max-width: 600px) {
+      .copy-btn {
+        position: static;
+        transform: none;
+        margin-top: 0.5rem;
+      }
+    }
+    
+    .cron-labels {
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      padding: 0 2rem;
+      margin-top: 0.25rem;
+    }
+    
+    .cron-labels span {
+      flex: 1;
+      text-align: center;
+    }
+    
+    .cron-explanation {
+      font-size: 1.25rem;
+      color: var(--text);
+    }
+    
+    .next-runs {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .next-runs-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    
+    .next-runs-list {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    .next-runs-list span {
+      display: block;
+      padding: 0.25rem 0;
+    }
+    
+    /* Presets */
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    .preset-btn {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--input-bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .preset-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    
+    .preset-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    /* Field Grid */
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+    }
+    
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.75rem;
+      }
+      
+      .container {
+        padding: 1rem;
+      }
+      
+      .card {
+        padding: 1rem;
+      }
+      
+      .field-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+      }
+      
+      .field-grid .field:last-child {
+        grid-column: span 2;
+      }
+      
+      .cron-expression {
+        font-size: 1.25rem;
+        padding: 0.75rem 1rem;
+      }
+      
+      .cron-labels {
+        padding: 0 1rem;
+        font-size: 0.6rem;
+      }
+      
+      .cron-explanation {
+        font-size: 1rem;
+      }
+      
+      .presets {
+        gap: 0.375rem;
+      }
+      
+      .preset-btn {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+      }
+      
+      .selector-options {
+        gap: 0.25rem;
+      }
+      
+      .selector-btn {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.5rem;
+        min-width: 30px;
+      }
+      
+      .keyboard-hints {
+        display: none;
+      }
+    }
+    
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .field-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    
+    .field-input {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--input-bg);
+      color: var(--text);
+      text-align: center;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .field-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    
+    .field-hint {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+      text-align: center;
+    }
+    
+    /* Quick Selectors */
+    .quick-selectors {
+      margin-top: 1.5rem;
+    }
+    
+    .selector-group {
+      margin-bottom: 1.25rem;
+    }
+    
+    .selector-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .selector-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+    }
+    
+    .selector-btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      padding: 0.375rem 0.625rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--input-bg);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      min-width: 36px;
+    }
+    
+    .selector-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    
+    .selector-btn.selected {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    
+    .random-row {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+    
+    .random-btn {
+      font-family: 'Jost', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 0.75rem 1.5rem;
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .random-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    
+    .random-btn:active {
+      transform: scale(0.98);
+    }
+    
+    /* Animation for cron expression update */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+    
+    .cron-expression.pulse {
+      animation: pulse 0.3s ease;
+    }
+    
+    /* Reference */
+    .reference {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    
+    .ref-item {
+      padding: 0.75rem;
+      background: var(--input-bg);
+      border-radius: 8px;
+    }
+    
+    .ref-symbol {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--accent);
+      margin-right: 0.5rem;
+    }
+    
+    .ref-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 1000;
+    }
+    
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    
+    /* Keyboard hints */
+    .keyboard-hints {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    
+    kbd {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.125rem 0.375rem;
+      font-size: 0.7rem;
+    }
+    
+    .timezone-note {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+  
+  <div class="container">
+    <header>
+      <h1>Cron Expression Builder</h1>
+      <p class="tagline">Build cron jobs without the syntax headache. Click, copy, done.</p>
+    </header>
+    
+    <!-- Output -->
+    <div class="card">
+      <div class="cron-output">
+        <div class="cron-expression-wrapper">
+          <div class="cron-expression" id="cronExpression" title="Click to copy">* * * * *</div>
+          <button class="copy-btn" id="copyBtn" title="Copy expression">📋</button>
+          <div class="cron-labels">
+            <span>min</span>
+            <span>hour</span>
+            <span>day</span>
+            <span>month</span>
+            <span>dow</span>
+          </div>
+        </div>
+        <div class="cron-explanation" id="cronExplanation">Every minute</div>
+        <div class="next-runs">
+          <div class="next-runs-title">Next 5 runs</div>
+          <div class="next-runs-list" id="nextRuns"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Presets -->
+    <div class="card">
+      <div class="card-title">Quick Presets</div>
+      <div class="presets" id="presets">
+        <button class="preset-btn" data-cron="* * * * *">Every minute</button>
+        <button class="preset-btn" data-cron="*/5 * * * *">Every 5 minutes</button>
+        <button class="preset-btn" data-cron="*/15 * * * *">Every 15 minutes</button>
+        <button class="preset-btn" data-cron="0 * * * *">Every hour</button>
+        <button class="preset-btn" data-cron="0 */6 * * *">Every 6 hours</button>
+        <button class="preset-btn" data-cron="0 0 * * *">Daily at midnight</button>
+        <button class="preset-btn" data-cron="0 9 * * *">Daily at 9am</button>
+        <button class="preset-btn" data-cron="0 9 * * 1-5">Weekdays at 9am</button>
+        <button class="preset-btn" data-cron="0 0 * * 0">Weekly on Sunday</button>
+        <button class="preset-btn" data-cron="0 0 1 * *">Monthly on the 1st</button>
+        <button class="preset-btn" data-cron="0 0 1 1 *">Yearly on Jan 1st</button>
+        <button class="preset-btn" data-cron="0 0 * * 1">Every Monday</button>
+      </div>
+    </div>
+    
+    <!-- Builder -->
+    <div class="card">
+      <div class="card-title">Build Your Expression</div>
+      <div class="field-grid">
+        <div class="field">
+          <label class="field-label">Minute</label>
+          <input type="text" class="field-input" id="minute" value="*">
+          <span class="field-hint">0-59</span>
+        </div>
+        <div class="field">
+          <label class="field-label">Hour</label>
+          <input type="text" class="field-input" id="hour" value="*">
+          <span class="field-hint">0-23</span>
+        </div>
+        <div class="field">
+          <label class="field-label">Day (Month)</label>
+          <input type="text" class="field-input" id="dayMonth" value="*">
+          <span class="field-hint">1-31</span>
+        </div>
+        <div class="field">
+          <label class="field-label">Month</label>
+          <input type="text" class="field-input" id="month" value="*">
+          <span class="field-hint">1-12</span>
+        </div>
+        <div class="field">
+          <label class="field-label">Day (Week)</label>
+          <input type="text" class="field-input" id="dayWeek" value="*">
+          <span class="field-hint">0-6 (Sun-Sat)</span>
+        </div>
+      </div>
+      
+      <div class="quick-selectors">
+        <div class="selector-group">
+          <label class="selector-label">Minutes</label>
+          <div class="selector-options" id="minuteSelector">
+            <button class="selector-btn" data-value="*">*</button>
+            <button class="selector-btn" data-value="0">0</button>
+            <button class="selector-btn" data-value="*/5">*/5</button>
+            <button class="selector-btn" data-value="*/10">*/10</button>
+            <button class="selector-btn" data-value="*/15">*/15</button>
+            <button class="selector-btn" data-value="*/30">*/30</button>
+          </div>
+        </div>
+        
+        <div class="selector-group">
+          <label class="selector-label">Hours</label>
+          <div class="selector-options" id="hourSelector">
+            <button class="selector-btn" data-value="*">*</button>
+            <button class="selector-btn" data-value="0">0</button>
+            <button class="selector-btn" data-value="6">6</button>
+            <button class="selector-btn" data-value="9">9</button>
+            <button class="selector-btn" data-value="12">12</button>
+            <button class="selector-btn" data-value="18">18</button>
+            <button class="selector-btn" data-value="*/6">*/6</button>
+          </div>
+        </div>
+        
+        <div class="selector-group">
+          <label class="selector-label">Day of Week</label>
+          <div class="selector-options" id="dowSelector">
+            <button class="selector-btn" data-value="*">*</button>
+            <button class="selector-btn" data-value="0">Sun</button>
+            <button class="selector-btn" data-value="1">Mon</button>
+            <button class="selector-btn" data-value="2">Tue</button>
+            <button class="selector-btn" data-value="3">Wed</button>
+            <button class="selector-btn" data-value="4">Thu</button>
+            <button class="selector-btn" data-value="5">Fri</button>
+            <button class="selector-btn" data-value="6">Sat</button>
+            <button class="selector-btn" data-value="1-5">Weekdays</button>
+            <button class="selector-btn" data-value="0,6">Weekend</button>
+          </div>
+        </div>
+        
+        <div class="selector-group">
+          <label class="selector-label">Day of Month</label>
+          <div class="selector-options" id="domSelector">
+            <button class="selector-btn" data-value="*">*</button>
+            <button class="selector-btn" data-value="1">1st</button>
+            <button class="selector-btn" data-value="15">15th</button>
+            <button class="selector-btn" data-value="L">Last</button>
+            <button class="selector-btn" data-value="1,15">1st & 15th</button>
+          </div>
+        </div>
+        
+        <div class="selector-group">
+          <label class="selector-label">Month</label>
+          <div class="selector-options" id="monthSelector">
+            <button class="selector-btn" data-value="*">*</button>
+            <button class="selector-btn" data-value="1">Jan</button>
+            <button class="selector-btn" data-value="4">Apr</button>
+            <button class="selector-btn" data-value="7">Jul</button>
+            <button class="selector-btn" data-value="10">Oct</button>
+            <button class="selector-btn" data-value="1,4,7,10">Quarterly</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="random-row">
+        <button class="random-btn" id="randomBtn">🎲 Surprise me</button>
+      </div>
+    </div>
+    
+    <!-- Reference -->
+    <div class="card">
+      <div class="card-title">Syntax Reference</div>
+      <div class="reference">
+        <div class="ref-item">
+          <span class="ref-symbol">*</span>
+          <span class="ref-desc">Every value</span>
+        </div>
+        <div class="ref-item">
+          <span class="ref-symbol">,</span>
+          <span class="ref-desc">Value list (1,3,5)</span>
+        </div>
+        <div class="ref-item">
+          <span class="ref-symbol">-</span>
+          <span class="ref-desc">Range (1-5)</span>
+        </div>
+        <div class="ref-item">
+          <span class="ref-symbol">/</span>
+          <span class="ref-desc">Step (*/15 = every 15)</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="keyboard-hints">
+      <span><kbd>C</kbd> Copy</span>
+      <span><kbd>R</kbd> Random</span>
+      <span><kbd>T</kbd> Theme</span>
+    </div>
+    
+    <p class="timezone-note">⏰ Next runs shown in your local timezone</p>
+  </div>
+  
+  <footer>
+    <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+  </footer>
+  
+  <div class="toast" id="toast">Copied!</div>
+  
+  <script>
+    // Theme
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    
+    themeToggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+    
+    // Elements
+    const minuteInput = document.getElementById('minute');
+    const hourInput = document.getElementById('hour');
+    const dayMonthInput = document.getElementById('dayMonth');
+    const monthInput = document.getElementById('month');
+    const dayWeekInput = document.getElementById('dayWeek');
+    const cronExpression = document.getElementById('cronExpression');
+    const cronExplanation = document.getElementById('cronExplanation');
+    const nextRuns = document.getElementById('nextRuns');
+    
+    // Toast
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+    
+    // Update cron expression
+    function updateCron() {
+      const cron = `${minuteInput.value} ${hourInput.value} ${dayMonthInput.value} ${monthInput.value} ${dayWeekInput.value}`;
+      cronExpression.textContent = cron;
+      cronExplanation.textContent = explainCron(cron);
+      updateNextRuns(cron);
+      updateURL(cron);
+    }
+    
+    // Explain cron in plain English
+    function explainCron(cron) {
+      const [min, hour, dom, month, dow] = cron.split(' ');
+      let parts = [];
+      
+      // Minute
+      if (min === '*') {
+        parts.push('Every minute');
+      } else if (min.startsWith('*/')) {
+        parts.push(`Every ${min.slice(2)} minutes`);
+      } else if (min === '0') {
+        parts.push('At minute 0');
+      } else {
+        parts.push(`At minute ${min}`);
+      }
+      
+      // Hour
+      if (hour === '*') {
+        if (min !== '*' && !min.startsWith('*/')) {
+          parts[0] = parts[0].replace('At minute', 'At');
+          parts.push('of every hour');
+        }
+      } else if (hour.startsWith('*/')) {
+        parts.push(`every ${hour.slice(2)} hours`);
+      } else {
+        const h = parseInt(hour);
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+        parts[0] = `At ${h12}:${min.padStart(2, '0')} ${ampm}`;
+      }
+      
+      // Day of month
+      if (dom !== '*') {
+        if (dom.startsWith('*/')) {
+          parts.push(`every ${dom.slice(2)} days`);
+        } else {
+          const suffix = getOrdinal(parseInt(dom));
+          parts.push(`on the ${dom}${suffix}`);
+        }
+      }
+      
+      // Month
+      if (month !== '*') {
+        const months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        if (month.includes(',')) {
+          const ms = month.split(',').map(m => months[parseInt(m)]).join(', ');
+          parts.push(`in ${ms}`);
+        } else if (month.includes('-')) {
+          const [start, end] = month.split('-').map(m => months[parseInt(m)]);
+          parts.push(`from ${start} to ${end}`);
+        } else {
+          parts.push(`in ${months[parseInt(month)]}`);
+        }
+      }
+      
+      // Day of week
+      if (dow !== '*') {
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        if (dow === '1-5') {
+          parts.push('on weekdays');
+        } else if (dow === '0,6') {
+          parts.push('on weekends');
+        } else if (dow.includes(',')) {
+          const ds = dow.split(',').map(d => days[parseInt(d)]).join(', ');
+          parts.push(`on ${ds}`);
+        } else if (dow.includes('-')) {
+          const [start, end] = dow.split('-').map(d => days[parseInt(d)]);
+          parts.push(`from ${start} to ${end}`);
+        } else {
+          parts.push(`on ${days[parseInt(dow)]}`);
+        }
+      }
+      
+      return parts.join(' ');
+    }
+    
+    function getOrdinal(n) {
+      const s = ['th', 'st', 'nd', 'rd'];
+      const v = n % 100;
+      return s[(v - 20) % 10] || s[v] || s[0];
+    }
+    
+    // Calculate next runs
+    function updateNextRuns(cron) {
+      const runs = getNextRuns(cron, 5);
+      nextRuns.innerHTML = runs.map(d => `<span>${formatDate(d)}</span>`).join('');
+    }
+    
+    function getNextRuns(cron, count) {
+      const [min, hour, dom, month, dow] = cron.split(' ');
+      const runs = [];
+      const now = new Date();
+      let candidate = new Date(now);
+      candidate.setSeconds(0);
+      candidate.setMilliseconds(0);
+      
+      // Simple brute force - check every minute
+      let iterations = 0;
+      const maxIterations = 60 * 24 * 365; // Max 1 year
+      
+      while (runs.length < count && iterations < maxIterations) {
+        candidate.setMinutes(candidate.getMinutes() + 1);
+        if (matchesCron(candidate, min, hour, dom, month, dow)) {
+          runs.push(new Date(candidate));
+        }
+        iterations++;
+      }
+      
+      return runs;
+    }
+    
+    function matchesCron(date, min, hour, dom, month, dow) {
+      return matchField(date.getMinutes(), min, 0, 59) &&
+             matchField(date.getHours(), hour, 0, 23) &&
+             matchField(date.getDate(), dom, 1, 31) &&
+             matchField(date.getMonth() + 1, month, 1, 12) &&
+             matchField(date.getDay(), dow, 0, 6);
+    }
+    
+    function matchField(value, field, min, max) {
+      if (field === '*') return true;
+      
+      // Step values */n
+      if (field.startsWith('*/')) {
+        const step = parseInt(field.slice(2));
+        return value % step === 0;
+      }
+      
+      // Ranges with step n-m/s (e.g., 1-30/2)
+      if (field.includes('/') && field.includes('-')) {
+        const [range, step] = field.split('/');
+        const [start, end] = range.split('-').map(Number);
+        const stepNum = parseInt(step);
+        if (value < start || value > end) return false;
+        return (value - start) % stepNum === 0;
+      }
+      
+      // Comma-separated values
+      if (field.includes(',')) {
+        return field.split(',').map(Number).includes(value);
+      }
+      
+      // Ranges
+      if (field.includes('-')) {
+        const [start, end] = field.split('-').map(Number);
+        return value >= start && value <= end;
+      }
+      
+      // Single value
+      return parseInt(field) === value;
+    }
+    
+    function formatDate(date) {
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const day = days[date.getDay()];
+      const mon = months[date.getMonth()];
+      const d = date.getDate();
+      const h = date.getHours().toString().padStart(2, '0');
+      const m = date.getMinutes().toString().padStart(2, '0');
+      return `${day}, ${mon} ${d} at ${h}:${m}`;
+    }
+    
+    // URL state
+    function updateURL(cron) {
+      const encoded = encodeURIComponent(cron);
+      history.replaceState(null, '', `?c=${encoded}`);
+    }
+    
+    function loadFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      const c = params.get('c');
+      if (c) {
+        const parts = decodeURIComponent(c).split(' ');
+        if (parts.length === 5) {
+          minuteInput.value = parts[0];
+          hourInput.value = parts[1];
+          dayMonthInput.value = parts[2];
+          monthInput.value = parts[3];
+          dayWeekInput.value = parts[4];
+        }
+      }
+      updateCron();
+    }
+    
+    // Copy
+    cronExpression.addEventListener('click', () => {
+      navigator.clipboard.writeText(cronExpression.textContent);
+      showToast('Copied!');
+    });
+    
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(cronExpression.textContent);
+      showToast('Copied!');
+    });
+    
+    // Presets
+    document.getElementById('presets').addEventListener('click', (e) => {
+      if (e.target.classList.contains('preset-btn')) {
+        const cron = e.target.dataset.cron;
+        const parts = cron.split(' ');
+        minuteInput.value = parts[0];
+        hourInput.value = parts[1];
+        dayMonthInput.value = parts[2];
+        monthInput.value = parts[3];
+        dayWeekInput.value = parts[4];
+        updateCron();
+        
+        // Update active state
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+      }
+    });
+    
+    // Quick selectors
+    document.getElementById('minuteSelector').addEventListener('click', (e) => {
+      if (e.target.classList.contains('selector-btn')) {
+        minuteInput.value = e.target.dataset.value;
+        updateCron();
+      }
+    });
+    
+    document.getElementById('hourSelector').addEventListener('click', (e) => {
+      if (e.target.classList.contains('selector-btn')) {
+        hourInput.value = e.target.dataset.value;
+        updateCron();
+      }
+    });
+    
+    document.getElementById('dowSelector').addEventListener('click', (e) => {
+      if (e.target.classList.contains('selector-btn')) {
+        dayWeekInput.value = e.target.dataset.value;
+        updateCron();
+      }
+    });
+    
+    document.getElementById('domSelector').addEventListener('click', (e) => {
+      if (e.target.classList.contains('selector-btn')) {
+        dayMonthInput.value = e.target.dataset.value;
+        updateCron();
+      }
+    });
+    
+    document.getElementById('monthSelector').addEventListener('click', (e) => {
+      if (e.target.classList.contains('selector-btn')) {
+        monthInput.value = e.target.dataset.value;
+        updateCron();
+      }
+    });
+    
+    // Random expression
+    document.getElementById('randomBtn').addEventListener('click', () => {
+      const randomPresets = [
+        '0 9 * * 1-5',   // Weekdays at 9am
+        '30 8 * * *',    // Daily at 8:30am
+        '0 */2 * * *',   // Every 2 hours
+        '0 0 1 * *',     // Monthly on 1st
+        '15 10 * * 1',   // Monday at 10:15
+        '0 12 * * 0',    // Sunday at noon
+        '*/30 * * * *',  // Every 30 minutes
+        '0 6 * * 1-5',   // Weekdays at 6am
+        '0 22 * * *',    // Daily at 10pm
+        '0 0 15 * *',    // 15th of each month
+        '0 9 1 1 *',     // Jan 1st at 9am
+        '45 17 * * 5',   // Friday at 5:45pm
+        '0 */4 * * *',   // Every 4 hours
+        '0 8 * * 0',     // Sunday at 8am
+        '30 23 * * *',   // Daily at 11:30pm
+      ];
+      const cron = randomPresets[Math.floor(Math.random() * randomPresets.length)];
+      const parts = cron.split(' ');
+      minuteInput.value = parts[0];
+      hourInput.value = parts[1];
+      dayMonthInput.value = parts[2];
+      monthInput.value = parts[3];
+      dayWeekInput.value = parts[4];
+      updateCron();
+      
+      // Add pulse animation
+      cronExpression.classList.add('pulse');
+      setTimeout(() => cronExpression.classList.remove('pulse'), 300);
+    });
+    
+    // Input changes
+    [minuteInput, hourInput, dayMonthInput, monthInput, dayWeekInput].forEach(input => {
+      input.addEventListener('input', updateCron);
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT') return;
+      
+      if (e.key.toLowerCase() === 'c') {
+        navigator.clipboard.writeText(cronExpression.textContent);
+        showToast('Copied!');
+      } else if (e.key.toLowerCase() === 'r') {
+        document.getElementById('randomBtn').click();
+      } else if (e.key.toLowerCase() === 't') {
+        themeToggle.click();
+      }
+    });
+    
+    // Init
+    loadFromURL();
+  </script>
+</body>
+</html>
