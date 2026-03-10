@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Converter | aikemist.com</title>
+  <meta name="description" content="Convert text between cases: UPPER, lower, Title, Sentence, camelCase, snake_case, kebab-case, and more.">
+  <meta property="og:title" content="Case Converter">
+  <meta property="og:description" content="Convert text between cases: UPPER, lower, Title, Sentence, camelCase, snake_case, kebab-case, and more.">
+  <meta property="og:image" content="https://day058.aikemist.com/og.png">
+  <meta property="og:url" content="https://day058.aikemist.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #fafafa;
+      --bg-card: #ffffff;
+      --text: #1a1a2e;
+      --text-muted: #6b7280;
+      --accent: #ec4899;
+      --accent-hover: #db2777;
+      --accent-soft: rgba(236, 72, 153, 0.1);
+      --border: #e5e7eb;
+      --input-bg: #f9fafb;
+      --success: #10b981;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #1e293b;
+      --input-bg: #1e1e2e;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .tagline {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+      z-index: 100;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+    }
+    
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Textarea */
+    .textarea-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .textarea-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .textarea-label-text {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    
+    .char-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--input-bg);
+      color: var(--text);
+      resize: vertical;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    
+    /* Case Buttons Grid */
+    .case-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .case-btn {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.875rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--input-bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    
+    .case-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      transform: translateY(-2px);
+    }
+    
+    .case-btn:active {
+      transform: translateY(0);
+    }
+    
+    .case-btn .case-name {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .case-btn .case-example {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    
+    /* Output */
+    .output-area {
+      position: relative;
+    }
+    
+    .output-text {
+      min-height: 100px;
+    }
+    
+    .copy-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.8rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-card);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .copy-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .copy-btn.copied {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+    
+    /* Actions */
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .action-btn {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--input-bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .action-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .keyboard-hints {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    
+    kbd {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.125rem 0.375rem;
+      font-size: 0.7rem;
+    }
+    
+    @media (max-width: 600px) {
+      h1 { font-size: 1.75rem; }
+      .container { padding: 1rem; }
+      .card { padding: 1rem; }
+      .case-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+      .case-btn { padding: 0.75rem 0.5rem; font-size: 0.8rem; }
+      .keyboard-hints { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+  
+  <div class="container">
+    <header>
+      <h1>Case Converter</h1>
+      <p class="tagline">Transform text case instantly. Click any style to convert.</p>
+    </header>
+    
+    <div class="card">
+      <!-- Input -->
+      <div class="textarea-group">
+        <div class="textarea-label">
+          <span class="textarea-label-text">Input Text</span>
+          <span class="char-count" id="charCount">0 chars</span>
+        </div>
+        <textarea id="inputText" placeholder="Type or paste your text here..."></textarea>
+      </div>
+      
+      <!-- Case Buttons -->
+      <div class="case-grid">
+        <button class="case-btn" data-case="upper">
+          <span class="case-name">UPPERCASE</span>
+          <span class="case-example">HELLO WORLD</span>
+        </button>
+        <button class="case-btn" data-case="lower">
+          <span class="case-name">lowercase</span>
+          <span class="case-example">hello world</span>
+        </button>
+        <button class="case-btn" data-case="title">
+          <span class="case-name">Title Case</span>
+          <span class="case-example">Hello World</span>
+        </button>
+        <button class="case-btn" data-case="sentence">
+          <span class="case-name">Sentence case</span>
+          <span class="case-example">Hello world</span>
+        </button>
+        <button class="case-btn" data-case="camel">
+          <span class="case-name">camelCase</span>
+          <span class="case-example">helloWorld</span>
+        </button>
+        <button class="case-btn" data-case="pascal">
+          <span class="case-name">PascalCase</span>
+          <span class="case-example">HelloWorld</span>
+        </button>
+        <button class="case-btn" data-case="snake">
+          <span class="case-name">snake_case</span>
+          <span class="case-example">hello_world</span>
+        </button>
+        <button class="case-btn" data-case="kebab">
+          <span class="case-name">kebab-case</span>
+          <span class="case-example">hello-world</span>
+        </button>
+        <button class="case-btn" data-case="constant">
+          <span class="case-name">CONSTANT_CASE</span>
+          <span class="case-example">HELLO_WORLD</span>
+        </button>
+        <button class="case-btn" data-case="dot">
+          <span class="case-name">dot.case</span>
+          <span class="case-example">hello.world</span>
+        </button>
+        <button class="case-btn" data-case="path">
+          <span class="case-name">path/case</span>
+          <span class="case-example">hello/world</span>
+        </button>
+        <button class="case-btn" data-case="alternating">
+          <span class="case-name">aLtErNaTiNg</span>
+          <span class="case-example">hElLo WoRlD</span>
+        </button>
+      </div>
+      
+      <!-- Output -->
+      <div class="textarea-group">
+        <div class="textarea-label">
+          <span class="textarea-label-text">Output</span>
+        </div>
+        <div class="output-area">
+          <textarea id="outputText" class="output-text" placeholder="Converted text will appear here..." readonly></textarea>
+          <button class="copy-btn" id="copyBtn">📋 Copy</button>
+        </div>
+      </div>
+      
+      <!-- Actions -->
+      <div class="actions">
+        <button class="action-btn" id="swapBtn">🔄 Use as Input</button>
+        <button class="action-btn" id="clearBtn">✕ Clear</button>
+        <button class="action-btn" id="sampleBtn">📝 Sample</button>
+      </div>
+    </div>
+    
+    <div class="keyboard-hints">
+      <span><kbd>T</kbd> Theme</span>
+    </div>
+  </div>
+  
+  <footer>
+    <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+  </footer>
+  
+  <script>
+    // Theme
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    
+    themeToggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+    
+    // Elements
+    const inputText = document.getElementById('inputText');
+    const outputText = document.getElementById('outputText');
+    const charCount = document.getElementById('charCount');
+    const copyBtn = document.getElementById('copyBtn');
+    
+    // Update char count
+    inputText.addEventListener('input', () => {
+      charCount.textContent = `${inputText.value.length} chars`;
+    });
+    
+    // Case conversion functions
+    const converters = {
+      upper: text => text.toUpperCase(),
+      
+      lower: text => text.toLowerCase(),
+      
+      title: text => text.toLowerCase().replace(/(?:^|\s|[-/])\w/g, m => m.toUpperCase()),
+      
+      sentence: text => {
+        return text.toLowerCase().replace(/(^\s*\w|[.!?]\s+\w)/g, m => m.toUpperCase());
+      },
+      
+      camel: text => {
+        return text.toLowerCase()
+          .replace(/[^a-zA-Z0-9]+(.)/g, (_, c) => c.toUpperCase())
+          .replace(/^[A-Z]/, c => c.toLowerCase());
+      },
+      
+      pascal: text => {
+        return text.toLowerCase()
+          .replace(/(?:^|[^a-zA-Z0-9]+)(.)/g, (_, c) => c.toUpperCase());
+      },
+      
+      snake: text => {
+        return text.toLowerCase()
+          .replace(/[^a-zA-Z0-9]+/g, '_')
+          .replace(/^_|_$/g, '');
+      },
+      
+      kebab: text => {
+        return text.toLowerCase()
+          .replace(/[^a-zA-Z0-9]+/g, '-')
+          .replace(/^-|-$/g, '');
+      },
+      
+      constant: text => {
+        return text.toUpperCase()
+          .replace(/[^A-Z0-9]+/g, '_')
+          .replace(/^_|_$/g, '');
+      },
+      
+      dot: text => {
+        return text.toLowerCase()
+          .replace(/[^a-zA-Z0-9]+/g, '.')
+          .replace(/^\.|\.$/g, '');
+      },
+      
+      path: text => {
+        return text.toLowerCase()
+          .replace(/[^a-zA-Z0-9]+/g, '/')
+          .replace(/^\/|\/$/g, '');
+      },
+      
+      alternating: text => {
+        let upper = true;
+        return text.split('').map(c => {
+          if (/[a-zA-Z]/.test(c)) {
+            const result = upper ? c.toLowerCase() : c.toUpperCase();
+            upper = !upper;
+            return result;
+          }
+          return c;
+        }).join('');
+      }
+    };
+    
+    // Convert on button click
+    document.querySelectorAll('.case-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const caseType = btn.dataset.case;
+        const input = inputText.value;
+        
+        if (input.trim()) {
+          outputText.value = converters[caseType](input);
+        }
+      });
+    });
+    
+    // Copy
+    copyBtn.addEventListener('click', () => {
+      if (outputText.value) {
+        navigator.clipboard.writeText(outputText.value);
+        copyBtn.textContent = '✓ Copied!';
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+          copyBtn.textContent = '📋 Copy';
+          copyBtn.classList.remove('copied');
+        }, 2000);
+      }
+    });
+    
+    // Swap (use output as input)
+    document.getElementById('swapBtn').addEventListener('click', () => {
+      if (outputText.value) {
+        inputText.value = outputText.value;
+        outputText.value = '';
+        charCount.textContent = `${inputText.value.length} chars`;
+        inputText.focus();
+      }
+    });
+    
+    // Clear
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      inputText.value = '';
+      outputText.value = '';
+      charCount.textContent = '0 chars';
+      inputText.focus();
+    });
+    
+    // Sample
+    document.getElementById('sampleBtn').addEventListener('click', () => {
+      inputText.value = 'The Quick Brown Fox Jumps Over The Lazy Dog';
+      charCount.textContent = `${inputText.value.length} chars`;
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 't' && document.activeElement.tagName !== 'TEXTAREA') {
+        themeToggle.click();
+      }
+    });
+  </script>
+</body>
+</html>
