@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Counter & Text Stats | aikemist.com</title>
+  <meta name="description" content="Count words, characters, sentences, paragraphs. Get reading time and text statistics instantly.">
+  <meta property="og:title" content="Word Counter & Text Stats">
+  <meta property="og:description" content="Count words, characters, sentences, paragraphs. Get reading time and text statistics instantly.">
+  <meta property="og:image" content="https://day057.aikemist.com/og.png">
+  <meta property="og:url" content="https://day057.aikemist.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg: #fafafa;
+      --bg-card: #ffffff;
+      --text: #1a1a2e;
+      --text-muted: #6b7280;
+      --accent: #14b8a6;
+      --accent-hover: #0d9488;
+      --accent-soft: rgba(20, 184, 166, 0.1);
+      --border: #e5e7eb;
+      --input-bg: #f9fafb;
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #1e293b;
+      --input-bg: #1e1e2e;
+    }
+    
+    body {
+      font-family: 'Jost', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--accent), #2dd4bf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .tagline {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+      z-index: 100;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+    }
+    
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+      background: var(--input-bg);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-2px);
+    }
+    
+    .stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--accent);
+      line-height: 1.2;
+    }
+    
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 0.25rem;
+    }
+    
+    /* Reading Time */
+    .reading-time {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 1rem;
+      background: var(--accent-soft);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .reading-item {
+      text-align: center;
+    }
+    
+    .reading-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    
+    .reading-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    /* Textarea */
+    textarea {
+      width: 100%;
+      min-height: 250px;
+      font-family: 'Jost', sans-serif;
+      font-size: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--input-bg);
+      color: var(--text);
+      resize: vertical;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      line-height: 1.8;
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    
+    textarea::placeholder {
+      color: var(--text-muted);
+    }
+    
+    /* Actions */
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .action-btn {
+      font-family: 'Jost', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--input-bg);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .action-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    
+    /* Top Words */
+    .top-words {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    
+    .word-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    .word-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      padding: 0.375rem 0.75rem;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .word-count {
+      font-size: 0.7rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    
+    /* Density Bar */
+    .density-section {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .density-bar {
+      height: 8px;
+      background: var(--input-bg);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+    
+    .density-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #2dd4bf);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    
+    .density-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    
+    footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .keyboard-hints {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    
+    kbd {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.125rem 0.375rem;
+      font-size: 0.7rem;
+    }
+    
+    @media (max-width: 600px) {
+      h1 { font-size: 1.75rem; }
+      .container { padding: 1rem; }
+      .card { padding: 1rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+      .stat-value { font-size: 1.5rem; }
+      textarea { min-height: 180px; }
+      .keyboard-hints { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+  
+  <div class="container">
+    <header>
+      <h1>Word Counter & Text Stats</h1>
+      <p class="tagline">Type or paste. Get instant statistics. Know your content.</p>
+    </header>
+    
+    <div class="card">
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="wordCount">0</div>
+          <div class="stat-label">Words</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="charCount">0</div>
+          <div class="stat-label">Characters</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="charNoSpace">0</div>
+          <div class="stat-label">No Spaces</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="sentenceCount">0</div>
+          <div class="stat-label">Sentences</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="paragraphCount">0</div>
+          <div class="stat-label">Paragraphs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="lineCount">0</div>
+          <div class="stat-label">Lines</div>
+        </div>
+      </div>
+      
+      <!-- Reading Time -->
+      <div class="reading-time">
+        <div class="reading-item">
+          <div class="reading-value" id="readingTime">0 min</div>
+          <div class="reading-label">Reading Time</div>
+        </div>
+        <div class="reading-item">
+          <div class="reading-value" id="speakingTime">0 min</div>
+          <div class="reading-label">Speaking Time</div>
+        </div>
+        <div class="reading-item">
+          <div class="reading-value" id="avgWordLength">0</div>
+          <div class="reading-label">Avg Word Length</div>
+        </div>
+        <div class="reading-item">
+          <div class="reading-value" id="avgSentenceLength">0</div>
+          <div class="reading-label">Words/Sentence</div>
+        </div>
+      </div>
+      
+      <!-- Textarea -->
+      <textarea id="textInput" placeholder="Start typing or paste your text here..."></textarea>
+      
+      <!-- Actions -->
+      <div class="actions">
+        <button class="action-btn" id="copyBtn">📋 Copy Text</button>
+        <button class="action-btn" id="clearBtn">✕ Clear</button>
+        <button class="action-btn" id="sampleBtn">📝 Sample</button>
+      </div>
+      
+      <!-- Top Words -->
+      <div class="top-words" id="topWordsSection" style="display: none;">
+        <div class="section-title">Most Frequent Words</div>
+        <div class="word-chips" id="topWords"></div>
+      </div>
+      
+      <!-- Text Density -->
+      <div class="density-section" id="densitySection" style="display: none;">
+        <div class="section-title">Unique Words: <span id="uniquePercent">0%</span></div>
+        <div class="density-bar">
+          <div class="density-fill" id="densityFill" style="width: 0%"></div>
+        </div>
+        <div class="density-labels">
+          <span>Repetitive</span>
+          <span>Diverse</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="keyboard-hints">
+      <span><kbd>T</kbd> Theme</span>
+    </div>
+  </div>
+  
+  <footer>
+    <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+  </footer>
+  
+  <script>
+    // Theme
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+    themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    
+    themeToggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+    
+    // Elements
+    const textInput = document.getElementById('textInput');
+    
+    // Common words to exclude
+    const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'as', 'is', 'was', 'are', 'were', 'been', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'shall', 'can', 'it', 'its', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'we', 'they', 'them', 'their', 'my', 'your', 'his', 'her', 'our']);
+    
+    // Analyze text
+    function analyze() {
+      const text = textInput.value;
+      
+      // Basic counts
+      const chars = text.length;
+      const charsNoSpace = text.replace(/\s/g, '').length;
+      const words = text.trim() ? text.trim().split(/\s+/).filter(w => w.length > 0) : [];
+      const wordCount = words.length;
+      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+      const sentenceCount = sentences.length;
+      const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+      const paragraphCount = text.trim() ? paragraphs.length : 0;
+      const lines = text.split('\n');
+      const lineCount = text.trim() ? lines.length : 0;
+      
+      // Update stats
+      document.getElementById('wordCount').textContent = wordCount.toLocaleString();
+      document.getElementById('charCount').textContent = chars.toLocaleString();
+      document.getElementById('charNoSpace').textContent = charsNoSpace.toLocaleString();
+      document.getElementById('sentenceCount').textContent = sentenceCount;
+      document.getElementById('paragraphCount').textContent = paragraphCount;
+      document.getElementById('lineCount').textContent = lineCount;
+      
+      // Reading time (200 wpm average)
+      const readingMins = Math.ceil(wordCount / 200);
+      document.getElementById('readingTime').textContent = readingMins < 1 ? '< 1 min' : `${readingMins} min`;
+      
+      // Speaking time (150 wpm average)
+      const speakingMins = Math.ceil(wordCount / 150);
+      document.getElementById('speakingTime').textContent = speakingMins < 1 ? '< 1 min' : `${speakingMins} min`;
+      
+      // Average word length
+      const totalWordChars = words.reduce((sum, w) => sum + w.replace(/[^a-zA-Z]/g, '').length, 0);
+      const avgWordLen = wordCount > 0 ? (totalWordChars / wordCount).toFixed(1) : 0;
+      document.getElementById('avgWordLength').textContent = avgWordLen;
+      
+      // Average sentence length
+      const avgSentLen = sentenceCount > 0 ? Math.round(wordCount / sentenceCount) : 0;
+      document.getElementById('avgSentenceLength').textContent = avgSentLen;
+      
+      // Word frequency
+      const wordFreq = {};
+      words.forEach(word => {
+        const clean = word.toLowerCase().replace(/[^a-zA-Z]/g, '');
+        if (clean.length > 2 && !stopWords.has(clean)) {
+          wordFreq[clean] = (wordFreq[clean] || 0) + 1;
+        }
+      });
+      
+      const sortedWords = Object.entries(wordFreq)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+      
+      const topWordsSection = document.getElementById('topWordsSection');
+      const topWordsContainer = document.getElementById('topWords');
+      
+      if (sortedWords.length > 0) {
+        topWordsSection.style.display = 'block';
+        topWordsContainer.innerHTML = sortedWords.map(([word, count]) => 
+          `<span class="word-chip">${word}<span class="word-count">×${count}</span></span>`
+        ).join('');
+      } else {
+        topWordsSection.style.display = 'none';
+      }
+      
+      // Unique word percentage
+      const densitySection = document.getElementById('densitySection');
+      if (wordCount > 0) {
+        const uniqueWords = new Set(words.map(w => w.toLowerCase().replace(/[^a-zA-Z]/g, '')));
+        const uniquePercent = Math.round((uniqueWords.size / wordCount) * 100);
+        document.getElementById('uniquePercent').textContent = uniquePercent + '%';
+        document.getElementById('densityFill').style.width = uniquePercent + '%';
+        densitySection.style.display = 'block';
+      } else {
+        densitySection.style.display = 'none';
+      }
+    }
+    
+    // Input handler
+    textInput.addEventListener('input', analyze);
+    
+    // Copy
+    document.getElementById('copyBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(textInput.value);
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => btn.textContent = '📋 Copy Text', 2000);
+    });
+    
+    // Clear
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      textInput.value = '';
+      analyze();
+      textInput.focus();
+    });
+    
+    // Sample
+    document.getElementById('sampleBtn').addEventListener('click', () => {
+      textInput.value = `The quick brown fox jumps over the lazy dog. This classic pangram contains every letter of the English alphabet at least once.
+
+Writing great content requires careful attention to word choice, sentence structure, and overall flow. Good writers understand that clarity is more important than complexity.
+
+When analyzing text, we look at several metrics: word count helps estimate reading time, sentence length affects readability, and word diversity indicates vocabulary richness.
+
+This sample text demonstrates various statistics. Notice how the word counter tracks characters, sentences, and paragraphs in real-time as you type or paste content.`;
+      analyze();
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 't' && document.activeElement.tagName !== 'TEXTAREA') {
+        themeToggle.click();
+      }
+    });
+    
+    // Init
+    analyze();
+  </script>
+</body>
+</html>
