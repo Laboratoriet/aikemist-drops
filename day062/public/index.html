@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT Decoder — Decode & Inspect JSON Web Tokens | Aikemist</title>
+    <meta name="description" content="Decode and inspect JSON Web Tokens instantly. See header, payload, and signature with syntax highlighting. Free, client-side, no data sent to servers.">
+    <meta property="og:title" content="JWT Decoder — Aikemist">
+    <meta property="og:description" content="Decode and inspect JSON Web Tokens instantly. Free, private, client-side.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://day062.aikemist.com">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔓</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --surface-alt: #f5f5f5;
+            --text: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e5e5e5;
+            --primary: #2563eb;
+            --header-color: #ef4444;
+            --header-bg: rgba(239, 68, 68, 0.08);
+            --payload-color: #8b5cf6;
+            --payload-bg: rgba(139, 92, 246, 0.08);
+            --signature-color: #06b6d4;
+            --signature-bg: rgba(6, 182, 212, 0.08);
+            --error: #dc2626;
+            --success: #16a34a;
+            --warning: #d97706;
+        }
+        
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-alt: #1a1a1a;
+            --text: #f5f5f5;
+            --text-muted: #a3a3a3;
+            --border: #2a2a2a;
+            --primary: #3b82f6;
+            --header-bg: rgba(239, 68, 68, 0.15);
+            --payload-bg: rgba(139, 92, 246, 0.15);
+            --signature-bg: rgba(6, 182, 212, 0.15);
+        }
+        
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .tagline {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .security-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.8rem;
+            background: rgba(22, 163, 74, 0.1);
+            color: var(--success);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 100;
+        }
+        
+        .theme-toggle:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .input-section {
+            margin-bottom: 2rem;
+        }
+        
+        .input-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .input-label label {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .char-count {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .jwt-input-wrapper {
+            position: relative;
+        }
+        
+        .jwt-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            word-break: break-all;
+        }
+        
+        .jwt-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .jwt-input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+        
+        .input-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.25rem;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+        
+        .btn-secondary {
+            background: var(--surface-alt);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            background: var(--surface);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .status-valid {
+            background: rgba(22, 163, 74, 0.12);
+            color: var(--success);
+        }
+        
+        .status-invalid {
+            background: rgba(220, 38, 38, 0.12);
+            color: var(--error);
+            animation: pulse-red 2s infinite;
+        }
+        
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+        }
+        
+        .status-warning {
+            background: rgba(217, 119, 6, 0.12);
+            color: var(--warning);
+        }
+        
+        .output-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .output-section.visible {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .token-preview {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            padding-top: 1.75rem;
+            margin-bottom: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            word-break: break-all;
+            line-height: 1.8;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .token-preview-label {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.75rem;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-family: 'Jost', sans-serif;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        
+        .token-header { color: var(--header-color); font-weight: 500; }
+        .token-payload { color: var(--payload-color); font-weight: 500; }
+        .token-signature { color: var(--signature-color); font-weight: 500; }
+        .token-dot { color: var(--text-muted); font-weight: 700; font-size: 1.2em; }
+        
+        .share-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--surface);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .share-link-icon {
+            font-size: 1rem;
+        }
+        
+        .share-link-text {
+            flex: 1;
+            color: var(--text-muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+        }
+        
+        .share-link .btn {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        
+        .decoded-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .decoded-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .decoded-section:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+        
+        [data-theme="dark"] .decoded-section:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.85rem 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .section-header.header-section {
+            background: var(--header-bg);
+            border-left: 4px solid var(--header-color);
+        }
+        
+        .section-header.payload-section {
+            background: var(--payload-bg);
+            border-left: 4px solid var(--payload-color);
+        }
+        
+        .section-header.signature-section {
+            background: var(--signature-bg);
+            border-left: 4px solid var(--signature-color);
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-badge {
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        
+        .header-section .section-badge { background: var(--header-color); color: white; }
+        .payload-section .section-badge { background: var(--payload-color); color: white; }
+        .signature-section .section-badge { background: var(--signature-color); color: white; }
+        
+        .section-content {
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            overflow-x: auto;
+            background: var(--surface);
+            line-height: 1.7;
+        }
+        
+        .json-key { color: var(--primary); }
+        .json-string { color: #16a34a; }
+        .json-number { color: #d97706; }
+        .json-boolean { color: #8b5cf6; }
+        .json-null { color: var(--text-muted); }
+        
+        [data-theme="dark"] .json-string { color: #4ade80; }
+        [data-theme="dark"] .json-number { color: #fbbf24; }
+        
+        .copy-btn {
+            padding: 0.35rem 0.7rem;
+            font-size: 0.75rem;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+            color: var(--text-muted);
+            transition: all 0.15s;
+        }
+        
+        [data-theme="dark"] .copy-btn {
+            background: rgba(0,0,0,0.3);
+        }
+        
+        .copy-btn:hover {
+            color: var(--text);
+            border-color: var(--text-muted);
+        }
+        
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .claims-info {
+            padding: 1rem;
+            background: var(--surface-alt);
+            border-top: 1px solid var(--border);
+        }
+        
+        .claims-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .claim-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border);
+            gap: 1rem;
+        }
+        
+        .claim-row:last-child {
+            border-bottom: none;
+        }
+        
+        .claim-label {
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+        
+        .claim-abbr {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            background: var(--surface);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+        
+        .claim-value {
+            font-weight: 500;
+            text-align: right;
+            word-break: break-all;
+            min-width: 0;
+        }
+        
+        .claim-value.expired {
+            color: var(--error);
+        }
+        
+        .claim-value.valid {
+            color: var(--success);
+        }
+        
+        .error-message {
+            background: rgba(220, 38, 38, 0.08);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            color: var(--error);
+            display: none;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .error-message.visible {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        
+        .error-icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        
+        .sample-tokens {
+            margin-top: 1.25rem;
+        }
+        
+        .sample-tokens summary {
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.15s;
+        }
+        
+        .sample-tokens summary:hover {
+            color: var(--text);
+        }
+        
+        .sample-tokens[open] summary {
+            margin-bottom: 1rem;
+        }
+        
+        .sample-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .sample-btn {
+            padding: 0.85rem 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Jost', sans-serif;
+        }
+        
+        .sample-btn:hover {
+            border-color: var(--primary);
+            background: var(--surface-alt);
+        }
+        
+        .sample-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .sample-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+            color: var(--text);
+        }
+        
+        .sample-desc {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+        
+        .algo-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: var(--surface-alt);
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+        
+        .algo-badge {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--signature-color);
+            color: white;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .algo-badge.algo-none {
+            background: var(--warning);
+        }
+        
+        .algo-desc {
+            color: var(--text-muted);
+        }
+        
+        footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        footer a {
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .keyboard-hint {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            margin-top: 0.75rem;
+        }
+        
+        kbd {
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.15rem 0.4rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text);
+            color: var(--bg);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 1000;
+            animation: toastIn 0.25s ease;
+        }
+        
+        @keyframes toastIn {
+            from { opacity: 0; transform: translate(-50%, 10px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        
+        @media (max-width: 640px) {
+            h1 { font-size: 1.75rem; }
+            .container { padding: 1.5rem 1rem; }
+            .input-actions { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+            .status-badge { margin: 0.75rem 0 0 0; width: 100%; justify-content: center; }
+            .claim-row { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
+            .claim-value { max-width: 100%; text-align: left; }
+            .token-preview { font-size: 0.6rem; padding: 1.5rem 0.75rem 0.75rem; }
+            .section-content { font-size: 0.72rem; padding: 0.75rem; }
+            .share-link { flex-direction: column; align-items: stretch; gap: 0.75rem; }
+            .share-link-text { text-align: center; }
+            .share-link .btn { width: 100%; justify-content: center; }
+            .sample-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme (T)">🌙</button>
+    
+    <div class="container">
+        <header>
+            <h1>JWT Decoder</h1>
+            <p class="tagline">Decode and inspect JSON Web Tokens instantly</p>
+            <span class="security-note">🔒 100% client-side — tokens never leave your browser</span>
+        </header>
+        
+        <main>
+            <div class="input-section">
+                <div class="input-label">
+                    <label for="jwt-input">Paste your JWT</label>
+                    <span id="char-count" class="char-count"></span>
+                </div>
+                <div class="jwt-input-wrapper">
+                    <textarea 
+                        id="jwt-input" 
+                        class="jwt-input" 
+                        placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ..."
+                        spellcheck="false"
+                    ></textarea>
+                </div>
+                <div class="input-actions">
+                    <button class="btn btn-primary" onclick="decodeJWT()">
+                        🔓 Decode
+                    </button>
+                    <button class="btn btn-secondary" onclick="pasteFromClipboard()">
+                        📋 Paste
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearAll()">
+                        ✕ Clear
+                    </button>
+                    <div id="status-badge"></div>
+                </div>
+                <p class="keyboard-hint">
+                    <kbd>Ctrl</kbd>+<kbd>Enter</kbd> decode · <kbd>V</kbd> paste · <kbd>X</kbd> clear · <kbd>T</kbd> theme
+                </p>
+                
+                <details class="sample-tokens">
+                    <summary>🧪 Try a sample token</summary>
+                    <div class="sample-grid">
+                        <button class="sample-btn" onclick="loadSample('basic')">
+                            <div class="sample-name">Basic</div>
+                            <div class="sample-desc">Simple user claims</div>
+                        </button>
+                        <button class="sample-btn" onclick="loadSample('expired')">
+                            <div class="sample-name">Expired</div>
+                            <div class="sample-desc">Past expiry date</div>
+                        </button>
+                        <button class="sample-btn" onclick="loadSample('admin')">
+                            <div class="sample-name">Admin</div>
+                            <div class="sample-desc">Roles & permissions</div>
+                        </button>
+                        <button class="sample-btn" onclick="loadSample('oauth')">
+                            <div class="sample-name">OAuth</div>
+                            <div class="sample-desc">Scopes & audience</div>
+                        </button>
+                    </div>
+                </details>
+            </div>
+            
+            <div id="error-message" class="error-message">
+                <span class="error-icon">⚠️</span>
+                <span id="error-text"></span>
+            </div>
+            
+            <div id="output-section" class="output-section">
+                <div id="share-link" class="share-link" style="display: none;">
+                    <span class="share-link-icon">🔗</span>
+                    <span id="share-link-text" class="share-link-text"></span>
+                    <button class="btn btn-secondary" onclick="copyShareLink()">Copy Link</button>
+                </div>
+                
+                <div id="token-preview" class="token-preview">
+                    <span class="token-preview-label">Token Structure</span>
+                </div>
+                
+                <div class="decoded-sections">
+                    <div class="decoded-section">
+                        <div class="section-header header-section">
+                            <span class="section-title">
+                                Header
+                                <span class="section-badge">HEADER</span>
+                            </span>
+                            <button class="copy-btn" onclick="copySection('header')">Copy</button>
+                        </div>
+                        <div id="header-content" class="section-content"></div>
+                    </div>
+                    
+                    <div class="decoded-section">
+                        <div class="section-header payload-section">
+                            <span class="section-title">
+                                Payload
+                                <span class="section-badge">PAYLOAD</span>
+                            </span>
+                            <button class="copy-btn" onclick="copySection('payload')">Copy</button>
+                        </div>
+                        <div id="payload-content" class="section-content"></div>
+                        <div id="claims-info" class="claims-info">
+                            <div class="claims-title">Standard Claims</div>
+                            <div id="claims-rows"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="decoded-section">
+                        <div class="section-header signature-section">
+                            <span class="section-title">
+                                Signature
+                                <span class="section-badge">VERIFY</span>
+                            </span>
+                            <button class="copy-btn" onclick="copySection('signature')">Copy</button>
+                        </div>
+                        <div id="signature-content" class="section-content"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+        </footer>
+    </div>
+
+    <script>
+        // Theme
+        const theme = localStorage.getItem('theme') || 
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+        updateThemeIcon();
+        
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon();
+        }
+        
+        function updateThemeIcon() {
+            const btn = document.querySelector('.theme-toggle');
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            btn.textContent = isDark ? '☀️' : '🌙';
+        }
+        
+        // Algorithm descriptions
+        const algoDescriptions = {
+            'HS256': 'HMAC with SHA-256',
+            'HS384': 'HMAC with SHA-384',
+            'HS512': 'HMAC with SHA-512',
+            'RS256': 'RSA Signature with SHA-256',
+            'RS384': 'RSA Signature with SHA-384',
+            'RS512': 'RSA Signature with SHA-512',
+            'ES256': 'ECDSA with P-256 and SHA-256',
+            'ES384': 'ECDSA with P-384 and SHA-384',
+            'ES512': 'ECDSA with P-521 and SHA-512',
+            'PS256': 'RSA-PSS with SHA-256',
+            'PS384': 'RSA-PSS with SHA-384',
+            'PS512': 'RSA-PSS with SHA-512',
+            'EdDSA': 'Edwards-curve Digital Signature',
+            'none': '⚠️ No signature (insecure)'
+        };
+        
+        // Sample tokens
+        const samples = {
+            basic: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZW1haWwiOiJqb2huQGV4YW1wbGUuY29tIiwiaWF0IjoxNTE2MjM5MDIyfQ.fake_signature_here',
+            expired: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzEyMyIsIm5hbWUiOiJKYW5lIFNtaXRoIiwiaWF0IjoxNjAwMDAwMDAwLCJleHAiOjE2MDAwMDM2MDB9.expired_signature',
+            admin: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImtleS0xMjMifQ.eyJzdWIiOiJhZG1pbl8wMDEiLCJuYW1lIjoiQWRtaW4gVXNlciIsInJvbGVzIjpbImFkbWluIiwidXNlciIsIm1vZGVyYXRvciJdLCJwZXJtaXNzaW9ucyI6WyJyZWFkIiwid3JpdGUiLCJkZWxldGUiXSwiaWF0IjoxNzA5MjUwMDAwLCJleHAiOjE3NDA4NzI0MDB9.admin_signature',
+            oauth: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2F1dGguZXhhbXBsZS5jb20iLCJzdWIiOiJvYXV0aHwyMTIzNDU2IiwiYXVkIjpbImh0dHBzOi8vYXBpLmV4YW1wbGUuY29tIl0sInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJhenAiOiJjbGllbnRfYXBwXzEyMyIsImlhdCI6MTcwOTI1MDAwMCwiZXhwIjoxNzQwODcyNDAwfQ.oauth_signature'
+        };
+        
+        function loadSample(type) {
+            document.getElementById('jwt-input').value = samples[type];
+            updateCharCount();
+            decodeJWT();
+        }
+        
+        // Character count
+        function updateCharCount() {
+            const input = document.getElementById('jwt-input').value;
+            const countEl = document.getElementById('char-count');
+            if (input.length > 0) {
+                countEl.textContent = `${input.length.toLocaleString()} chars`;
+            } else {
+                countEl.textContent = '';
+            }
+        }
+        
+        // Decode
+        let decodedData = { header: null, payload: null, signature: null, raw: null };
+        
+        function decodeJWT() {
+            const input = document.getElementById('jwt-input').value.trim();
+            const errorEl = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            const outputEl = document.getElementById('output-section');
+            const statusEl = document.getElementById('status-badge');
+            
+            errorEl.classList.remove('visible');
+            outputEl.classList.remove('visible');
+            statusEl.innerHTML = '';
+            
+            if (!input) return;
+            
+            const parts = input.split('.');
+            
+            if (parts.length !== 3) {
+                showError(`Invalid JWT format. Expected 3 parts separated by dots, got ${parts.length}. A valid JWT looks like: header.payload.signature`);
+                return;
+            }
+            
+            try {
+                const header = JSON.parse(atob(parts[0].replace(/-/g, '+').replace(/_/g, '/')));
+                const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+                const signature = parts[2];
+                
+                decodedData = { header, payload, signature, raw: input };
+                
+                // Update share link
+                updateShareLink(input);
+                
+                // Token preview with colors
+                const previewEl = document.getElementById('token-preview');
+                previewEl.innerHTML = 
+                    `<span class="token-preview-label">Token Structure</span>` +
+                    `<span class="token-header">${parts[0]}</span><span class="token-dot">.</span><span class="token-payload">${parts[1]}</span><span class="token-dot">.</span><span class="token-signature">${parts[2]}</span>`;
+                
+                // Header
+                document.getElementById('header-content').innerHTML = syntaxHighlight(JSON.stringify(header, null, 2));
+                
+                // Payload
+                document.getElementById('payload-content').innerHTML = syntaxHighlight(JSON.stringify(payload, null, 2));
+                
+                // Claims info
+                renderClaimsInfo(payload);
+                
+                // Signature with algorithm info
+                const algoDesc = algoDescriptions[header.alg] || 'Unknown algorithm';
+                const algoClass = header.alg === 'none' ? 'algo-badge algo-none' : 'algo-badge';
+                document.getElementById('signature-content').innerHTML = 
+                    `<div style="word-break: break-all; color: var(--text-muted);">${signature || '(empty)'}</div>
+                    <div class="algo-info">
+                        <span class="${algoClass}">${header.alg || 'none'}</span>
+                        <span class="algo-desc">${algoDesc}</span>
+                    </div>`;
+                
+                // Status
+                const status = getTokenStatus(payload);
+                statusEl.innerHTML = `<span class="status-badge ${status.class}">${status.icon} ${status.text}</span>`;
+                
+                outputEl.classList.add('visible');
+                
+            } catch (e) {
+                showError('Failed to decode JWT. The token appears malformed. Make sure you\'ve copied the complete token without extra whitespace.');
+            }
+        }
+        
+        function updateShareLink(token) {
+            const shareEl = document.getElementById('share-link');
+            const textEl = document.getElementById('share-link-text');
+            
+            if (token.length < 2000) {
+                const url = `${window.location.origin}${window.location.pathname}?token=${encodeURIComponent(token)}`;
+                textEl.textContent = url;
+                shareEl.style.display = 'flex';
+                history.replaceState(null, '', `?token=${encodeURIComponent(token)}`);
+            } else {
+                shareEl.style.display = 'none';
+                history.replaceState(null, '', window.location.pathname);
+            }
+        }
+        
+        function copyShareLink() {
+            const url = document.getElementById('share-link-text').textContent;
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('Link copied!');
+            });
+        }
+        
+        function showError(message) {
+            const errorEl = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            errorText.textContent = message;
+            errorEl.classList.add('visible');
+        }
+        
+        function syntaxHighlight(json) {
+            return json
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+                    let cls = 'json-number';
+                    if (/^"/.test(match)) {
+                        if (/:$/.test(match)) {
+                            cls = 'json-key';
+                        } else {
+                            cls = 'json-string';
+                        }
+                    } else if (/true|false/.test(match)) {
+                        cls = 'json-boolean';
+                    } else if (/null/.test(match)) {
+                        cls = 'json-null';
+                    }
+                    return `<span class="${cls}">${match}</span>`;
+                });
+        }
+        
+        function getTokenStatus(payload) {
+            const now = Math.floor(Date.now() / 1000);
+            
+            if (payload.exp && payload.exp < now) {
+                const expiredAgo = getRelativeTime(payload.exp);
+                return { class: 'status-invalid', icon: '⚠️', text: `Expired ${expiredAgo.replace(' ago', '')} ago` };
+            }
+            
+            if (payload.nbf && payload.nbf > now) {
+                return { class: 'status-warning', icon: '⏳', text: 'Not yet valid' };
+            }
+            
+            if (payload.exp) {
+                const expiresIn = getRelativeTime(payload.exp);
+                return { class: 'status-valid', icon: '✓', text: `Valid · expires ${expiresIn}` };
+            }
+            
+            return { class: 'status-warning', icon: '∞', text: 'No expiration' };
+        }
+        
+        function renderClaimsInfo(payload) {
+            const claimsEl = document.getElementById('claims-rows');
+            const now = Math.floor(Date.now() / 1000);
+            let html = '';
+            
+            const claims = [
+                { key: 'iss', label: 'Issuer', abbr: 'iss' },
+                { key: 'sub', label: 'Subject', abbr: 'sub' },
+                { key: 'aud', label: 'Audience', abbr: 'aud' },
+                { key: 'iat', label: 'Issued At', abbr: 'iat', isTime: true },
+                { key: 'exp', label: 'Expires', abbr: 'exp', isTime: true },
+                { key: 'nbf', label: 'Not Before', abbr: 'nbf', isTime: true },
+                { key: 'jti', label: 'JWT ID', abbr: 'jti' }
+            ];
+            
+            let found = false;
+            claims.forEach(claim => {
+                if (payload[claim.key] !== undefined) {
+                    found = true;
+                    let value = payload[claim.key];
+                    let extraClass = '';
+                    
+                    if (claim.isTime) {
+                        const date = new Date(value * 1000);
+                        const relative = getRelativeTime(value);
+                        value = `${date.toLocaleString()} (${relative})`;
+                        
+                        if (claim.key === 'exp' && payload.exp < now) {
+                            extraClass = 'expired';
+                        } else if (claim.key === 'exp') {
+                            extraClass = 'valid';
+                        }
+                    }
+                    
+                    if (Array.isArray(value)) {
+                        value = value.join(', ');
+                    }
+                    
+                    html += `<div class="claim-row">
+                        <span class="claim-label">
+                            <span class="claim-abbr">${claim.abbr}</span>
+                            ${claim.label}
+                        </span>
+                        <span class="claim-value ${extraClass}">${value}</span>
+                    </div>`;
+                }
+            });
+            
+            claimsEl.innerHTML = html || '<div style="color: var(--text-muted); text-align: center; padding: 0.5rem;">No standard claims found</div>';
+            document.getElementById('claims-info').style.display = found ? 'block' : 'none';
+        }
+        
+        function getRelativeTime(timestamp) {
+            const now = Math.floor(Date.now() / 1000);
+            const diff = timestamp - now;
+            const absDiff = Math.abs(diff);
+            
+            const units = [
+                { name: 'year', seconds: 31536000 },
+                { name: 'month', seconds: 2592000 },
+                { name: 'day', seconds: 86400 },
+                { name: 'hour', seconds: 3600 },
+                { name: 'minute', seconds: 60 }
+            ];
+            
+            for (const unit of units) {
+                const count = Math.floor(absDiff / unit.seconds);
+                if (count >= 1) {
+                    const plural = count > 1 ? 's' : '';
+                    return diff > 0 
+                        ? `in ${count} ${unit.name}${plural}`
+                        : `${count} ${unit.name}${plural} ago`;
+                }
+            }
+            
+            return diff > 0 ? 'in a few seconds' : 'just now';
+        }
+        
+        function copySection(section) {
+            let text = '';
+            if (section === 'header') {
+                text = JSON.stringify(decodedData.header, null, 2);
+            } else if (section === 'payload') {
+                text = JSON.stringify(decodedData.payload, null, 2);
+            } else if (section === 'signature') {
+                text = decodedData.signature;
+            }
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied!');
+            });
+        }
+        
+        function showToast(message) {
+            document.querySelectorAll('.toast').forEach(t => t.remove());
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+        
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('jwt-input').value = text;
+                updateCharCount();
+                decodeJWT();
+                showToast('Pasted!');
+            } catch (e) {
+                showToast('Unable to paste');
+            }
+        }
+        
+        function clearAll() {
+            document.getElementById('jwt-input').value = '';
+            document.getElementById('output-section').classList.remove('visible');
+            document.getElementById('error-message').classList.remove('visible');
+            document.getElementById('status-badge').innerHTML = '';
+            document.getElementById('share-link').style.display = 'none';
+            document.getElementById('char-count').textContent = '';
+            decodedData = { header: null, payload: null, signature: null, raw: null };
+            history.replaceState(null, '', window.location.pathname);
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', e => {
+            const isTyping = document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT';
+            
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                decodeJWT();
+            }
+            
+            if (!isTyping) {
+                if (e.key === 't' || e.key === 'T') {
+                    e.preventDefault();
+                    toggleTheme();
+                }
+                if (e.key === 'v' || e.key === 'V') {
+                    e.preventDefault();
+                    pasteFromClipboard();
+                }
+                if (e.key === 'x' || e.key === 'X') {
+                    e.preventDefault();
+                    clearAll();
+                }
+            }
+        });
+        
+        // Input events
+        document.getElementById('jwt-input').addEventListener('input', () => {
+            updateCharCount();
+            const value = document.getElementById('jwt-input').value.trim();
+            if (value && value.split('.').length === 3) {
+                decodeJWT();
+            }
+        });
+        
+        // Load token from URL on page load
+        window.addEventListener('load', () => {
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('token');
+            if (token) {
+                document.getElementById('jwt-input').value = token;
+                updateCharCount();
+                decodeJWT();
+            }
+        });
+    </script>
+</body>
+</html>
