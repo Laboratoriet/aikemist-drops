@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Table Generator — Visual Table Builder | Aikemist</title>
+    <meta name="description" content="Create markdown tables visually. Add rows, columns, edit cells, set alignment, import CSV, and copy perfect markdown. No more counting pipes.">
+    <meta property="og:title" content="Markdown Table Generator — Aikemist">
+    <meta property="og:description" content="Create markdown tables visually. No more counting pipes and dashes.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://day063.aikemist.com">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        :root {
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --surface-alt: #f5f5f5;
+            --text: #1a1a1a;
+            --text-muted: #666666;
+            --border: #e5e5e5;
+            --primary: #2563eb;
+            --primary-light: rgba(37, 99, 235, 0.1);
+            --success: #16a34a;
+            --error: #dc2626;
+        }
+        
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-alt: #1a1a1a;
+            --text: #f5f5f5;
+            --text-muted: #a3a3a3;
+            --border: #2a2a2a;
+            --primary: #3b82f6;
+            --primary-light: rgba(59, 130, 246, 0.15);
+        }
+        
+        body {
+            font-family: 'Jost', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        
+        .tagline {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 100;
+        }
+        
+        .theme-toggle:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .btn {
+            padding: 0.6rem 1.25rem;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:active { transform: scale(0.98); }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover { filter: brightness(1.1); }
+        
+        .btn-secondary {
+            background: var(--surface-alt);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary);
+        }
+        
+        .btn-small {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.8rem;
+        }
+        
+        .table-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--surface-alt);
+            border-bottom: 1px solid var(--border);
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .section-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .size-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 12px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .table-container {
+            padding: 1rem;
+            overflow-x: auto;
+        }
+        
+        .editable-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .editable-table th,
+        .editable-table td {
+            border: 1px solid var(--border);
+            padding: 0;
+            position: relative;
+            min-width: 120px;
+        }
+        
+        .editable-table th {
+            background: var(--primary-light);
+        }
+        
+        .editable-table input {
+            width: 100%;
+            padding: 0.65rem 0.75rem;
+            border: none;
+            background: transparent;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+        
+        .editable-table input:focus {
+            outline: none;
+            background: var(--primary-light);
+        }
+        
+        .editable-table th input {
+            font-weight: 600;
+        }
+        
+        .controls-row {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+        
+        .control-spacer {
+            width: 36px;
+            flex-shrink: 0;
+        }
+        
+        .col-control {
+            flex: 1;
+            min-width: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.2rem;
+            padding: 0.35rem;
+            border-right: 1px solid var(--border);
+        }
+        
+        .col-control:last-child {
+            border-right: none;
+        }
+        
+        .ctrl-btn {
+            padding: 0.22rem 0.38rem;
+            font-size: 0.68rem;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.15s;
+            line-height: 1;
+        }
+        
+        .ctrl-btn:hover {
+            background: var(--surface-alt);
+            color: var(--text);
+            border-color: var(--border);
+        }
+        
+        .ctrl-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .ctrl-btn.delete:hover {
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--error);
+            border-color: rgba(220, 38, 38, 0.3);
+        }
+        
+        .row-control {
+            width: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: none !important;
+            background: var(--surface) !important;
+        }
+        
+        .output-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .output-content {
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            line-height: 1.7;
+            white-space: pre;
+            overflow-x: auto;
+            color: var(--text);
+            min-height: 80px;
+            background: var(--surface);
+        }
+        
+        .preview-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .preview-content {
+            padding: 1rem;
+            overflow-x: auto;
+        }
+        
+        .preview-content table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .preview-content th,
+        .preview-content td {
+            border: 1px solid var(--border);
+            padding: 0.6rem 0.75rem;
+        }
+        
+        .preview-content th {
+            background: var(--surface-alt);
+            font-weight: 600;
+        }
+        
+        .preview-content td[data-align="center"],
+        .preview-content th[data-align="center"] { text-align: center; }
+        .preview-content td[data-align="right"],
+        .preview-content th[data-align="right"] { text-align: right; }
+        
+        .import-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            animation: fadeIn 0.15s ease;
+        }
+        
+        .import-modal.visible {
+            display: flex;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.2s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .modal-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .modal-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            resize: vertical;
+            margin-bottom: 1rem;
+        }
+        
+        .modal-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+        
+        .format-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+        
+        .format-hint code {
+            background: var(--surface-alt);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+        }
+        
+        footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        footer a {
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        footer a:hover { text-decoration: underline; }
+        
+        .keyboard-hint {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        
+        kbd {
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.15rem 0.4rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text);
+            color: var(--bg);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 1001;
+            animation: toastIn 0.25s ease;
+        }
+        
+        @keyframes toastIn {
+            from { opacity: 0; transform: translate(-50%, 10px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        
+        .compact-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .compact-toggle input {
+            cursor: pointer;
+        }
+        
+        @media (max-width: 640px) {
+            h1 { font-size: 1.75rem; }
+            .container { padding: 1.5rem 1rem; }
+            .section-header { flex-direction: column; align-items: flex-start; }
+            .section-actions { width: 100%; flex-wrap: wrap; }
+            .btn-small { flex: 1; justify-content: center; min-width: 70px; }
+            .editable-table th, .editable-table td { min-width: 100px; }
+            .col-control { min-width: 100px; }
+            .size-badge { order: -1; }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme (T)">🌙</button>
+    
+    <div class="container">
+        <header>
+            <h1>Markdown Table Generator</h1>
+            <p class="tagline">Create tables visually — no more counting pipes and dashes</p>
+        </header>
+        
+        <main>
+            <div class="table-section">
+                <div class="section-header">
+                    <span class="section-title">📊 Edit Table</span>
+                    <div class="section-actions">
+                        <span class="size-badge" id="size-badge">3×3</span>
+                        <button class="btn btn-secondary btn-small" onclick="addColumn()">+ Col</button>
+                        <button class="btn btn-secondary btn-small" onclick="addRow()">+ Row</button>
+                        <button class="btn btn-secondary btn-small" onclick="showImport()">📥 Import</button>
+                        <button class="btn btn-secondary btn-small" onclick="resetTable()">↺ Reset</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <div id="controls-row" class="controls-row"></div>
+                    <table class="editable-table" id="editable-table">
+                        <thead id="table-head"></thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="output-section">
+                <div class="section-header">
+                    <span class="section-title">📝 Markdown</span>
+                    <div class="section-actions">
+                        <label class="compact-toggle">
+                            <input type="checkbox" id="compact-mode" onchange="generateMarkdown()">
+                            Compact
+                        </label>
+                        <button class="btn btn-primary btn-small" onclick="copyMarkdown()">📋 Copy</button>
+                    </div>
+                </div>
+                <div id="markdown-output" class="output-content"></div>
+            </div>
+            
+            <div class="preview-section">
+                <div class="section-header">
+                    <span class="section-title">👁️ Preview</span>
+                </div>
+                <div id="preview-content" class="preview-content"></div>
+            </div>
+            
+            <p class="keyboard-hint">
+                <kbd>Tab</kbd> next cell · <kbd>Shift</kbd>+<kbd>Tab</kbd> previous · <kbd>C</kbd> copy · <kbd>T</kbd> theme
+            </p>
+        </main>
+        
+        <footer>
+            <a href="https://aikemist.com">aikemist.com</a> · Made by <a href="https://alkemist.no">Alkemist</a>
+        </footer>
+    </div>
+    
+    <div id="import-modal" class="import-modal" onclick="if(event.target === this) hideImport()">
+        <div class="modal-content">
+            <div class="modal-title">📥 Import Data</div>
+            <p class="modal-text">Paste tabular data. First row becomes headers.</p>
+            <p class="format-hint">Supports: <code>CSV</code> <code>TSV</code> <code>Semicolon-separated</code></p>
+            <textarea id="import-textarea" class="modal-textarea" placeholder="Name,Age,City
+John,30,New York
+Jane,25,London
+
+— or paste from Excel/Sheets —"></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="hideImport()">Cancel</button>
+                <button class="btn btn-primary" onclick="doImport()">Import</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme
+        const theme = localStorage.getItem('theme') || 
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+        updateThemeIcon();
+        
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon();
+        }
+        
+        function updateThemeIcon() {
+            const btn = document.querySelector('.theme-toggle');
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            btn.textContent = isDark ? '☀️' : '🌙';
+        }
+        
+        // Table state
+        let columns = 3;
+        let rows = 3;
+        let headers = ['Header 1', 'Header 2', 'Header 3'];
+        let data = [
+            ['', '', ''],
+            ['', '', ''],
+            ['', '', '']
+        ];
+        let alignments = ['left', 'left', 'left'];
+        
+        function renderTable() {
+            const controlsRow = document.getElementById('controls-row');
+            const thead = document.getElementById('table-head');
+            const tbody = document.getElementById('table-body');
+            
+            // Column controls
+            controlsRow.innerHTML = `
+                <div class="control-spacer"></div>
+                ${headers.map((_, i) => `
+                    <div class="col-control">
+                        <button class="ctrl-btn ${alignments[i] === 'left' ? 'active' : ''}" onclick="setAlign(${i}, 'left')" title="Left">⬅</button>
+                        <button class="ctrl-btn ${alignments[i] === 'center' ? 'active' : ''}" onclick="setAlign(${i}, 'center')" title="Center">⬌</button>
+                        <button class="ctrl-btn ${alignments[i] === 'right' ? 'active' : ''}" onclick="setAlign(${i}, 'right')" title="Right">➡</button>
+                        ${columns > 1 ? `<button class="ctrl-btn delete" onclick="deleteColumn(${i})" title="Delete">✕</button>` : ''}
+                    </div>
+                `).join('')}
+            `;
+            
+            // Header row
+            thead.innerHTML = `<tr>
+                <td class="row-control"></td>
+                ${headers.map((h, i) => `
+                    <th><input type="text" value="${escapeHtml(h)}" oninput="updateHeader(${i}, this.value)" data-row="-1" data-col="${i}" placeholder="Header"></th>
+                `).join('')}
+            </tr>`;
+            
+            // Data rows
+            tbody.innerHTML = data.map((row, ri) => `
+                <tr>
+                    <td class="row-control">
+                        ${rows > 1 ? `<button class="ctrl-btn delete" onclick="deleteRow(${ri})" title="Delete row">✕</button>` : ''}
+                    </td>
+                    ${row.map((cell, ci) => `
+                        <td><input type="text" value="${escapeHtml(cell)}" oninput="updateCell(${ri}, ${ci}, this.value)" data-row="${ri}" data-col="${ci}" placeholder=""></td>
+                    `).join('')}
+                </tr>
+            `).join('');
+            
+            updateSizeBadge();
+            generateMarkdown();
+        }
+        
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        
+        function escapeMd(str) {
+            // Escape pipe characters in content
+            return String(str).replace(/\|/g, '\\|');
+        }
+        
+        function updateHeader(index, value) {
+            headers[index] = value;
+            generateMarkdown();
+        }
+        
+        function updateCell(row, col, value) {
+            data[row][col] = value;
+            generateMarkdown();
+        }
+        
+        function setAlign(index, align) {
+            alignments[index] = align;
+            renderTable();
+        }
+        
+        function addColumn() {
+            columns++;
+            headers.push(`Header ${columns}`);
+            alignments.push('left');
+            data.forEach(row => row.push(''));
+            renderTable();
+        }
+        
+        function addRow() {
+            rows++;
+            data.push(new Array(columns).fill(''));
+            renderTable();
+        }
+        
+        function deleteColumn(index) {
+            if (columns <= 1) return;
+            columns--;
+            headers.splice(index, 1);
+            alignments.splice(index, 1);
+            data.forEach(row => row.splice(index, 1));
+            renderTable();
+        }
+        
+        function deleteRow(index) {
+            if (rows <= 1) return;
+            rows--;
+            data.splice(index, 1);
+            renderTable();
+        }
+        
+        function resetTable() {
+            columns = 3;
+            rows = 3;
+            headers = ['Header 1', 'Header 2', 'Header 3'];
+            data = [['', '', ''], ['', '', ''], ['', '', '']];
+            alignments = ['left', 'left', 'left'];
+            renderTable();
+        }
+        
+        function updateSizeBadge() {
+            document.getElementById('size-badge').textContent = `${columns}×${rows}`;
+        }
+        
+        function generateMarkdown() {
+            const compact = document.getElementById('compact-mode').checked;
+            
+            if (compact) {
+                // Compact mode - no padding
+                let md = '| ' + headers.map(h => escapeMd(h)).join(' | ') + ' |\n';
+                md += '| ' + alignments.map(align => {
+                    if (align === 'center') return ':---:';
+                    if (align === 'right') return '---:';
+                    return '---';
+                }).join(' | ') + ' |\n';
+                data.forEach(row => {
+                    md += '| ' + row.map(cell => escapeMd(cell || '')).join(' | ') + ' |\n';
+                });
+                document.getElementById('markdown-output').textContent = md;
+            } else {
+                // Pretty mode - padded columns
+                const widths = headers.map((h, i) => {
+                    let max = String(h).length;
+                    data.forEach(row => {
+                        const len = String(row[i] || '').length;
+                        if (len > max) max = len;
+                    });
+                    return Math.max(max, 3);
+                });
+                
+                let md = '| ' + headers.map((h, i) => escapeMd(h).padEnd(widths[i])).join(' | ') + ' |\n';
+                md += '| ' + alignments.map((align, i) => {
+                    const w = widths[i];
+                    if (align === 'center') return ':' + '-'.repeat(Math.max(w - 2, 1)) + ':';
+                    if (align === 'right') return '-'.repeat(Math.max(w - 1, 1)) + ':';
+                    return '-'.repeat(w);
+                }).join(' | ') + ' |\n';
+                data.forEach(row => {
+                    md += '| ' + row.map((cell, i) => escapeMd(cell || '').padEnd(widths[i])).join(' | ') + ' |\n';
+                });
+                document.getElementById('markdown-output').textContent = md;
+            }
+            
+            renderPreview();
+        }
+        
+        function renderPreview() {
+            let html = '<table><thead><tr>';
+            headers.forEach((h, i) => {
+                html += `<th data-align="${alignments[i]}">${escapeHtml(h)}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            data.forEach(row => {
+                html += '<tr>';
+                row.forEach((cell, i) => {
+                    html += `<td data-align="${alignments[i]}">${escapeHtml(cell || '') || '&nbsp;'}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            document.getElementById('preview-content').innerHTML = html;
+        }
+        
+        function copyMarkdown() {
+            const md = document.getElementById('markdown-output').textContent;
+            navigator.clipboard.writeText(md).then(() => {
+                showToast('Copied!');
+            });
+        }
+        
+        // Import
+        function showImport() {
+            document.getElementById('import-modal').classList.add('visible');
+            document.getElementById('import-textarea').focus();
+        }
+        
+        function hideImport() {
+            document.getElementById('import-modal').classList.remove('visible');
+            document.getElementById('import-textarea').value = '';
+        }
+        
+        function doImport() {
+            const text = document.getElementById('import-textarea').value.trim();
+            if (!text) return;
+            
+            const lines = text.split('\n').filter(l => l.trim());
+            if (lines.length === 0) return;
+            
+            // Detect delimiter
+            let delimiter = ',';
+            const firstLine = lines[0];
+            if (firstLine.includes('\t')) delimiter = '\t';
+            else if (firstLine.split(';').length > firstLine.split(',').length) delimiter = ';';
+            
+            // Parse with simple CSV handling
+            const parsed = lines.map(line => {
+                const cells = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"' && (i === 0 || line[i-1] !== '\\')) {
+                        inQuotes = !inQuotes;
+                    } else if (char === delimiter && !inQuotes) {
+                        cells.push(current.trim().replace(/^["']|["']$/g, ''));
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                cells.push(current.trim().replace(/^["']|["']$/g, ''));
+                return cells;
+            });
+            
+            if (parsed.length < 1 || parsed[0].length === 0) return;
+            
+            headers = parsed[0];
+            columns = headers.length;
+            data = parsed.slice(1);
+            rows = data.length;
+            
+            // Normalize row lengths
+            data = data.map(row => {
+                while (row.length < columns) row.push('');
+                return row.slice(0, columns);
+            });
+            
+            if (rows === 0) {
+                data = [new Array(columns).fill('')];
+                rows = 1;
+            }
+            
+            alignments = new Array(columns).fill('left');
+            
+            hideImport();
+            renderTable();
+            showToast(`Imported ${columns}×${rows} table`);
+        }
+        
+        function showToast(message) {
+            document.querySelectorAll('.toast').forEach(t => t.remove());
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+        
+        // Keyboard
+        document.addEventListener('keydown', e => {
+            const isTyping = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
+            
+            if (!isTyping) {
+                if (e.key === 't' || e.key === 'T') {
+                    e.preventDefault();
+                    toggleTheme();
+                }
+                if (e.key === 'c' || e.key === 'C') {
+                    e.preventDefault();
+                    copyMarkdown();
+                }
+            }
+            
+            // Tab navigation
+            if (e.key === 'Tab' && document.activeElement.closest('.editable-table')) {
+                const inputs = Array.from(document.querySelectorAll('.editable-table input'));
+                const currentIndex = inputs.indexOf(document.activeElement);
+                
+                if (currentIndex !== -1) {
+                    e.preventDefault();
+                    const nextIndex = e.shiftKey 
+                        ? (currentIndex - 1 + inputs.length) % inputs.length
+                        : (currentIndex + 1) % inputs.length;
+                    inputs[nextIndex].focus();
+                    inputs[nextIndex].select();
+                }
+            }
+            
+            // Escape closes modal
+            if (e.key === 'Escape') {
+                hideImport();
+            }
+        });
+        
+        // Initialize
+        renderTable();
+    </script>
+</body>
+</html>
